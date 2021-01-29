@@ -13,4 +13,6 @@ public interface UserMapper {
     User queryUserByEmail(String userEmail);
     // 添加用户
     void addUser(User user);
+    // 更新用户信息
+    void updateUser(User user);
 }

@@ -12,4 +12,12 @@
     <insert id="addUser" parameterType="user">
         insert into t_user (username, user_email, user_type, user_password, salt) values (#{username}, #{userEmail}, #{userType}, #{userPassword}, #{salt});
     </insert>
+    <update id="updateUser" parameterType="user">
+        update t_user
+        <trim prefix="set" suffixOverrides=",">
+            <if test="userEmail!=null and userEmail!=''">user_email = #{userEmail},</if>
+            <if test="userPassword!=null and userPassword!=''">user_password = #{userPassword},</if>
+        </trim>
+        where username = #{username};
+    </update>
 </mapper>

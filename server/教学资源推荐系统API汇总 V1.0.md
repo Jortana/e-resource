@@ -120,9 +120,9 @@
 
 #### Request
 
-+ Method: **PUT**
++ Method: **PATCH**
 
-+ URL: `/v1.0/user/userID`
++ URL: `/v1.0/user/{username}`
 
 + Headers: `Content-Type: application/json`
 
@@ -130,8 +130,8 @@
 
   ```json
   {
-      "username": "ZhangSan",
-      "password": "123456Abc@"
+      "password": "123456Abc@",
+      "email": "ZhangSan@njnu.edu.com"
   }
   ```
 
