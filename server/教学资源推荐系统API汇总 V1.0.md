@@ -4,7 +4,7 @@
 
 ### 服务器API地址
 
-前缀：`http://服务器ip:9000/eresource/api`
+前缀：`http://服务器ip:9000/e-resource/api`
 
 完整的API地址为：`前缀` + `具体接口路径`
 
@@ -31,8 +31,8 @@
     ```json
     {
         "code": 200,
-        "message": "OK"
-        "data": 某种类型的数据，比如字符串，数字，对象（字典）等等
+        "message": "OK",
+        "data": "某种类型的数据，比如字符串，数字，对象（字典）等等"
     }
     ```
 
@@ -40,8 +40,8 @@
 
     ```json
     {
-        "code": 具体的错误码,
-        "message": 具体的错误信息字符串
+        "code": "具体的错误码",
+        "message": "具体的错误信息字符串"
     }
     ```
 
@@ -61,9 +61,9 @@
 
   ```json
   {
-      username: "zhangsan",
-      password: "123456Abc@",
-      email: "zhangsan@njnu.edu.com"
+      "username": "ZhangSan",
+      "password": "123456Abc@",
+      "email": "zhangsan@njnu.edu.com"
   }
   ```
 
@@ -96,8 +96,8 @@
 
   ```json
   {
-      username: "Zhangsan",
-      password: "123456Abc@"
+      "username": "ZhangSan",
+      "password": "123456Abc@"
   }
   ```
 
@@ -130,8 +130,8 @@
 
   ```json
   {
-      username: "Zhangsan",
-      password: "123456Abc@"
+      "username": "ZhangSan",
+      "password": "123456Abc@"
   }
   ```
 
@@ -178,12 +178,14 @@
                   "name": "静夜思",
                   "gradeSubject": 2,
                   "download": 21,
-                  "resource": "..."
+                  "resource": "...",
                   "collection": 97,
                   "url": "http://...",
-                  "entity": ["李白", ...]
+                  "entity": ["李白", "..."]
               },
-      		...
+              {
+                "...": "..."
+              } 
           ]
       }
   }
@@ -223,12 +225,14 @@
                   "gradeSubject": 2,
                   "name": "静夜思",
                   "download": 21,
-                  "resource": "..."
+                  "resource": "...",
                   "collection": 97,
                   "url": "http://...",
-                  "entity": ["李白", ...]
+                  "entity": ["李白", "..."]
               },
-      		...
+              {
+                  "...": "..."
+              } 
           ]
       }
   }
@@ -257,10 +261,10 @@
           "gradeSubject": 2,
           "name": "静夜思",
           "download": 21,
-          "resource": "..."
+          "resource": "...",
           "collection": 97,
           "url": "http://...",
-          "entity": ["李白", ...]
+          "entity": ["李白", "..."]
       }
   }
   ```
@@ -309,12 +313,14 @@
               "gradeSubject": 2,
               "name": "静夜思",
               "download": 21,
-              "resource": "..."
+              "resource": "...",
               "collection": 97,
               "url": "http://...",
-              "entity": ["李白", ...]
-          }，
-  		...
+              "entity": ["李白", "..."]
+          },
+          {
+              "...":  "..."
+          }
       ]
   }
   ```
@@ -357,13 +363,15 @@
               "gradeSubject": 2,
               "name": "静夜思",
               "download": 21,
-              "resource": "..."
+              "resource": "...",
               "collection": 97,
               "url": "http://...",
-              "entity": ["李白", ...],
+              "entity": ["李白", "..."],
      			"date": 1611837233181
-          }，
-  		...
+          },
+          {
+              "...": "..."
+          }
       ]
   }
   ```
@@ -385,7 +393,7 @@
 
   ```json
   {
-      "username": "Zhangsan"
+      "username": "ZhangSan",
       "duration": 100
   }
   ```
@@ -420,7 +428,10 @@
       "message": "查询成功",
       "data": [
           {
-              知识实体
+              "entity": "..."
+          },
+          {
+              "...": "..."
           }
       ]
   }
@@ -446,7 +457,7 @@
       "data": [
           {
               "planID": "1",
-              "content": 教案切片内容
+              "content": "教案切片内容"
           }
       ]
   }
@@ -472,7 +483,7 @@
       "data": [
           {
               "paperID": "1",
-              "content": 题目内容
+              "content": "题目内容"
           }
       ]
   }
@@ -523,8 +534,8 @@
   {
       "resourceType": 5,
       "name": "静夜思",
-      "gradeSubject": 2
-      "content": 资源内容
+      "gradeSubject": 2,
+      "content": "资源内容"
   }
   ```
 
@@ -557,7 +568,7 @@
   ```json
   {
       "resourceType": 5, 
-      "resouceID": 1
+      "resourceID": 1
   }
   ```
 
@@ -570,7 +581,7 @@
       "code": 200,
       "message": "删除成功 || 内容已被删除",
       "data": {
-  		"deletedCount": 1 || 0
+  		"deletedCount": "1 || 0"
   	}
   }
   ```
@@ -591,10 +602,9 @@
   {
       "resourceType": 5,
       "resourceID": 1,
-      --- 可选 ---
       "name": "静夜思",
-      "gradeSubject": 2
-      "content": 资源内容
+      "gradeSubject": 2,
+      "content": "资源内容"
   }
   ```
 

@@ -1,6 +1,18 @@
+# 运行端口
+server:
+  port: 9000
+
+# 数据库配置
 spring:
   datasource:
     username: root
-    password: password
-    url: jdbc:mysql://localhost:3306/test?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8
+    password: 123456
+    url: jdbc:mysql://223.2.51.185:3306/resources_class?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+# 整合mybatis
+mybatis:
+  type-aliases-package: cn.edu.njnu.pojo
+  mapper-locations: classpath:mybatis/mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
