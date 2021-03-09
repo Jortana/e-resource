@@ -53,8 +53,7 @@ export default {
 }
 
 .main-search >>> .el-input__prefix,
-.main-search >>> .el-input__suffix{
-  top: 2px;
+.main-search >>> .el-input__suffix {
   font-size: 16px;
   color: #9aa0a6;
 }

@@ -1,0 +1,109 @@
+<template>
+  <div
+    class="avatar"
+    @mouseenter="showCard"
+    @mouseleave="hideCard">
+    <el-avatar class="img" size="medium" icon="el-icon-user-solid"></el-avatar>
+    <transition name="el-fade-in-linear">
+      <el-card v-show="cardVisible" class="submenu-card" :body-style="{ padding: 0 }">
+        <div slot="header" class="clearfix">
+          <el-avatar icon="el-icon-user-solid"></el-avatar>
+          <div class="username">username</div>
+          <div class="email">username@test.com</div>
+        </div>
+        <div class="submenus">
+          <div class="submenu" v-for="submenu in submenus" :key="submenu.index">
+            <i class="icon" :class="submenu.icon"></i> <span v-html="submenu.label"></span>
+          </div>
+        </div>
+      </el-card>
+    </transition>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'Avatar',
+  data () {
+    return {
+      submenus: [
+        { label: '个人中心', index: 'a', icon: 'el-icon-user' },
+        { label: '我的收藏', index: 'b', icon: 'el-icon-folder-opened' },
+        { label: '退出', index: 'c', icon: 'el-icon-switch-button' }
+      ],
+      cardVisible: false
+    }
+  },
+  methods: {
+    showCard () {
+      this.cardVisible = true
+    },
+    hideCard () {
+      this.cardVisible = false
+    }
+  }
+}
+</script>
+
+<style scoped>
+.avatar {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.img,
+.submenu {
+  cursor: pointer;
+}
+
+.submenu-card {
+  width: 200px;
+  position: absolute;
+  top: 50px;
+  right: 0;
+  text-align: center;
+}
+
+.username {
+  font-size: 1.5rem;
+}
+
+.email {
+  color: #5f6368;
+}
+
+.submenus {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  text-align: left;
+}
+
+.submenu:last-child {
+  position: relative;
+  margin-top: 20px;
+}
+
+.submenu:last-child::after {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 0;
+  width: 100%;
+  border-top: 1px solid #ebeef5;
+}
+
+.submenu {
+  height: 2.5rem;
+  line-height: 2.5rem;
+  padding-left: 20px;
+}
+
+.submenu .icon {
+  color: #979797;
+}
+
+.submenu:hover {
+  background-color: #f4f4f4
+}
+</style>

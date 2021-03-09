@@ -11,8 +11,21 @@ const routes = [
   },
   {
     path: '/search',
-    name: 'resourceCenter',
+    name: 'ResourceCenter',
     component: () => import('@/view/ResourceCenter')
+  },
+  {
+    path: '/account',
+    name: 'Account',
+    component: () => import('@/view/Account/Account'),
+    redirect: '/account/home',
+    children: [
+      {
+        path: 'home',
+        name: 'UserInfo',
+        component: () => import('@/view/Account/Home')
+      }
+    ]
   }
 ]
 

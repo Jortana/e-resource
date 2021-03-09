@@ -44,4 +44,9 @@ main {
   max-width: 580px;
   transform: translateY(-50%);
 }
+
+.main-search >>> .el-input__prefix,
+.main-search >>> .el-input__suffix {
+  top: 2px;
+}
 </style>
