@@ -15,6 +15,11 @@ const routes = [
     component: () => import('@/view/ResourceCenter')
   },
   {
+    path: '/login',
+    name: 'Login',
+    component: () => import('@/view/Sign')
+  },
+  {
     path: '/account',
     name: 'Account',
     component: () => import('@/view/Account/Account'),

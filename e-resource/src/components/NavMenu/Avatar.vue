@@ -12,7 +12,7 @@
           <div class="email">username@test.com</div>
         </div>
         <div class="submenus">
-          <div class="submenu" v-for="submenu in submenus" :key="submenu.index">
+          <div class="submenu" v-for="submenu in submenus" :key="submenu.index" @click="jumpTo(submenu.index)">
             <i class="icon" :class="submenu.icon"></i> <span v-html="submenu.label"></span>
           </div>
         </div>
@@ -27,9 +27,9 @@ export default {
   data () {
     return {
       submenus: [
-        { label: '个人中心', index: 'a', icon: 'el-icon-user' },
-        { label: '我的收藏', index: 'b', icon: 'el-icon-folder-opened' },
-        { label: '退出', index: 'c', icon: 'el-icon-switch-button' }
+        { label: '个人中心', index: '/account', icon: 'el-icon-user' },
+        { label: '我的收藏', index: '/favourite', icon: 'el-icon-folder-opened' },
+        { label: '退出', index: 'logout', icon: 'el-icon-switch-button' }
       ],
       cardVisible: false
     }
@@ -40,6 +40,17 @@ export default {
     },
     hideCard () {
       this.cardVisible = false
+    },
+    jumpTo (index) {
+      if (index === 'logout') {
+        this.$router.push('/')
+      } else {
+        this.$router
+          .push(index)
+          .catch(() => {
+            this.$router.go(0)
+          })
+      }
     }
   }
 }
