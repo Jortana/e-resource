@@ -17,5 +17,4 @@ class EResourceApplicationTests {
 		System.out.println(dataSource.getClass());
 		System.out.println(dataSource.getConnection());
 	}
-
 }

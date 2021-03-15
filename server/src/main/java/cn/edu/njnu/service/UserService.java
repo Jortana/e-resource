@@ -27,6 +27,10 @@ public class UserService {
         return userMapper.queryUserByEmail(userEmail);
     }
 
+    public User getByNameNoPassword(String username) {
+        return userMapper.queryUserByNameNP(username);
+    }
+
     public boolean isExist(String username, String userEmail) {
         User user = getByName(username);
         if (user == null) {
@@ -56,6 +60,7 @@ public class UserService {
         user.setSalt(salt);
         user.setUserPassword(encodedPassword);
         user.setUserType(0);
+        user.setAvatar("default-avatar.jpg");
         addUser(user);
 
         return true;

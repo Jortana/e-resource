@@ -6,7 +6,8 @@
       <search class="search"></search>
     </div>
   </div>
-  <avatar class="avatar"></avatar>
+  <avatar v-if="this.$store.state.user" class="avatar"></avatar>
+  <el-button v-else class="avatar login-btn" @click="gotoLogin">登 录</el-button>
 </div>
 </template>
 
@@ -28,6 +29,14 @@ export default {
         searchContent: ''
       }
     }
+  },
+  methods: {
+    gotoLogin () {
+      this.$router.push({
+        path: '/login',
+        query: { redirect: this.$route.fullPath }
+      })
+    }
   }
 }
 </script>
@@ -37,6 +46,7 @@ export default {
   height: 50px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-top: 1rem;
 }
 
@@ -65,5 +75,11 @@ export default {
 
 .avatar {
   margin-right: 1rem;
+}
+
+.login-btn {
+  height: 0;
+  line-height: 0;
+  padding: 18px 20px;
 }
 </style>

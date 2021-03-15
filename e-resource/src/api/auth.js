@@ -1,4 +1,6 @@
-import request from '@/utils/request'
+import http from '@/utils/http'
+
+let baseURL = '/v1.0'
 
 /**
  * 注册
@@ -12,16 +14,11 @@ import request from '@/utils/request'
  * @param {string} params.username
  * @param {string} params.email
  * @param {string} params.password
- * @param {string} params.confirmPassword
  * @param {Number} params.period
  * @param {Number} params.grade
  */
-export function register (params) {
-  return request({
-    url: '/register',
-    method: 'post',
-    params
-  })
+export const register = (params) => {
+  return http.post(`${baseURL}/public/register`, params)
 }
 
 /**
@@ -32,10 +29,13 @@ export function register (params) {
  * @param {string} params.username
  * @param {string} params.password
  */
-export function login (params) {
-  return request({
-    url: '/login',
-    method: 'post',
-    params
-  })
+export const login = (params) => {
+  return http.post(`${baseURL}/public/login`, params)
+}
+
+/**
+ * 每次切换页面都发送一个验证请求，防止偷鸡登录
+ */
+export const authentication = () => {
+  return http.get(`${baseURL}/authentication`)
 }

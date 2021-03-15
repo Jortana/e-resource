@@ -3,7 +3,7 @@
     <div :class="signUpActive === true ? 'container active' : 'container'">
       <div class="user sign-in-box">
         <div class="img-box"><img src="@/assets/sign/in.jpg" alt=""></div>
-        <div class="form-box">
+        <div class="form-box" v-loading="signInLoading">
           <el-form class="form" ref="signInForm" :model="signIn">
             <h2>登录</h2>
             <el-form-item>
@@ -12,13 +12,13 @@
             <el-form-item>
               <el-input type="password" v-model="signIn.password" placeholder="密码"></el-input>
             </el-form-item>
-            <el-button type="primary" class="submit-btn">登录</el-button>
+            <el-button type="primary" class="submit-btn" @click="login">登录</el-button>
             <p class="signup">还没有账号吗？<span @click="toggle">点击注册</span></p>
           </el-form>
         </div>
       </div>
       <div class="user sign-up-box">
-        <div class="form-box">
+        <div class="form-box" v-loading="signUpLoading">
           <el-form class="form" ref="signUpForm" :model="signUp" :rules="signUpRules">
             <h2>创建你的账号</h2>
             <el-form-item prop="username">
@@ -59,6 +59,8 @@
 </template>
 
 <script>
+import { register, login } from '@/api/auth'
+
 export default {
   name: 'Sign',
   data () {
@@ -86,6 +88,8 @@ export default {
     }
     return {
       signUpActive: false,
+      signInLoading: false,
+      signUpLoading: false,
       signIn: {
         username: '',
         password: ''
@@ -139,12 +143,56 @@ export default {
     validateSignUp () {
       this.$refs.signUpForm.validate(valid => {
         if (valid) {
-          alert('submit!')
+          let signUp = this.signUp
+          this.signUpLoading = true
+          register({
+            username: signUp.username,
+            email: signUp.email,
+            password: signUp.password,
+            period: Number(signUp.grade[0]),
+            grade: Number(signUp.grade[1])
+          })
+            .then(response => {
+              console.log(response)
+              this.signUpLoading = false
+              if (response.data.code === 200) {
+                this.$message.success(response.data.message)
+                this.signIn.username = signUp.username
+                this.signUpActive = false
+                this.signUp.grade = ''
+                this.$refs.signUpForm.resetFields()
+              } else {
+                this.$message.warning(response.data.message)
+              }
+            })
         } else {
-          console.log('error submit!!')
           return false
         }
       })
+    },
+    login () {
+      let signIn = this.signIn
+      for (let userInfo in signIn) {
+        if (signIn[userInfo] === '') {
+          this.$message.warning('请填写用户名和密码')
+          return false
+        }
+      }
+      login({
+        username: signIn.username,
+        password: signIn.password
+      })
+        .then(response => {
+          console.log(response)
+          if (response.data.code === 200) {
+            this.$message.success(response.data.message)
+            this.$store.commit('login', response.data.data)
+            let path = this.$route.query.redirect
+            this.$router.replace({ path: path === '/' || path === undefined ? '/' : path })
+          } else {
+            this.$message.warning(response.data.message)
+          }
+        })
     }
   }
 }

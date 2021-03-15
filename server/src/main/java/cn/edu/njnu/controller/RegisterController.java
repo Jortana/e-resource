@@ -19,8 +19,9 @@ public class RegisterController {
         this.userService = userService;
     }
 
-    @PostMapping("/v1.0/open/register")
+    @PostMapping("/v1.0/public/register")
     public Result register(@RequestBody User user) {
+        System.out.println(user);
         String username = user.getUsername();
         username = HtmlUtils.htmlEscape(username);
         user.setUsername(username);

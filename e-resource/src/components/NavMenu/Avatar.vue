@@ -3,13 +3,13 @@
     class="avatar"
     @mouseenter="showCard"
     @mouseleave="hideCard">
-    <el-avatar class="img" size="medium" icon="el-icon-user-solid"></el-avatar>
+    <el-avatar class="img" size="medium" icon="el-icon-user-solid" :src="userInfo !== '' ? userInfo['avatar'] : ''"></el-avatar>
     <transition name="el-fade-in-linear">
       <el-card v-show="cardVisible" class="submenu-card" :body-style="{ padding: 0 }">
         <div slot="header" class="clearfix">
-          <el-avatar icon="el-icon-user-solid"></el-avatar>
-          <div class="username">username</div>
-          <div class="email">username@test.com</div>
+          <el-avatar icon="el-icon-user-solid" :src="userInfo !== '' ? userInfo['avatar'] : ''"></el-avatar>
+          <div class="username">{{ this.$store.state.user['username'] }}</div>
+          <div class="email">{{ this.$store.state.user['userEmail'] }}</div>
         </div>
         <div class="submenus">
           <div class="submenu" v-for="submenu in submenus" :key="submenu.index" @click="jumpTo(submenu.index)">
@@ -31,7 +31,8 @@ export default {
         { label: '我的收藏', index: '/favourite', icon: 'el-icon-folder-opened' },
         { label: '退出', index: 'logout', icon: 'el-icon-switch-button' }
       ],
-      cardVisible: false
+      cardVisible: false,
+      userInfo: this.$store.state.user
     }
   },
   methods: {

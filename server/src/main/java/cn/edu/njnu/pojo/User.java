@@ -18,4 +18,7 @@ public class User {
     @JsonAlias("password")
     private String userPassword;
     private String salt;
+    private int period;
+    private int grade;
+    private String avatar;
 }
