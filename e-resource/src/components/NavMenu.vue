@@ -1,26 +1,26 @@
 <template>
 <div class="menu">
   <div class="left">
-    <div class="logo-container">
-      <div class="logo"></div>
-      <div class="title"><h1>智能学伴系统</h1></div>
-    </div>
+    <logo></logo>
     <div class="search-container">
       <search class="search"></search>
     </div>
   </div>
-  <div class="avatar">
-    <el-avatar icon="el-icon-user-solid"></el-avatar>
-  </div>
+  <avatar v-if="this.$store.state.user" class="avatar"></avatar>
+  <el-button v-else class="avatar login-btn" @click="gotoLogin">登 录</el-button>
 </div>
 </template>
 
 <script>
 import Search from '@/components/Search'
+import Logo from '@/components/NavMenu/Logo'
+import Avatar from '@/components/NavMenu/Avatar'
 export default {
   name: 'NavMenu',
   components: {
-    Search
+    Search,
+    Logo,
+    Avatar
   },
   data () {
     return {
@@ -28,6 +28,14 @@ export default {
         type: '0',
         searchContent: ''
       }
+    }
+  },
+  methods: {
+    gotoLogin () {
+      this.$router.push({
+        path: '/login',
+        query: { redirect: this.$route.fullPath }
+      })
     }
   }
 }
@@ -38,6 +46,7 @@ export default {
   height: 50px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-top: 1rem;
 }
 
@@ -45,31 +54,13 @@ export default {
   display: flex;
 }
 
-.logo-container {
-  display: flex;
-}
-
-.logo {
-  width: 50px;
-  height: 50px;
-  background-color: #aaa;
-}
-
-.title {
-  height: 50px;
-  line-height: 50px;
-  font-size: 0.8rem;
-  margin-left: 0.5rem;
-  margin-right: 1rem;
-}
-
 .search {
   min-width: 700px;
   width: 100%;
+  height: 80% !important;
 }
 
-.search-container,
-.avatar {
+.search-container {
   display: flex;
   align-items: center;
 }
@@ -84,6 +75,11 @@ export default {
 
 .avatar {
   margin-right: 1rem;
-  cursor: pointer;
+}
+
+.login-btn {
+  height: 0;
+  line-height: 0;
+  padding: 18px 20px;
 }
 </style>

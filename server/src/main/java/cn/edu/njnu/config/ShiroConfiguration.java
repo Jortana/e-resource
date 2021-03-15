@@ -1,5 +1,6 @@
 package cn.edu.njnu.config;
 
+import cn.edu.njnu.filter.URLPathMatchingFilter;
 import cn.edu.njnu.realm.ERRealm;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.mgt.SecurityManager;
@@ -9,6 +10,11 @@ import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import javax.servlet.Filter;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Configuration
 public class ShiroConfiguration {
@@ -21,7 +27,21 @@ public class ShiroConfiguration {
     public ShiroFilterFactoryBean shiroFilter(SecurityManager securityManager) {
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
         shiroFilterFactoryBean.setSecurityManager(securityManager);
+
+        Map<String, String> filterChainDefinitionMap = new LinkedHashMap<String, String>();
+        Map<String, Filter> customizedFilter = new HashMap<>();                                 // 自定义过滤器设置 1
+        customizedFilter.put("url", getURLPathMatchingFilter());                               // 自定义过滤器设置 2，命名，需在设置过滤路径前
+        filterChainDefinitionMap.put("/e-resource/api/v1.0/authentication", "authc");      // 防鸡贼登录
+        filterChainDefinitionMap.put("/e-resource/api/v1.0/private/**", "authc");
+        filterChainDefinitionMap.put("/e-resource/api/v1.0/private/**", "url");             // 自定义过滤器设置 3，设置过滤路径
+        shiroFilterFactoryBean.setFilters(customizedFilter);                                   // 自定义过滤器设置 4，启用
+        shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
+
         return shiroFilterFactoryBean;
+    }
+
+    public URLPathMatchingFilter getURLPathMatchingFilter() {
+        return new URLPathMatchingFilter();
     }
 
     @Bean

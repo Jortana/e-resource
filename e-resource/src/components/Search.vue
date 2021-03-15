@@ -2,10 +2,10 @@
   <el-input
     class="main-search"
     v-model="searchContent"
-    @change="emitSearchContent">
+    @change="changeSearchContent">
     <i slot="prefix" class="el-input__icon el-icon-search"></i>
     <el-button class="search-btn phone-btn" slot="append" icon="el-icon-microphone"></el-button>
-    <el-button class="search-btn" slot="append" icon="el-icon-search" @click="emitSearchContent"></el-button>
+    <el-button class="search-btn" slot="append" icon="el-icon-search" @click="search"></el-button>
   </el-input>
 </template>
 
@@ -18,8 +18,14 @@ export default {
     }
   },
   methods: {
-    emitSearchContent () {
+    changeSearchContent () {
       this.$emit('update:searchContent', this.searchContent)
+    },
+    search () {
+      this.$emit('search')
+    },
+    test () {
+      console.log('a')
     }
   }
 }
@@ -53,8 +59,7 @@ export default {
 }
 
 .main-search >>> .el-input__prefix,
-.main-search >>> .el-input__suffix{
-  top: 2px;
+.main-search >>> .el-input__suffix {
   font-size: 16px;
   color: #9aa0a6;
 }

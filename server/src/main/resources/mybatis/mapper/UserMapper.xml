@@ -6,11 +6,14 @@
     <select id="queryUserByName" resultType="user">
         select user_id, username, user_email, user_type, user_password, salt from t_user where username = #{username};
     </select>
+    <select id="queryUserByNameNP" resultType="user">
+        select user_id, username, user_email, user_type, avatar from t_user where username = #{username};
+    </select>
     <select id="queryUserByEmail" resultType="user">
         select user_id, username, user_email, user_type, user_password, salt from t_user where user_email = #{userEmail};
     </select>
     <insert id="addUser" parameterType="user">
-        insert into t_user (username, user_email, user_type, user_password, salt) values (#{username}, #{userEmail}, #{userType}, #{userPassword}, #{salt});
+        insert into t_user (username, user_email, user_type, user_password, salt, period, grade, avatar) values (#{username}, #{userEmail}, #{userType}, #{userPassword}, #{salt}, #{period}, #{grade}, #{avatar});
     </insert>
     <update id="updateUser" parameterType="user">
         update t_user

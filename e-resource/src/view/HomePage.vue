@@ -1,6 +1,8 @@
 <template>
   <main>
-    <search class="search" :searchContent.sync="searchContent"></search>
+    <div @keyup.enter="search">
+      <search class="search" :searchContent.sync="searchContent" @search="search"></search>
+    </div>
   </main>
 </template>
 
@@ -15,8 +17,10 @@ export default {
     }
   },
   watch: {
-    searchContent (content) {
-      console.log(content)
+  },
+  methods: {
+    search () {
+      let content = this.searchContent
       if (content !== '') {
         this.$router.push({
           path: '/search',
@@ -43,5 +47,10 @@ main {
   height: 3rem;
   max-width: 580px;
   transform: translateY(-50%);
+}
+
+.main-search >>> .el-input__prefix,
+.main-search >>> .el-input__suffix {
+  top: 2px;
 }
 </style>

@@ -25,4 +25,8 @@ export default {
   padding: 0;
   box-sizing: border-box;
 }
+
+.full-width {
+  width: 100%;
+}
 </style>

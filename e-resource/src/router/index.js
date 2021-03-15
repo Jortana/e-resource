@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+// import store from '@/store'
 
 Vue.use(VueRouter)
 
@@ -11,8 +12,29 @@ const routes = [
   },
   {
     path: '/search',
-    name: 'resourceCenter',
+    name: 'ResourceCenter',
     component: () => import('@/view/ResourceCenter')
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: () => import('@/view/Sign')
+  },
+  {
+    path: '/account',
+    name: 'Account',
+    component: () => import('@/view/Account/Account'),
+    meta: {
+      requireAuth: true
+    },
+    redirect: '/account/home',
+    children: [
+      {
+        path: 'home',
+        name: 'UserInfo',
+        component: () => import('@/view/Account/Home')
+      }
+    ]
   }
 ]
 
@@ -27,5 +49,23 @@ const router = new VueRouter({
     }
   }
 })
+
+// router.beforeEach((to, from, next) => {
+//   if (to.meta.requireAuth) {
+//     if (store.state.user) {
+//       axios.get('/authentication').then(resp => {
+//         if (resp) next()
+//       })
+//     } else {
+//       next({
+//         path: 'login',
+//         query: {redirect: to.fullPath}
+//       })
+//     }
+//   } else {
+//     next()
+//   }
+// }
+// )
 
 export default router
