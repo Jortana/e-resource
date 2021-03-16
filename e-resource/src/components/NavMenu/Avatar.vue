@@ -22,6 +22,7 @@
 </template>
 
 <script>
+import { logout } from '@/api/auth'
 export default {
   name: 'Avatar',
   data () {
@@ -44,7 +45,10 @@ export default {
     },
     jumpTo (index) {
       if (index === 'logout') {
-        this.$router.push('/')
+        logout()
+          .then(response => {
+            console.log(response)
+          })
       } else {
         this.$router
           .push(index)
