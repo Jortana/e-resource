@@ -31,6 +31,7 @@ public class LoginController {
         UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(username, requestUser.getUserPassword());
         try {
             subject.login(usernamePasswordToken);
+            System.out.println(subject.isAuthenticated());
             User userInfo =  userService.getByNameNoPassword(username);
             return ResultFactory.buildSuccessResult("登录成功", userInfo);
         } catch (IncorrectCredentialsException e) {
@@ -38,5 +39,14 @@ public class LoginController {
         } catch (AuthenticationException e) {
             return ResultFactory.buildFailResult("账号不存在");
         }
+    }
+
+
+    @GetMapping("/v1.0/private/logout")
+    public Result logout() {
+        Subject subject = SecurityUtils.getSubject();
+        subject.logout();
+        String message = "成功登出";
+        return ResultFactory.buildSuccessResult(message, null);
     }
 }

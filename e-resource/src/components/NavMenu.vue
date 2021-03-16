@@ -2,7 +2,7 @@
 <div class="menu">
   <div class="left">
     <logo></logo>
-    <div class="search-container">
+    <div class="search-container" v-if="$route.fullPath !== '/'">
       <search class="search"></search>
     </div>
   </div>

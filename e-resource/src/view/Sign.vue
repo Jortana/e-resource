@@ -3,7 +3,7 @@
     <div :class="signUpActive === true ? 'container active' : 'container'">
       <div class="user sign-in-box">
         <div class="img-box"><img src="@/assets/sign/in.jpg" alt=""></div>
-        <div class="form-box" v-loading="signInLoading">
+        <div class="form-box" v-loading="signInLoading" @keyup.enter="login">
           <el-form class="form" ref="signInForm" :model="signIn">
             <h2>登录</h2>
             <el-form-item>

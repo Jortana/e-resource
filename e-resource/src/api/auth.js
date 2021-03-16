@@ -33,6 +33,10 @@ export const login = (params) => {
   return http.post(`${baseURL}/public/login`, params)
 }
 
+export const logout = () => {
+  return http.get(`${baseURL}/private/logout`)
+}
+
 /**
  * 每次切换页面都发送一个验证请求，防止偷鸡登录
  */

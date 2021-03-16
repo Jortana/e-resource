@@ -1,16 +1,20 @@
 <template>
-  <main>
-    <div @keyup.enter="search">
-      <search class="search" :searchContent.sync="searchContent" @search="search"></search>
-    </div>
-  </main>
+  <div>
+    <nav-menu class="menu"></nav-menu>
+    <main>
+      <div @keyup.enter="search">
+        <search class="search" :searchContent.sync="searchContent" @search="search"></search>
+      </div>
+    </main>
+  </div>
 </template>
 
 <script>
 import Search from '@/components/Search'
+import NavMenu from '@/components/NavMenu'
 export default {
   name: 'HomePage',
-  components: { Search },
+  components: { NavMenu, Search },
   data () {
     return {
       searchContent: ''
@@ -36,7 +40,7 @@ export default {
 
 <style scoped>
 main {
-  height: 100vh;
+  height: calc(100vh - 70px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -46,7 +50,7 @@ main {
   width: 50vw;
   height: 3rem;
   max-width: 580px;
-  transform: translateY(-50%);
+  transform: translateY(-80%);
 }
 
 .main-search >>> .el-input__prefix,
