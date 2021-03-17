@@ -5,7 +5,9 @@ import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 @Repository
@@ -15,4 +17,5 @@ public interface ResourceMapper {
     int queryResourceNumByKeywords(String keyword, int resourceType, int period, int grade, int subject, String updateTime);
     //通过ID获取资源信息
     Resource queryResourceByID(int resource_id);
+    List<Map> queryType();
 }
