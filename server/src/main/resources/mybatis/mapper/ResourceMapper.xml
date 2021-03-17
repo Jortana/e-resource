@@ -3,8 +3,9 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.edu.njnu.mapper.ResourceMapper">
+    <!-- 根据关键词查资源 -->
     <select id="queryResourceByKeywords" resultType="resource">
-        select id, resource_name, download, collection, `period`, grade, subject, url, entity from t_resource where
+        select id, resource_name, download, collection, `period`, grade, subject, url, entity, updateTime from t_resource where
         <trim suffixOverrides="and">
             <if test="keyword!=null">resource_name like concat('%',#{keyword},'%') and </if>
             <if test="resourceType!=0">resource_type=#{resourceType} and </if>
@@ -15,6 +16,7 @@
         </trim>
         limit #{limit},#{perPage};
     </select>
+    <!-- 根据关键词查资源个数 -->
     <select id="queryResourceNumByKeywords" resultType="int">
         select count(id) from t_resource where
         <trim suffixOverrides="and">
@@ -26,7 +28,12 @@
             <if test="updateTime!=null">updateTime >= #{updateTime} and </if>
         </trim>
     </select>
+    <!-- 根据ID查资源 -->
     <select id="queryResourceByID" resultType="resource">
          select id, resource_name, download, collection, `period`, grade, subject, url, entity from t_resource where id = #{resource_id}
+    </select>
+    <!-- 获取资源类型 -->
+    <select id="queryType" resultType="HashMap">
+        select type_id, resource_type from t_resource_type
     </select>
 </mapper>

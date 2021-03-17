@@ -3,15 +3,13 @@ package cn.edu.njnu.service;
 import cn.edu.njnu.mapper.ResourceMapper;
 import cn.edu.njnu.pojo.Resource;
 import cn.edu.njnu.pojo.Result;
+import cn.edu.njnu.pojo.ResultCode;
 import cn.edu.njnu.pojo.ResultFactory;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ResourceService {
@@ -20,7 +18,24 @@ public class ResourceService {
     public ResourceService(ResourceMapper resourceMapper) {
         this.resourceMapper = resourceMapper;
     }
-
+    //获取资源类型
+    public Result getResourceType(){
+        List<Map> typeMap = resourceMapper.queryType();
+        System.out.println(typeMap);
+        JSONArray typeArray = new JSONArray();
+        JSONObject typeAll = new JSONObject();
+        typeAll.put("type", "全部");
+        typeAll.put("code", 0);
+        typeArray.add(typeAll);
+        for (Map map : typeMap){
+            JSONObject typeCode = new JSONObject();
+            typeCode.put("type", map.get("resource_type"));
+            typeCode.put("code", map.get("type_id"));
+            typeArray.add(typeCode);
+        }
+        return ResultFactory.buildSuccessResult("成功获取资源类型", typeArray);
+    }
+    //关键词查找资源
     public Result conditionalQueryResource(Map<String, Object> conditionalMap){
         System.out.println(conditionalMap);
         String keyword = conditionalMap.get("keyword") != null ? (String) conditionalMap.get("keyword") : null;
@@ -40,7 +55,7 @@ public class ResourceService {
         int total = resourceMapper.queryResourceNumByKeywords(keyword, resourceType, period, grade, subject, updateTime);
         System.out.println(resourceList);
         if (total == 0){
-            return ResultFactory.buildSuccessResult("未查询到相关资源", null);
+            return ResultFactory.buildFailResult("未查询到相关资源");
         }
 
         JSONObject resultData = new JSONObject();
@@ -67,6 +82,7 @@ public class ResourceService {
         resultData.put("resources", resources);
         return ResultFactory.buildSuccessResult("查询成功", resultData);
     }
+    //
 
 //    public Result queryResourceByID(Map<String, Object> ResourceIDMap){
 //        int resourceID = (int) ResourceIDMap.get("resourceID");

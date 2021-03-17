@@ -17,7 +17,14 @@ public class ResourceController {
     }
 
     @CrossOrigin
-    @GetMapping("/conditionalQueryResource")
+    @GetMapping("/v1.0/getResourceType")
+    //获取资源类型
+    public Result getResourceType(){
+        return resourceService.getResourceType();
+    }
+
+    @CrossOrigin
+    @GetMapping("/v1.0/conditionalQueryResource")
     public Result conditionalQueryResource(@RequestParam Map<String, Object> conditionalMap){
         return resourceService.conditionalQueryResource(conditionalMap);
     }
