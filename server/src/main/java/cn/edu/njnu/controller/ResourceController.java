@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/e-resource/api/public")
+@RequestMapping("/e-resource/api/v1.0/public")
 public class ResourceController {
 
     private final ResourceService resourceService;
@@ -19,6 +19,7 @@ public class ResourceController {
     @CrossOrigin
     @GetMapping("/conditionalQueryResource")
     public Result conditionalQueryResource(@RequestParam Map<String, Object> conditionalMap){
+        System.out.println(conditionalMap);
         return resourceService.conditionalQueryResource(conditionalMap);
     }
 

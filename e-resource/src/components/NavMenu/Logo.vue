@@ -1,7 +1,7 @@
 <template>
   <div class="logo-container">
     <div class="logo"></div>
-    <div class="title"><h1>智能学伴系统</h1></div>
+    <div class="title"><h1>智能学伴</h1></div>
   </div>
 </template>
 

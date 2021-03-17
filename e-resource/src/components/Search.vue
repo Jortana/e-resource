@@ -1,7 +1,7 @@
 <template>
   <el-input
     class="main-search"
-    v-model="searchContent"
+    v-model="searchQ"
     @change="changeSearchContent">
     <i slot="prefix" class="el-input__icon el-icon-search"></i>
     <el-button class="search-btn phone-btn" slot="append" icon="el-icon-microphone"></el-button>
@@ -12,14 +12,17 @@
 <script>
 export default {
   name: 'Search',
+  props: {
+    searchContent: String
+  },
   data () {
     return {
-      searchContent: ''
+      searchQ: this.searchContent
     }
   },
   methods: {
     changeSearchContent () {
-      this.$emit('update:searchContent', this.searchContent)
+      this.$emit('update:searchContent', this.searchQ)
     },
     search () {
       this.$emit('search')

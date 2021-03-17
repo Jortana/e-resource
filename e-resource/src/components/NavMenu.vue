@@ -3,7 +3,7 @@
   <div class="left">
     <logo></logo>
     <div class="search-container" v-if="$route.fullPath !== '/'">
-      <search class="search"></search>
+      <search class="search" :searchContent.sync="searchInfo.content" @search="search"></search>
     </div>
   </div>
   <avatar v-if="this.$store.state.user" class="avatar"></avatar>
@@ -17,17 +17,17 @@ import Logo from '@/components/NavMenu/Logo'
 import Avatar from '@/components/NavMenu/Avatar'
 export default {
   name: 'NavMenu',
+  props: {
+    searchInfo: Object
+  },
   components: {
     Search,
     Logo,
     Avatar
   },
   data () {
+    console.log(this.searchInfo)
     return {
-      search: {
-        type: '0',
-        searchContent: ''
-      }
     }
   },
   methods: {
@@ -36,6 +36,9 @@ export default {
         path: '/login',
         query: { redirect: this.$route.fullPath }
       })
+    },
+    search () {
+      console.log(this.searchInfo)
     }
   }
 }
