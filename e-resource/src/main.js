@@ -7,6 +7,7 @@ import store from './store'
 // 引入Element UI
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
+import '@/../static/css/common.css'
 
 Vue.config.productionTip = false
 
