@@ -13,11 +13,9 @@ import java.util.Map;
 @Service
 public class EntityService {
     private Driver createDrive(){
-        return GraphDatabase.driver( "bolt://223.2.51.185:7687", AuthTokens.basic( "neo4j", "123456" ) );
+        return GraphDatabase.driver( "bolt://223.2.50.241:7687", AuthTokens.basic( "neo4j", "123456" ) );
     }
-    public JSONArray getRelatedEntity(String entityName){
-        Driver driver = createDrive();
-        Session session = driver.session();
+    public JSONArray getRelatedEntity(String entityName, Session session){
         StatementResult result = session.run( "MATCH (a:concept) -[]-> (m:concept) where a.name = { name }" +
                         "RETURN m.name AS name limit 5",
                 parameters( "name", entityName ) );
@@ -27,8 +25,6 @@ public class EntityService {
             Record record = result.next();
             relatedEntity.add(record.get( "name" ).asString());
         }
-        session.close();
-        driver.close();
         return relatedEntity;
     }
 
@@ -37,7 +33,7 @@ public class EntityService {
         Driver driver = createDrive();
         Session session = driver.session();
         StatementResult result = session.run( "MATCH (a:concept) where a.name =~ {name} " +
-                        "RETURN a.name AS name",
+                        "RETURN a.name AS name order by a.name limit 5",
                 parameters( "name", ".*" + keyword + ".*" ) );
 
         JSONArray resArray = new JSONArray();
@@ -50,7 +46,7 @@ public class EntityService {
             Record record = result.next();
             String entityName = record.get( "name" ).asString();
             JSONObject similarEntity = new JSONObject();
-            similarEntity.put("relatedEntity", getRelatedEntity(entityName));
+            similarEntity.put("relatedEntity", getRelatedEntity(entityName, session));
             similarEntity.put("entityName", entityName);
             resArray.add(similarEntity);
         }

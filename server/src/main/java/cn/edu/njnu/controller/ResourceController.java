@@ -17,7 +17,7 @@ public class ResourceController {
     }
 
     @CrossOrigin
-    @GetMapping("/v1.0/public/getResourceType")
+    @GetMapping("/v1.0/public/resourceType")
     //获取资源类型
     public Result getResourceType(){
         return resourceService.getResourceType();

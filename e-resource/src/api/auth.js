@@ -33,6 +33,9 @@ export const login = (params) => {
   return http.post(`${baseURL}/public/login`, params)
 }
 
+/**
+ * 登出
+ */
 export const logout = () => {
   return http.get(`${baseURL}/private/logout`)
 }

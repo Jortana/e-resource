@@ -8,6 +8,7 @@ public class Resource {
     String related_10;
     String keywords;
     String entity;
+    String[] entityList;
     int download;
     int collection;
     int type;
@@ -55,6 +56,14 @@ public class Resource {
 
     public int getId() {
         return id;
+    }
+
+    public String[] getEntityList() {
+        return entityList;
+    }
+
+    public void setEntityList(String[] entityList) {
+        this.entityList = entityList;
     }
 
     public void setId(int id) {

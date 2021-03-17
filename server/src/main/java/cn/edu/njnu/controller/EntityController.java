@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/e-resource/api/public")
+@RequestMapping("/e-resource/api")
 public class EntityController {
 
     private final EntityService entityService;
@@ -17,7 +17,7 @@ public class EntityController {
     }
 
     @CrossOrigin
-    @GetMapping("/v1.0/getEntity")
+    @GetMapping("/v1.0/public/relatedEntity")
     public Result getEntity(@RequestParam Map<String, Object> keywordMap){
         return entityService.getEntityByKeyword(keywordMap);
     }
