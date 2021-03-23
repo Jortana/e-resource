@@ -40,7 +40,6 @@
     <select id="queryRelated" resultType="string">
         select related_10 from t_resource where resource_id = #{resource_id}
     </select>
-
     <select id="queryResourceByEntity" resultType="resource">
         select id, resource_name, download, collection, `period`, grade, subject, url, entity, updateTime from t_resource where entity like concat('%',#{entity},'%')
     </select>

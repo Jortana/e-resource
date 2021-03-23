@@ -71,7 +71,7 @@ public class ResourceService {
         JSONObject resultData = new JSONObject();
         resultData.put("page", page);
         resultData.put("perPage", perPage);
-        resultData.put("pages", (int)Math.ceil(total*1.0/resourceList.size()));
+        resultData.put("pages", (int)Math.ceil(total * 1.0 / resourceList.size()));
         resultData.put("total", total);
         JSONArray resources = new JSONArray();
         for (Resource perResource : resourceList){
@@ -82,7 +82,6 @@ public class ResourceService {
         resultData.put("resources", resources);
         return ResultFactory.buildSuccessResult("查询成功", resultData);
     }
-
 
 //    public Result queryResourceByID(Map<String, Object> ResourceIDMap){
 //        int resourceID = (int) ResourceIDMap.get("resourceID");
