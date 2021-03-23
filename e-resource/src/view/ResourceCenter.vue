@@ -11,7 +11,7 @@
         </el-tab-pane>
       </el-tabs>
       <div class="resources">
-        <div class="resource-list flex-1">
+        <div class="resource-list flex-1" v-if="resources.resources.length !== 0">
           <div
             class="resource"
             v-for="(resource, index) in resources.resources"
@@ -46,7 +46,7 @@
             </el-pagination>
           </div>
         </div>
-<!--        <div class="flex-1" v-else>未查询到相关资源</div>-->
+        <div class="flex-1" v-else>未查询到相关资源</div>
         <div class="graph flex-1">
           <el-button
             round
@@ -79,12 +79,18 @@ export default {
     }
   },
   watch: {
-    query (query) {
-      console.log('query changed')
-      this.searchInfo.type = query.type === undefined ? 0 : query.type
-      this.searchInfo.content = query.q === undefined ? 0 : query.q
-      this.pageInfo.page = query.page === undefined ? 1 : query.page
-      this.getResource()
+    query: {
+      handler (newQuery, oldQuery) {
+        console.log('query changed')
+        this.searchInfo.type = newQuery.type === undefined ? 0 : newQuery.type
+        this.searchInfo.content = newQuery.q === undefined ? 0 : newQuery.q
+        this.pageInfo.page = newQuery.page === undefined ? 1 : newQuery.page
+        this.getResource()
+        if (oldQuery === undefined || newQuery.q !== oldQuery.q) {
+          this.getRelatedEntity(newQuery.q)
+        }
+      },
+      immediate: true
     }
   },
   data () {
@@ -143,10 +149,9 @@ export default {
       }).catch(() => {
         this.$router.go(0)
       })
-      this.getResource()
+      // this.getResource()
     },
     getResource () {
-      console.log(this.pageInfo)
       resource({
         keyword: this.searchInfo.content,
         resourceType: this.searchInfo.type,
@@ -159,24 +164,20 @@ export default {
           this.resources.resources = response.data.data.resources
           this.resources.total = response.data.data.total
           this.resources.pages = response.data.data.pages
-          this.getRelatedEntity(this.searchInfo.content)
-        } else {
-          this.$message({
-            message: response.data.message,
-            type: 'warning',
-            duration: 800
-          })
         }
-        console.log(this.resources)
       })
     },
     resetResource () {
       this.resources.resources = []
       this.resources.total = 0
       this.resources.pages = 0
+    },
+    resetEntity () {
       this.entities.entities = []
     },
     getRelatedEntity (keyword) {
+      this.resetEntity()
+      console.log(keyword)
       relatedEntity(keyword)
         .then(response => {
           console.log(response)
@@ -243,5 +244,9 @@ export default {
 
 .graph {
   padding-left: 2rem;
+}
+
+.graph button {
+  margin-top: 10px;
 }
 </style>
