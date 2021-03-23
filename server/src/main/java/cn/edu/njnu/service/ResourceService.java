@@ -7,12 +7,15 @@ import cn.edu.njnu.pojo.ResultCode;
 import cn.edu.njnu.pojo.ResultFactory;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.ansj.domain.Term;
+import org.ansj.splitWord.analysis.ToAnalysis;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
 public class ResourceService {
+
     private final ResourceMapper resourceMapper;
 
     public ResourceService(ResourceMapper resourceMapper) {
@@ -39,50 +42,47 @@ public class ResourceService {
     public Result conditionalQueryResource(Map<String, Object> conditionalMap){
         System.out.println(conditionalMap);
         String keyword = conditionalMap.get("keyword") != null ? (String) conditionalMap.get("keyword") : null;
+        //关键词分词提取
+        String keywordList = new String();
+        if (keyword != null){
+            org.ansj.domain.Result result = ToAnalysis.parse(keyword); //封装的分词结果对象，包含一个terms列表
+            List<Term> terms = result.getTerms(); //term列表，元素就是拆分出来的词以及词性
+            for(Term term:terms){
+                System.out.println(term.getName());		//分词的内容
+            }
+        }
+
         int resourceType = conditionalMap.get("resourceType") != null ? Integer.parseInt ((String) conditionalMap.get("resourceType")) : 0;
         int period = conditionalMap.get("period") != null ? Integer.parseInt ((String)conditionalMap.get("period")) : 0;
         int grade = conditionalMap.get("grade") != null?Integer.parseInt ((String)conditionalMap.get("grade")) : 0;
         int subject = conditionalMap.get("subject") != null ? Integer.parseInt ((String)conditionalMap.get("subject")) : 0;
         String updateTime = conditionalMap.get("updateTime") != null ? (String) conditionalMap.get("updateTime") : null;
 
-//        int relevantType = Integer.parseInt ((String) conditionalMap.get("relevantType"));
-//        int relevantID = Integer.parseInt ((String) conditionalMap.get("relevantID"));
+        //int relevantType = Integer.parseInt ((String) conditionalMap.get("relevantType"));
+        //int relevantID = Integer.parseInt ((String) conditionalMap.get("relevantID"));
         int page = Integer.parseInt ((String)conditionalMap.get("page"));
         int perPage = Integer.parseInt ((String)conditionalMap.get("perPage"));
-        int limit = perPage*(page - 1);
-//        System.out.println(limit);
-        ArrayList<Resource> resourceList = resourceMapper.queryResourceByKeywords(keyword, resourceType, period, grade, subject, updateTime, limit, perPage);
+        int limit = perPage * (page - 1);
         int total = resourceMapper.queryResourceNumByKeywords(keyword, resourceType, period, grade, subject, updateTime);
-        System.out.println(resourceList);
         if (total == 0){
             return ResultFactory.buildFailResult("未查询到相关资源");
         }
-
+        ArrayList<Resource> resourceList = resourceMapper.queryResourceByKeywords(keyword, resourceType, period, grade, subject, updateTime, limit, perPage);
         JSONObject resultData = new JSONObject();
         resultData.put("page", page);
         resultData.put("perPage", perPage);
-        resultData.put("pages", (int)(total/Math.ceil(resourceList.size())));
+        resultData.put("pages", (int)Math.ceil(total*1.0/resourceList.size()));
         resultData.put("total", total);
         JSONArray resources = new JSONArray();
         for (Resource perResource : resourceList){
-            JSONObject resultPerResource = new JSONObject();
-            resultPerResource.put("resourceID", perResource.getId());
-            resultPerResource.put("name", perResource.getResourceName());
-            resultPerResource.put("download", perResource.getDownload());
-            resultPerResource.put("collection", perResource.getCollection());
-            resultPerResource.put("url", perResource.getUrl());
-            String[] entityList = perResource.getEntity().split("#");
-            resultPerResource.put("entity", entityList);
-            resultPerResource.put("period", perResource.getPeriod());
-            resultPerResource.put("grade", perResource.getGrade());
-            resultPerResource.put("subject", perResource.getSubject());
-            resources.add(resultPerResource);
+            perResource.setEntityList(perResource.getEntity().split("#"));
+            resources.add(perResource);
         }
 
         resultData.put("resources", resources);
         return ResultFactory.buildSuccessResult("查询成功", resultData);
     }
-    //
+
 
 //    public Result queryResourceByID(Map<String, Object> ResourceIDMap){
 //        int resourceID = (int) ResourceIDMap.get("resourceID");
