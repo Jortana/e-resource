@@ -7,12 +7,15 @@ import cn.edu.njnu.pojo.ResultCode;
 import cn.edu.njnu.pojo.ResultFactory;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.ansj.domain.Term;
+import org.ansj.splitWord.analysis.ToAnalysis;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
 public class ResourceService {
+
     private final ResourceMapper resourceMapper;
 
     public ResourceService(ResourceMapper resourceMapper) {
@@ -39,6 +42,16 @@ public class ResourceService {
     public Result conditionalQueryResource(Map<String, Object> conditionalMap){
         System.out.println(conditionalMap);
         String keyword = conditionalMap.get("keyword") != null ? (String) conditionalMap.get("keyword") : null;
+        //关键词分词提取
+        String keywordList = new String();
+        if (keyword != null){
+            org.ansj.domain.Result result = ToAnalysis.parse(keyword); //封装的分词结果对象，包含一个terms列表
+            List<Term> terms = result.getTerms(); //term列表，元素就是拆分出来的词以及词性
+            for(Term term:terms){
+                System.out.println(term.getName());		//分词的内容
+            }
+        }
+
         int resourceType = conditionalMap.get("resourceType") != null ? Integer.parseInt ((String) conditionalMap.get("resourceType")) : 0;
         int period = conditionalMap.get("period") != null ? Integer.parseInt ((String)conditionalMap.get("period")) : 0;
         int grade = conditionalMap.get("grade") != null?Integer.parseInt ((String)conditionalMap.get("grade")) : 0;

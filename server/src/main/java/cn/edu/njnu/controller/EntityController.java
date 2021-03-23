@@ -18,7 +18,13 @@ public class EntityController {
 
     @CrossOrigin
     @GetMapping("/v1.0/public/relatedEntity")
+    public Result relatedEntity(@RequestParam Map<String, Object> keywordMap){
+        return entityService.getRelatedEntity(keywordMap);
+    }
+
+    @CrossOrigin
+    @GetMapping("/v1.0/public/queryEntity")
     public Result getEntity(@RequestParam Map<String, Object> keywordMap){
-        return entityService.getEntityByKeyword(keywordMap);
+        return entityService.getEntity(keywordMap);
     }
 }
