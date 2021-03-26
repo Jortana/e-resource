@@ -98,6 +98,7 @@ export default {
 .resource-info {
   margin-top: 1rem;
   position: relative;
+  border-right: 1px solid #DCDFE6;
 }
 
 .resource-info >>> h2 {

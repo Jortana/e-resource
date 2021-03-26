@@ -14,6 +14,11 @@ export default {
   },
   mounted () {
     // this.initCharts()
+    setTimeout(() => {
+      window.onresize = () => {
+        this.chart.resize()
+      }
+    }, 200)
   },
   watch: {
     entities: {
