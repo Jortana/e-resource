@@ -10,7 +10,8 @@ const service = axios.create({
   // baseURL: process.env.BASE_API,
   baseURL: 'http://127.0.0.1:9000/e-resource/api',
   // 超时时间 单位是ms，这里设置了3s的超时时间
-  timeout: 3 * 1000,
+  // timeout: 3 * 1000,
+  timeout: 5 * 1000,
   withCredentials: true
 })
 // 2.请求拦截器

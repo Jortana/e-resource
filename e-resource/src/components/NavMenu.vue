@@ -18,7 +18,14 @@ import Avatar from '@/components/NavMenu/Avatar'
 export default {
   name: 'NavMenu',
   props: {
-    searchInfo: Object
+    searchInfo: {
+      type: Object,
+      default () {
+        return {
+          content: ''
+        }
+      }
+    }
   },
   components: {
     Search,

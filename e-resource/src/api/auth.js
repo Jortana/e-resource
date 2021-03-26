@@ -11,9 +11,9 @@ let baseURL = '/v1.0'
  * - period: 学段代码（2: 小学, 3: 初中, 4: 高中）
  * - grade: 年级
  * @param {Object} params
- * @param {string} params.username
- * @param {string} params.email
- * @param {string} params.password
+ * @param {String} params.username
+ * @param {String} params.email
+ * @param {String} params.password
  * @param {Number} params.period
  * @param {Number} params.grade
  */

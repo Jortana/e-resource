@@ -35,6 +35,11 @@ const routes = [
         component: () => import('@/view/Account/Home')
       }
     ]
+  },
+  {
+    path: '/resource/:resourceID',
+    name: 'Resource',
+    component: () => import('@/view/Resource')
   }
 ]
 

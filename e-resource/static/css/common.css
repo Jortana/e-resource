@@ -5,3 +5,8 @@
 .flex-1 {
   flex: 1;
 }
+
+/* 主要界面需要向右移，和logo右侧对齐 */
+.main-container {
+  margin-left: 176px;
+}

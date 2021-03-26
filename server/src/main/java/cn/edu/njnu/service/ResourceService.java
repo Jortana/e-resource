@@ -9,6 +9,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.ansj.domain.Term;
 import org.ansj.splitWord.analysis.ToAnalysis;
+import org.apache.catalina.webresources.AbstractSingleArchiveResource;
+import org.neo4j.kernel.api.impl.index.storage.DirectoryFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -51,15 +53,11 @@ public class ResourceService {
                 System.out.println(term.getName());		//分词的内容
             }
         }
-
         int resourceType = conditionalMap.get("resourceType") != null ? Integer.parseInt ((String) conditionalMap.get("resourceType")) : 0;
         int period = conditionalMap.get("period") != null ? Integer.parseInt ((String)conditionalMap.get("period")) : 0;
-        int grade = conditionalMap.get("grade") != null?Integer.parseInt ((String)conditionalMap.get("grade")) : 0;
+        int grade = conditionalMap.get("grade") != null ? Integer.parseInt ((String)conditionalMap.get("grade")) : 0;
         int subject = conditionalMap.get("subject") != null ? Integer.parseInt ((String)conditionalMap.get("subject")) : 0;
         String updateTime = conditionalMap.get("updateTime") != null ? (String) conditionalMap.get("updateTime") : null;
-
-        //int relevantType = Integer.parseInt ((String) conditionalMap.get("relevantType"));
-        //int relevantID = Integer.parseInt ((String) conditionalMap.get("relevantID"));
         int page = Integer.parseInt ((String)conditionalMap.get("page"));
         int perPage = Integer.parseInt ((String)conditionalMap.get("perPage"));
         int limit = perPage * (page - 1);
@@ -71,19 +69,43 @@ public class ResourceService {
         JSONObject resultData = new JSONObject();
         resultData.put("page", page);
         resultData.put("perPage", perPage);
-        resultData.put("pages", (int)Math.ceil(total * 1.0 / resourceList.size()));
+        resultData.put("pages", (int)Math.ceil(total*1.0/resourceList.size()));
         resultData.put("total", total);
         JSONArray resources = new JSONArray();
         for (Resource perResource : resourceList){
             perResource.setEntityList(perResource.getEntity().split("#"));
             resources.add(perResource);
         }
-
         resultData.put("resources", resources);
         return ResultFactory.buildSuccessResult("查询成功", resultData);
     }
 
-//    public Result queryResourceByID(Map<String, Object> ResourceIDMap){
-//        int resourceID = (int) ResourceIDMap.get("resourceID");
-//    }
+    //查相关资源
+    public Result queryRelated(Map<String, Object> resourceIDMap){
+        int resourceID = Integer.parseInt((String)resourceIDMap.get("resourceID"));
+        String related_10 = resourceMapper.queryRelated(resourceID);
+        if (related_10 == null){
+            return ResultFactory.buildFailResult("未查询到相关资源");
+        }
+        JSONObject resObject = new JSONObject();
+        JSONArray resourcesList = new JSONArray();
+        String[] relatedID = related_10.split("#");
+        for (String perResourceID : relatedID){
+            int id = Integer.parseInt(perResourceID);
+            Resource singleResource = resourceMapper.queryResourceByID(id);
+            resourcesList.add(entityList(singleResource));
+        }
+        return ResultFactory.buildSuccessResult("查询成功", resourcesList);
+    }
+    //根据ID查资源属性
+    public Result queryResource(Map<String, Object> ResourceIDMap){
+        int resourceID = Integer.parseInt ((String) ResourceIDMap.get("resourceID"));
+        Resource queryResource = resourceMapper.queryResourceByID(resourceID);
+        return ResultFactory.buildSuccessResult("查询成功",entityList(queryResource));
+    }
+    //将数据库entity转换为List类型
+    public Resource entityList(Resource resource){
+        resource.setEntityList(resource.getEntity().split("#"));
+        return resource;
+    }
 }
