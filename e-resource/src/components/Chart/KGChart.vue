@@ -52,12 +52,17 @@ export default {
     /**
      * 节点点击事件
      */
-    async nodeClick (node) {
-      console.log(node)
-      // const index = this.seriesData.findIndex(
-      //   (item) => item['id'] === node.data.id
-      // )
-      // console.log('点了节点:' + index + 1, 'clicked')
+    nodeClick (node) {
+      console.log(node.data)
+      if (node.data.name === this.$route.query.q) {
+        return
+      }
+      this.$router.push({
+        path: '/search',
+        query: {
+          q: node.data.name
+        }
+      })
     },
     /**
      * 格式化数据为echarts需要的格式
