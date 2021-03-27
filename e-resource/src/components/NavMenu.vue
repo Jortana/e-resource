@@ -32,6 +32,11 @@ export default {
     Logo,
     Avatar
   },
+  computed: {
+    searchContent () {
+      return this.searchInfo.content
+    }
+  },
   data () {
     console.log(this.searchInfo)
     return {

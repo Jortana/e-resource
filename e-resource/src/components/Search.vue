@@ -15,9 +15,20 @@ export default {
   props: {
     searchContent: String
   },
+  computed: {
+    queryQ () {
+      return this.$route.query.q
+    }
+  },
+  watch: {
+    queryQ () {
+      this.searchQ = this.$route.query.q
+    }
+  },
   data () {
     return {
       searchQ: this.searchContent
+      // searchQ: this.$route.query.q === undefined ? '' : this.$route.query.q
     }
   },
   methods: {

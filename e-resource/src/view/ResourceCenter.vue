@@ -95,6 +95,7 @@ export default {
         // this.searchInfo.type = newQuery.type === undefined ? 0 : newQuery.type
         this.searchInfo.content = newQuery.q === undefined ? 0 : newQuery.q
         this.pageInfo.page = newQuery.page === undefined ? 1 : newQuery.page
+        console.log(this.searchInfo)
         this.goSearch()
         if (oldQuery === undefined || newQuery.q !== oldQuery.q) {
           this.getRelatedEntity(newQuery.q)
