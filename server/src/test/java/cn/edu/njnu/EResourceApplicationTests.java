@@ -17,4 +17,9 @@ class EResourceApplicationTests {
 		System.out.println(dataSource.getClass());
 		System.out.println(dataSource.getConnection());
 	}
+
+	@Test
+	void neo4jTest(){
+
+	}
 }

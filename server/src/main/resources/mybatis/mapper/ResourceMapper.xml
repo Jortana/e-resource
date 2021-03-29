@@ -9,7 +9,7 @@
         <trim suffixOverrides="and">
             <if test="keyword!=null">entity like concat('%',#{keyword},'%') and </if>
             <if test="resourceType!=0">resource_type=#{resourceType} and </if>
-            <if test="period!=0">period = #{period} and </if>
+            <if test="period!=0">`period` = #{period} and </if>
             <if test="grade!=0">grade = #{grade} and </if>
             <if test="subject!=0">subject = #{subject} and </if>
             <if test="updateTime!=null">updateTime >= #{updateTime}and </if>
@@ -38,10 +38,14 @@
     </select>
     <!-- 根据资源ID查找相关资源 -->
     <select id="queryRelated" resultType="string">
-        select related_10 from t_resource where resource_id = #{resource_id}
+        select related_10 from t_resource where id = #{resource_id}
     </select>
-
+    <!-- 通过实体找资源 -->
     <select id="queryResourceByEntity" resultType="resource">
         select id, resource_name, download, collection, `period`, grade, subject, url, entity, updateTime from t_resource where entity like concat('%',#{entity},'%')
+    </select>
+    <!-- 查教学目标和重难点 -->
+    <select id="queryGoalAndKey" resultType="HashMap">
+        select t_goal, t_key, resource_id from t_instruction_plan_clips inner join t_resource on t_instruction_plan_clips.resource_id = t_resource.id where entity like concat('%',#{entity},'%')
     </select>
 </mapper>

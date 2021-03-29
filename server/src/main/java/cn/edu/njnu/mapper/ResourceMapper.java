@@ -22,4 +22,6 @@ public interface ResourceMapper {
     String queryRelated(int resource_id);
 
     ArrayList<Resource> queryResourceByEntity(String entity);
+
+    List<Map> queryGoalAndKey(String entity);
 }
