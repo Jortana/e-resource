@@ -7,5 +7,6 @@ export const resource = (params) => {
   for (let info in params) {
     data += info + '=' + params[info] + '&'
   }
+  console.log(data)
   return http.get(`${baseURL}/public/conditionalQueryResource?${data}`)
 }

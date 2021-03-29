@@ -2,7 +2,7 @@
 <div class="menu">
   <div class="left">
     <logo></logo>
-    <div class="search-container" v-if="$route.fullPath !== '/'">
+    <div class="search-container" v-if="$route.fullPath !== '/'" @keyup.enter="search">
       <search class="search" :searchContent.sync="searchInfo.content" @search="search"></search>
     </div>
   </div>
@@ -38,7 +38,18 @@ export default {
       })
     },
     search () {
-      console.log(this.searchInfo)
+      if (this.searchInfo.content === '') {
+        return
+      }
+      this.$router.push({
+        path: '/search',
+        query: {
+          q: this.searchInfo.content,
+          type: this.searchInfo.type
+        }
+      }).catch(() => {
+        this.$router.go(0)
+      })
     }
   }
 }
