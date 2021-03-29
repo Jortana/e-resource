@@ -13,6 +13,8 @@ import static org.neo4j.driver.v1.Values.parameters;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -40,10 +42,8 @@ public class EntityService {
     }
 
     public Result getRelatedEntity(Map<String, Object> keywordMap){
-        System.out.println(keywordMap);
         String[] keyword = ((String) keywordMap.get("keyword")).split("#");
         Driver driver = createDrive();
-
         Session session = driver.session();
         JSONArray resArray = new JSONArray();
         if (keyword.length > 1) {
@@ -83,7 +83,7 @@ public class EntityService {
         Driver driver = createDrive();
         Session session = driver.session();
         StatementResult result = session.run( "MATCH (a:concept) where a.name =~ {name} " +
-                        "RETURN a.name AS name order by a.name skip {skip} limit {limit}",
+                        "RETURN properties(a) AS props order by a.name skip {skip} limit {limit}",
                 parameters( "name", ".*" + keyword + ".*", "skip", skip, "limit", perPage ) );
         JSONObject resObject = new JSONObject();
         JSONArray resArray = new JSONArray();
@@ -91,15 +91,16 @@ public class EntityService {
             return ResultFactory.buildFailResult("未查询到相关知识点");
         }
         int totalEntity = 0;
-//        System.out.println(result);
         while ( result.hasNext() )
         {
             totalEntity ++;
             Record record = result.next();
-            String entityName = record.get( "name" ).asString();
+            String entityName = record.get( "props" ).get( "name" ).asString();
             JSONObject similarEntity = new JSONObject();
             similarEntity.put("entityName", entityName);
+            similarEntity.put("properties", record.get( "props" ).asMap());
             similarEntity.put("resources", queryResource(entityName));
+            similarEntity.put("goalAndKey", goalAndKey(entityName));
             resArray.add(similarEntity);
         }
 //        System.out.println("test!");
@@ -119,5 +120,38 @@ public class EntityService {
             resourceList.add(perResource);
         }
         return resourceList;
+    }
+    //根据entity查找重难点
+    public JSONArray goalAndKey(String entityName){
+        JSONArray resArray = new JSONArray();
+        String entity = entityName + '#';
+        List<Map> goalAndKey = resourceMapper.queryGoalAndKey(entity);
+        for (Map perGK : goalAndKey){
+            JSONObject singleGK = new JSONObject();
+            singleGK.put("objectives", perGK.get("t_goal"));
+            singleGK.put("resourceID", perGK.get("resource_id"));
+            singleGK.put("keyPoint", perGK.get("t_key"));
+            resArray.add(singleGK);
+        }
+        return resArray;
+    }
+
+    public Result getProperties(Map<String, Object> nameMap){
+        String entityName = (String) nameMap.get("entityName");
+        Driver driver = createDrive();
+        Session session = driver.session();
+        StatementResult result = session.run( "MATCH (a:concept) where a.name = {name} " +
+                        "RETURN properties(a) AS props ",
+                parameters( "name",  entityName ) );
+        if (!result.hasNext()) {
+            return ResultFactory.buildFailResult("未查询到相关知识点");
+        }
+        JSONObject resObject = new JSONObject();
+        Record record = result.next();
+        resObject.put("entityName", entityName);
+        resObject.put("properties", record.get( "props" ).asMap());
+        session.close();
+//        driver.close();
+        return ResultFactory.buildSuccessResult("查询成功", resObject);
     }
 }
