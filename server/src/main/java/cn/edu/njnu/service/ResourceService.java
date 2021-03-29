@@ -69,7 +69,7 @@ public class ResourceService {
         JSONObject resultData = new JSONObject();
         resultData.put("page", page);
         resultData.put("perPage", perPage);
-        resultData.put("pages", (int)Math.ceil(total * 1.0 / resourceList.size()));
+        resultData.put("pages", (int)Math.ceil(total*1.0/resourceList.size()));
         resultData.put("total", total);
         JSONArray resources = new JSONArray();
         for (Resource perResource : resourceList){
@@ -79,6 +79,7 @@ public class ResourceService {
         resultData.put("resources", resources);
         return ResultFactory.buildSuccessResult("查询成功", resultData);
     }
+
     //查相关资源
     public Result queryRelated(Map<String, Object> resourceIDMap){
         int resourceID = Integer.parseInt((String)resourceIDMap.get("resourceID"));

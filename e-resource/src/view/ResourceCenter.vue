@@ -1,8 +1,8 @@
 <template>
   <div>
     <nav-menu :searchInfo.sync="searchInfo"></nav-menu>
-    <div class="resource-container">
-      <el-tabs v-model="searchInfo.type" @tab-click="changeType">
+    <div class="main-container resource-container">
+      <el-tabs v-if="false" v-model="searchInfo.type" @tab-click="changeType">
         <el-tab-pane
           v-for="type in resourceTypes"
           :key="type.code"
@@ -11,33 +11,35 @@
         </el-tab-pane>
       </el-tabs>
       <div class="resources">
-        <div class="resource-list flex-1" v-if="resources.resources.length !== 0">
-          <div
-            class="resource"
-            v-for="(resource, index) in resources.resources"
-            :key="index"
-          >
-            <el-card shadow="never">
-              <div class="resource-name"><span>{{ resource['resourceName'] }}</span></div>
-              <div class="name-in-url"><span>{{ resource.url.split('/').slice(-1)[0] }}</span></div>
-              <div class="entities">
-                <el-button
-                  class="entity"
-                  round
-                  size="mini"
-                  v-for="entity in resource['entityList']"
-                  :key="entity">
-                  {{ entity }}
-                </el-button>
-              </div>
-              <div class="resource-info flex">
-                <div class="flex-1"><span>收藏：{{ resource['collection'] }}</span></div>
-                <div class="flex-1"><span>下载：{{ resource['download'] }}</span></div>
-                <div class="flex-1"><span>更新时间：{{ resource['updateTime'] }}</span></div>
-              </div>
-            </el-card>
+        <div class="resource-list flex-1">
+          <div class="resource">
+            <el-collapse v-model="activeEntity">
+              <el-collapse-item
+                v-for="(entity, index) in resources.resources"
+                :key="index"
+              >
+                <template slot="title">
+                  <div class="entity-title">{{ entity['entityName'] }}</div>
+                </template>
+                <div v-if="entity.resources.length > 0">
+                  <div
+                    v-for="resource in entity.resources"
+                    :key="resource.id"
+                  >
+                    <div class="resource-info">
+                      <span class="resource-name" @click="viewResource(resource['id'])">
+                        {{ resource['resourceName'] }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div v-else>无相关资源</div>
+              </el-collapse-item>
+            </el-collapse>
+            <!-- 隐藏的a元素，用来在新窗口打开资源页面 -->
+            <a class="resource-target" ref="resourceTarget" href="" target="_blank" v-show="false"></a>
           </div>
-          <div class="pages">
+          <div class="pages" v-if="resources.total > 10">
             <el-pagination
               layout="prev, pager, next"
               :total="resources.total"
@@ -46,14 +48,15 @@
             </el-pagination>
           </div>
         </div>
-        <div class="flex-1" v-else>未查询到相关资源</div>
+<!--        <div class="flex-1" v-else>未查询到相关知识点</div>-->
         <div class="graph flex-1">
-          <el-button
-            round
-            v-for="entity in entities.entities"
-            :key="entity['entityName']">
-            {{ entity['entityName'] }}
-          </el-button>
+            <k-g-chart :entities="entities.entities" ref="chart"></k-g-chart>
+<!--          <el-button-->
+<!--            round-->
+<!--            v-for="entity in entities.entities"-->
+<!--            :key="entity['entityName']">-->
+<!--            {{ entity['entityName'] }}-->
+<!--          </el-button>-->
         </div>
       </div>
     </div>
@@ -62,42 +65,56 @@
 
 <script>
 import NavMenu from '@/components/NavMenu'
-import { resource } from '@/api/resource'
-import { relatedEntity } from '@/api/entity'
+// import { resource } from '@/api/resource'
+import { searchEntity, relatedEntity } from '@/api/entity'
 import merge from 'webpack-merge'
+import KGChart from '@/components/Chart/KGChart'
 export default {
   name: 'ResourceCenter',
   components: {
-    NavMenu
+    NavMenu,
+    KGChart
   },
   mounted () {
-    this.getResource()
+    this.goSearch()
   },
   computed: {
     query () {
       return this.$route.query
+    },
+    graphEntity () {
+      return this.entities.entities
     }
   },
   watch: {
     query: {
       handler (newQuery, oldQuery) {
         console.log('query changed')
-        this.searchInfo.type = newQuery.type === undefined ? 0 : newQuery.type
+        this.resetResource()
+        this.resetEntity()
+        // this.searchInfo.type = newQuery.type === undefined ? 0 : newQuery.type
         this.searchInfo.content = newQuery.q === undefined ? 0 : newQuery.q
         this.pageInfo.page = newQuery.page === undefined ? 1 : newQuery.page
-        this.getResource()
+        console.log(this.searchInfo)
+        this.goSearch()
         if (oldQuery === undefined || newQuery.q !== oldQuery.q) {
           this.getRelatedEntity(newQuery.q)
         }
       },
       immediate: true
+    },
+    graphEntity: {
+      handler () {
+        console.log('aaa')
+        // this.$refs.chart.initCharts()
+      }
     }
   },
   data () {
     console.log(this.$route.query)
     return {
       searchInfo: {
-        type: this.$route.query.type === undefined ? 0 : this.$route.query.type,
+        // type: this.$route.query.type === undefined ? 0 : this.$route.query.type,
         content: this.$route.query.q
       },
       pageInfo: {
@@ -133,7 +150,8 @@ export default {
       },
       entities: {
         entities: []
-      }
+      },
+      activeEntity: ''
     }
   },
   methods: {
@@ -149,12 +167,11 @@ export default {
       }).catch(() => {
         this.$router.go(0)
       })
-      // this.getResource()
+      // this.goSearch()
     },
-    getResource () {
-      resource({
+    goSearch () {
+      searchEntity({
         keyword: this.searchInfo.content,
-        resourceType: this.searchInfo.type,
         page: this.pageInfo.page,
         perPage: this.pageInfo.perPage
       }).then(response => {
@@ -192,31 +209,39 @@ export default {
           'page': curPage
         })
       })
+    },
+    viewResource (resourceID) {
+      console.log(resourceID)
+      let target = this.$refs.resourceTarget
+      console.log(target)
+      target.setAttribute('href', `${window.location.origin}/resource/${resourceID}`)
+      target.click()
     }
   }
 }
 </script>
 
 <style scoped>
-.resource-container {
-  margin-left: 176px;
-}
-
 .resources {
   display: flex;
+  margin-top: 1rem;
   /*justify-content: space-evenly;*/
+}
+
+.entity-title {
+  font-size: 1.2rem;
+  line-height: 1.2rem;
 }
 
 .resource-name {
   color: #1a0dab;
-  font-size: 1.2rem;
+  font-size: 1rem;
   cursor: pointer;
-  margin-bottom: .2rem;
 }
 
 .resource-name:hover {
   text-decoration: underline;
-  text-underline-offset: .2rem;
+  text-underline-offset: .1rem;
 }
 
 .name-in-url {
@@ -232,11 +257,6 @@ export default {
   margin-left: -2px;
 }
 
-.resource-info {
-  margin-top: .5rem;
-  font-size: .9rem;
-}
-
 .pages {
   display: flex;
   justify-content: center;
@@ -244,6 +264,7 @@ export default {
 
 .graph {
   padding-left: 2rem;
+  min-height: 500px;
 }
 
 .graph button {

@@ -7,7 +7,6 @@ import cn.edu.njnu.pojo.ResultFactory;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.neo4j.cypherdsl.core.Limit;
-import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.driver.v1.*;
 import static org.neo4j.driver.v1.Values.parameters;
 

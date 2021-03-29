@@ -49,3 +49,4 @@
         select t_goal, t_key, resource_id from t_instruction_plan_clips inner join t_resource on t_instruction_plan_clips.resource_id = t_resource.id where entity like concat('%',#{entity},'%')
     </select>
 </mapper>
+
