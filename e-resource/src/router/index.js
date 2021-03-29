@@ -36,10 +36,17 @@ const routes = [
       }
     ]
   },
+  // 资源页面
   {
     path: '/resource/:resourceID',
     name: 'Resource',
     component: () => import('@/view/Resource')
+  },
+  // 知识页面
+  {
+    path: '/knowledge/:entityName',
+    name: 'Knowledge',
+    component: () => import('@/view/Knowledge')
   }
 ]
 

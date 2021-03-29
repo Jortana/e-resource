@@ -1,5 +1,5 @@
 <template>
-  <div class="logo-container">
+  <div class="logo-container" @click="goHome">
     <div class="logo"></div>
     <div class="title"><h1>智能学伴</h1></div>
   </div>
@@ -7,13 +7,21 @@
 
 <script>
 export default {
-  name: 'Logo'
+  name: 'Logo',
+  methods: {
+    goHome () {
+      this.$router.push({
+        path: '/'
+      })
+    }
+  }
 }
 </script>
 
 <style scoped>
 .logo-container {
   display: flex;
+  cursor: pointer;
 }
 
 .logo {
