@@ -137,7 +137,7 @@ public class EntityService {
     }
 
     public Result getProperties(Map<String, Object> nameMap){
-        String entityName = (String) nameMap.get("entityName");
+        String entityName = (String) nameMap.get("keyword");
         Driver driver = createDrive();
         Session session = driver.session();
         StatementResult result = session.run( "MATCH (a:concept) where a.name = {name} " +

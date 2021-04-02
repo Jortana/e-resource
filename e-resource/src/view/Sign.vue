@@ -185,7 +185,11 @@ export default {
         .then(response => {
           console.log(response)
           if (response.data.code === 200) {
-            this.$message.success(response.data.message)
+            this.$message({
+              message: response.data.message,
+              type: 'success',
+              duration: 1500
+            })
             this.$store.commit('login', response.data.data)
             let path = this.$route.query.redirect
             this.$router.replace({ path: path === '/' || path === undefined ? '/' : path })

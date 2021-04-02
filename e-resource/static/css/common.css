@@ -6,7 +6,17 @@
   flex: 1;
 }
 
+.bold {
+  font-weight: bold;
+}
+
 /* 主要界面需要向右移，和logo右侧对齐 */
 .main-container {
   margin-left: 176px;
+}
+
+/*空出nav-menu的位置*/
+.main-container {
+  height: calc(100vh - 100px);
+  margin-top: 1rem;
 }

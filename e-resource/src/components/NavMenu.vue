@@ -38,7 +38,6 @@ export default {
     }
   },
   data () {
-    console.log(this.searchInfo)
     return {
     }
   },

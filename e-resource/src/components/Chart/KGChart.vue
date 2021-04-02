@@ -24,8 +24,6 @@ export default {
     entities: {
       handler (entities) {
         this.resetData()
-        console.log('watch')
-        console.log(entities)
         this.formatData(entities)
       }
     }
@@ -120,8 +118,6 @@ export default {
       }
       let nodes = JSON.parse(JSON.stringify(this.nodes))
       let links = JSON.parse(JSON.stringify(this.links))
-      console.log(nodes)
-      console.log(links)
       // 指定图表的配置项和数据
       let option = {
         // 动画更新变化时间

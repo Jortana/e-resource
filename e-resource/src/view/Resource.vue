@@ -3,7 +3,7 @@
   <nav-menu></nav-menu>
   <div class="main-container flex">
     <div class="resource-info flex-1">
-      <h2>{{ resource['resourceName'] }}</h2>
+      <h2 @click="addToCart(resource.id)">{{ resource['resourceName'] }}</h2>
       <div class="resource-name" v-if="resource['url'] !== undefined">{{ resource['url'].split('/').slice(-1)[0] }}</div>
       <div class="related-resource">
         <h2>相关资源</h2>
@@ -49,10 +49,8 @@ export default {
             if (response.data.code === 200) {
               this.resource = response.data.data
               // 获取相关实体
-              console.log(response.data.data['entity'])
               relatedEntity(response.data.data['entity'])
                 .then(entityResponse => {
-                  console.log(entityResponse)
                   if (entityResponse.data.code === 200) {
                     this.entities.entities = entityResponse.data.data
                   }
@@ -64,10 +62,8 @@ export default {
         // 获取相关资源
         related(resourceID)
           .then(response => {
-            console.log(response)
             if (response.data.code === 200) {
               this.relatedResources = response.data.data
-              console.log(this.relatedResources)
             }
           })
       },
@@ -82,21 +78,21 @@ export default {
       },
       relatedResources: []
     }
+  },
+  methods: {
+    addToCart (resourceID) {
+      this.$store.commit('addToCart', resourceID)
+    }
   }
 }
 </script>
 
 <style scoped>
-.main-container {
-  height: calc(100vh - 70px);
-}
-
 .graph {
   height: 100%;
 }
 
 .resource-info {
-  margin-top: 1rem;
   position: relative;
   border-right: 1px solid #DCDFE6;
 }

@@ -45,10 +45,28 @@ export default {
     },
     jumpTo (index) {
       if (index === 'logout') {
-        logout()
-          .then(response => {
-            console.log(response)
-          })
+        this.$confirm('确认登出吗', '登出', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          console.log('logout')
+          logout()
+            .then(response => {
+              console.log(response)
+              if (response.data.code === 200) {
+                this.$message({
+                  message: response.data.message,
+                  type: 'success',
+                  duration: 1500
+                })
+                this.$store.commit('logout')
+              } else {
+                this.$message.error(response.data.message)
+              }
+            })
+        }).catch(() => {
+        })
       } else {
         this.$router
           .push(index)
@@ -66,6 +84,7 @@ export default {
   position: relative;
   display: flex;
   align-items: center;
+  z-index: 9;
 }
 
 .img,

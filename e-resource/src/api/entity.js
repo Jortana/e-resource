@@ -33,3 +33,13 @@ export const relatedEntity = (keyword) => {
   keyword = keyword.replaceAll('#', '%23')
   return http.get(`${baseURL}/public/relatedEntity?keyword=${keyword}`)
 }
+
+/**
+ * 根据关键词查询知识实体的属性
+ * - keyword: 查找的关键词
+ * @param {string} keyword
+ * @returns {AxiosPromise}
+ */
+export const properties = (keyword) => {
+  return http.get(`${baseURL}/public/getProperties?keyword=${keyword}`)
+}

@@ -31,7 +31,7 @@ public class ShiroConfiguration {
         Map<String, String> filterChainDefinitionMap = new LinkedHashMap<String, String>();
         Map<String, Filter> customizedFilter = new HashMap<>();                                 // 自定义过滤器设置 1
         customizedFilter.put("url", getURLPathMatchingFilter());                               // 自定义过滤器设置 2，命名，需在设置过滤路径前
-        filterChainDefinitionMap.put("/e-resource/api/v1.0/authentication", "authc");      // 防鸡贼登录
+        // filterChainDefinitionMap.put("/e-resource/api/v1.0/private/authentication", "authc");      // 防鸡贼登录
         filterChainDefinitionMap.put("/e-resource/api/v1.0/private/**", "authc");
         filterChainDefinitionMap.put("/e-resource/api/v1.0/private/**", "url");             // 自定义过滤器设置 3，设置过滤路径
         shiroFilterFactoryBean.setFilters(customizedFilter);                                   // 自定义过滤器设置 4，启用
