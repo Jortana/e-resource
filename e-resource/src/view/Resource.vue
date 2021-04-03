@@ -26,6 +26,7 @@ import NavMenu from '@/components/NavMenu'
 import KGChart from '@/components/Chart/KGChart'
 import { resourceInfo, related } from '@/api/resource'
 import { relatedEntity } from '@/api/entity'
+import { authentication } from '@/api/auth'
 
 export default {
   name: 'Resource',
@@ -81,7 +82,22 @@ export default {
   },
   methods: {
     addToCart (resourceID) {
-      this.$store.commit('addToCart', resourceID)
+      authentication()
+        .then(response => {
+          if (response.data.code === 200) {
+            this.$store.commit('addToCart', resourceID)
+          } else {
+            this.$message({
+              message: '请先登录',
+              type: 'warning',
+              duration: 1500
+            })
+            this.$router.push({
+              path: '/login',
+              query: { redirect: this.$route.fullPath }
+            })
+          }
+        })
     }
   }
 }

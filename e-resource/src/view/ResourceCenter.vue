@@ -15,7 +15,7 @@
       <div class="resources">
         <div class="resource-list flex-1">
           <!-- 知识卡片 -->
-          <knowledge-card class="knowledge-card" :entityInfo="cardInfo"></knowledge-card>
+          <knowledge-card class="knowledge-card" :entityInfo="cardInfo" v-if="JSON.stringify(cardInfo) !== '{}'"></knowledge-card>
           <!-- 找到的实体和资源信息 -->
           <div class="resource">
             <el-collapse v-model="activeEntity">
@@ -27,23 +27,27 @@
                   <div class="entity-title">{{ entity['entityName'] }}</div>
                 </template>
                 <!-- 教学目标和教学重难点 -->
-                <div class="subtitle">教学目标</div>
-                <div
-                  v-for="(goal, index) in entity.goal"
-                  :key="index"
-                  v-if="index < 5"
-                  :class="goal.content.length > 43 ? 'content-link overflow-content' : 'content-link'"
-                  @click="viewResource(goal.resourceID)">
-                  {{ goal.content }}
+                <div v-if="entity.goal.length > 0">
+                  <div class="subtitle">教学目标</div>
+                  <div
+                    v-for="(goal, index) in entity.goal"
+                    :key="index"
+                    v-if="index < 5"
+                    :class="goal.content.length > 43 ? 'content-link overflow-content' : 'content-link'"
+                    @click="viewResource(goal.resourceID)">
+                    {{ goal.content }}
+                  </div>
                 </div>
-                <div class="subtitle">教学重难点</div>
-                <div
-                  v-for="(key, index) in entity.key"
-                  :key="'key' + index"
-                  v-if="index < 5"
-                  :class="key.content.length > 43 ? 'content-link overflow-content' : 'content-link'"
-                  @click="viewResource(key.resourceID)">
-                  {{ key.content }}
+                <div v-if="entity.key.length > 0">
+                  <div class="subtitle">教学重难点</div>
+                  <div
+                    v-for="(key, index) in entity.key"
+                    :key="'key' + index"
+                    v-if="index < 5"
+                    :class="key.content.length > 43 ? 'content-link overflow-content' : 'content-link'"
+                    @click="viewResource(key.resourceID)">
+                    {{ key.content }}
+                  </div>
                 </div>
                 <!-- ----------------- -->
                 <div class="resource-list" v-if="entity.resources.length > 0">
