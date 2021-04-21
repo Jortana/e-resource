@@ -4,6 +4,9 @@ import cn.edu.njnu.pojo.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Map;
+
 @Mapper
 @Repository
 public interface UserMapper {
@@ -16,4 +19,11 @@ public interface UserMapper {
     void addUser(User user);
     // 更新用户信息
     void updateUser(User user);
+    //获取用户ID
+    List<Map> queryUserID();
+    //浏览记录
+    List<Map> browseRecord(int user_id);
+    List<Map> entityRecord(int user_id);
+    void updateRelated(int user_id, String related_user);
+    String queryRelatedUser(int user_id);
 }

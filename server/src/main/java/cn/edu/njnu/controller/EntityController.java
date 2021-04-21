@@ -1,13 +1,9 @@
 package cn.edu.njnu.controller;
 
-import cn.edu.njnu.Reporsitory.RelationRepository;
-import cn.edu.njnu.pojo.EntityNode;
 import cn.edu.njnu.pojo.Result;
 import cn.edu.njnu.service.EntityService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -15,7 +11,6 @@ import java.util.Map;
 public class EntityController {
 
     private final EntityService entityService;
-
     public EntityController(EntityService entityService) {
         this.entityService = entityService;
     }
@@ -31,17 +26,16 @@ public class EntityController {
     public Result getEntity(@RequestParam Map<String, Object> keywordMap){
         return entityService.getEntity(keywordMap);
     }
+    //根据entity查找重难点,从neo4j里面查
+    @CrossOrigin
+    @GetMapping("/v1.0/public/queryEntity_neo4j")
+    public Result getEntity_neo4j(@RequestParam Map<String, Object> keywordMap){
+        return entityService.getEntity_neo4j(keywordMap);
+    }
 
     @CrossOrigin
     @GetMapping("/v1.0/public/getProperties")
     public Result getProperties(@RequestParam Map<String, Object> nameMap){
         return entityService.getProperties(nameMap);
     }
-//    @Autowired
-//    private RelationRepository relationRepository;
-//
-//    @RequestMapping(method = RequestMethod.GET, path = "/rest/v1/person")
-//    public List<EntityNode> getMoviesByPersonName(@RequestParam String name) {
-//        return relationRepository.findUserRelationByEachId(name);
-//    }
 }

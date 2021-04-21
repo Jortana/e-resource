@@ -10,7 +10,6 @@ import com.alibaba.fastjson.JSONObject;
 import org.ansj.domain.Term;
 import org.ansj.splitWord.analysis.ToAnalysis;
 import org.apache.catalina.webresources.AbstractSingleArchiveResource;
-import org.neo4j.kernel.api.impl.index.storage.DirectoryFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
