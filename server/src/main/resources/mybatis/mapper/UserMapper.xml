@@ -23,4 +23,23 @@
         </trim>
         where username = #{username};
     </update>
+    <!-- 获取用户ID -->
+    <select id="queryUserID" resultType="HashMap">
+        SELECT user_id FROM t_user
+    </select>
+    <!-- 获取资源浏览记录 -->
+    <select id="browseRecord" resultType="HashMap">
+        SELECT resource_id FROM t_browse_record where user_id = #{user_id} AND resource_id IS NOT NULL ORDER BY resource_id
+    </select>
+    <!-- 获取知识点浏览记录 -->
+    <select id="entityRecord" resultType="HashMap">
+        SELECT entity_name FROM t_browse_record where user_id = #{user_id} AND entity_name IS NOT NULL ORDER BY browse_date
+    </select>
+    <update id="updateRelated">
+        update t_user set related_user=#{related_user} where user_id = #{user_id}
+    </update>
+
+    <select id="queryRelatedUser" resultType="string">
+        select related_user from t_user where user_id = #{user_id}
+    </select>
 </mapper>

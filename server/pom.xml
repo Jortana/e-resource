@@ -98,7 +98,6 @@
 			<artifactId>mybatis-spring</artifactId>
 			<version>1.3.1</version>
 		</dependency>
-
         <!-- ansj分词 -->
 		<dependency>
 			<groupId>org.ansj</groupId>
