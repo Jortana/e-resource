@@ -51,6 +51,7 @@
 import NavMenu from '@/components/NavMenu'
 import KGChart from '@/components/Chart/KGChart'
 import { properties, relatedEntity } from '@/api/entity'
+import { record } from '@/api/record'
 
 export default {
   name: 'Knowledge',
@@ -86,6 +87,8 @@ export default {
               })
             }
           })
+        // 上传用户记录
+        this.record()
       },
       immediate: true
     }
@@ -94,6 +97,13 @@ export default {
     return {
       entityInfo: {},
       relatedEntities: []
+    }
+  },
+  methods: {
+    record () {
+      record({
+        entityName: String(this.entityName)
+      })
     }
   }
 }

@@ -18,14 +18,11 @@
           <knowledge-card class="knowledge-card" :entityInfo="cardInfo" v-if="JSON.stringify(cardInfo) !== '{}'"></knowledge-card>
           <!-- 找到的实体和资源信息 -->
           <div class="resource">
-            <el-collapse v-model="activeEntity">
-              <el-collapse-item
+            <div>
+              <div
                 v-for="(entity, index) in resources.resources"
                 :key="index"
               >
-                <template slot="title">
-                  <div class="entity-title">{{ entity['entityName'] }}</div>
-                </template>
                 <!-- 教学目标和教学重难点 -->
                 <div v-if="entity.goal.length > 0">
                   <div class="subtitle">教学目标</div>
@@ -63,8 +60,8 @@
                   </div>
                 </div>
                 <div v-else>无相关资源</div>
-              </el-collapse-item>
-            </el-collapse>
+              </div>
+            </div>
             <!-- 隐藏的a元素，用来在新窗口打开资源页面 -->
             <a class="resource-target" ref="resourceTarget" href="" target="_blank" v-show="false"></a>
           </div>
@@ -288,9 +285,6 @@ export default {
 
 .resource .subtitle {
   color: #606266;
-}
-
-.subtitle ~ .subtitle {
   margin-top: .5rem;
 }
 
@@ -300,6 +294,7 @@ export default {
   cursor: pointer;
   text-align: justify;
   width: 100%;
+  font-size: .8rem;
   line-height: 1.2rem;
   height: 1.2rem;
   color: #909399;

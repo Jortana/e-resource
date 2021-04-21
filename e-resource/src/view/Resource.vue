@@ -27,6 +27,7 @@ import KGChart from '@/components/Chart/KGChart'
 import { resourceInfo, related } from '@/api/resource'
 import { relatedEntity } from '@/api/entity'
 import { authentication } from '@/api/auth'
+import { record } from '@/api/record'
 
 export default {
   name: 'Resource',
@@ -67,6 +68,8 @@ export default {
               this.relatedResources = response.data.data
             }
           })
+        // 上传用户访问记录
+        this.record()
       },
       immediate: true
     }
@@ -98,6 +101,11 @@ export default {
             })
           }
         })
+    },
+    record () {
+      record({
+        resourceID: Number(this.resourceID)
+      })
     }
   }
 }

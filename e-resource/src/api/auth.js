@@ -4,18 +4,13 @@ let baseURL = '/v1.0'
 
 /**
  * 注册
- * - username: 用户名
- * - email: 邮箱
- * - password: 密码
- * - confirmPassword: 确认密码
- * - period: 学段代码（2: 小学, 3: 初中, 4: 高中）
- * - grade: 年级
  * @param {Object} params
- * @param {String} params.username
- * @param {String} params.email
- * @param {String} params.password
- * @param {Number} params.period
- * @param {Number} params.grade
+ * @param {String} params.username - 用户名
+ * @param {String} params.email - 邮箱
+ * @param {String} params.password - 密码
+ * @param {String} params.confirmPassword - 密码
+ * @param {Number} params.period - 学段代码（2: 小学, 3: 初中, 4: 高中）
+ * @param {Number} params.grade - 年级
  */
 export const register = (params) => {
   return http.post(`${baseURL}/public/register`, params)
