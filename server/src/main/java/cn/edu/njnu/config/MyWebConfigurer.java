@@ -21,5 +21,6 @@ public class MyWebConfigurer implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/e-resource/api/file/avatar/**").addResourceLocations("file:" + "d:/e-resource/avatar/");
+        registry.addResourceHandler("/e-resource/api/file/resource/**").addResourceLocations("file:" + "d:/e-resource/resource");
     }
 }

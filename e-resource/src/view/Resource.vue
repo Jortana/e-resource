@@ -5,6 +5,9 @@
     <div class="resource-info flex-1">
       <h2 @click="addToCart(resource.id)">{{ resource['resourceName'] }}</h2>
       <div class="resource-name" v-if="resource['url'] !== undefined">{{ resource['url'].split('/').slice(-1)[0] }}</div>
+      <!-- 资源展示组件 -->
+      <resource-viewer :url="String(resource.url)"></resource-viewer>
+      <!-- ---------- -->
       <div class="related-resource">
         <h2>相关资源</h2>
         <div
@@ -24,6 +27,7 @@
 <script>
 import NavMenu from '@/components/NavMenu'
 import KGChart from '@/components/Chart/KGChart'
+import ResourceViewer from '@/components/ViewResource/ResourceViewer'
 import { resourceInfo, related } from '@/api/resource'
 import { relatedEntity } from '@/api/entity'
 import { authentication } from '@/api/auth'
@@ -33,7 +37,8 @@ export default {
   name: 'Resource',
   components: {
     NavMenu,
-    KGChart
+    KGChart,
+    ResourceViewer
   },
   props: {
   },
@@ -134,4 +139,10 @@ export default {
   left: 0;
   bottom: 2rem;
 }
+
+/*@media only screen and (max-width : 768px) {*/
+/*  .main-container {*/
+/*    flex-direction: column;*/
+/*  }*/
+/*}*/
 </style>
