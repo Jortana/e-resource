@@ -40,7 +40,6 @@ public class ResourceController {
     @CrossOrigin
     @GetMapping("/v1.0/public/queryResource")
     public Result queryResource(@RequestParam Map<String, Object> resourceIDMap){
-        System.out.println(resourceIDMap);
         return resourceService.queryResource(resourceIDMap);
     }
 

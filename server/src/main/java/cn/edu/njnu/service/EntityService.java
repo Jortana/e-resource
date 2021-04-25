@@ -22,7 +22,7 @@ public class EntityService {
     public EntityService(ResourceMapper resourceMapper) {
         this.resourceMapper = resourceMapper;
     }
-
+    String resourceRoot = "http://223.2.50.241:8082";
     private Driver createDrive(){
         return GraphDatabase.driver( "bolt://223.2.50.241:7687", AuthTokens.basic( "neo4j", "123456" ) );
     }
@@ -121,6 +121,8 @@ public class EntityService {
         ArrayList<Resource> queryResource = resourceMapper.queryResourceByEntity(entity);
         JSONArray resourceList = new JSONArray();
         for (Resource perResource : queryResource){
+//            perResource.setUrl(resourceRoot + perResource.getUrl());
+//            perResource.setViewUrl(resourceRoot + perResource.getViewUrl());
             resourceList.add(perResource);
         }
         return resourceList;

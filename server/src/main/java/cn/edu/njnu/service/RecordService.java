@@ -18,14 +18,13 @@ public class RecordService {
         Date date = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String browseDate = formatter.format(date);
-        System.out.println(browseDate);
-        int userID = Integer.parseInt((String) recordMap.get("userID"));
+        int userID = (int) recordMap.get("userId");
         if (recordMap.containsKey("entityName")){
             String entityName = (String) recordMap.get("entityName");
             recordMapper.addEntityRecord(userID, browseDate, entityName);
         }
         if (recordMap.containsKey("resourceID")){
-            int resourceID = Integer.parseInt((String) recordMap.get("resourceID"));
+            int resourceID = (int) recordMap.get("resourceID");
             recordMapper.addResourceRecord(userID, browseDate, resourceID);
         }
     }

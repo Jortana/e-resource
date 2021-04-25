@@ -18,7 +18,7 @@ import java.util.*;
 public class ResourceService {
 
     private final ResourceMapper resourceMapper;
-
+    String resourceRoot = "http://223.2.50.241:8082";
     public ResourceService(ResourceMapper resourceMapper) {
         this.resourceMapper = resourceMapper;
     }
@@ -73,6 +73,8 @@ public class ResourceService {
         JSONArray resources = new JSONArray();
         for (Resource perResource : resourceList){
             perResource.setEntityList(perResource.getEntity().split("#"));
+//            perResource.setUrl(resourceRoot + perResource.getUrl());
+//            perResource.setViewUrl(resourceRoot + perResource.getViewUrl());
             resources.add(perResource);
         }
         resultData.put("resources", resources);

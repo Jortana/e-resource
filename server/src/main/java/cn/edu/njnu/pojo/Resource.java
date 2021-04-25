@@ -1,10 +1,13 @@
 package cn.edu.njnu.pojo;
 
+import java.util.Arrays;
+
 public class Resource {
     int id;
     String resourceName;
     String remark;
     String url;
+    String viewUrl;
     String related_10;
     String keywords;
     String entity;
@@ -19,14 +22,16 @@ public class Resource {
     public Resource() {
     }
 
-    public Resource(int id, String resourceName, String remark, String url, String related_10, String keywords, String entity, int download, int collection, int type, int period, int grade, int subject) {
+    public Resource(int id, String resourceName, String remark, String url, String viewUrl, String related_10, String keywords, String entity, String[] entityList, int download, int collection, int type, int period, int grade, int subject) {
         this.id = id;
         this.resourceName = resourceName;
         this.remark = remark;
         this.url = url;
+        this.viewUrl = viewUrl;
         this.related_10 = related_10;
         this.keywords = keywords;
         this.entity = entity;
+        this.entityList = entityList;
         this.download = download;
         this.collection = collection;
         this.type = type;
@@ -42,9 +47,11 @@ public class Resource {
                 ", resourceName='" + resourceName + '\'' +
                 ", remark='" + remark + '\'' +
                 ", url='" + url + '\'' +
+                ", viewUrl='" + viewUrl + '\'' +
                 ", related_10='" + related_10 + '\'' +
                 ", keywords='" + keywords + '\'' +
                 ", entity='" + entity + '\'' +
+                ", entityList=" + Arrays.toString(entityList) +
                 ", download=" + download +
                 ", collection=" + collection +
                 ", type=" + type +
@@ -56,14 +63,6 @@ public class Resource {
 
     public int getId() {
         return id;
-    }
-
-    public String[] getEntityList() {
-        return entityList;
-    }
-
-    public void setEntityList(String[] entityList) {
-        this.entityList = entityList;
     }
 
     public void setId(int id) {
@@ -94,6 +93,14 @@ public class Resource {
         this.url = url;
     }
 
+    public String getViewUrl() {
+        return viewUrl;
+    }
+
+    public void setViewUrl(String viewUrl) {
+        this.viewUrl = viewUrl;
+    }
+
     public String getRelated_10() {
         return related_10;
     }
@@ -116,6 +123,14 @@ public class Resource {
 
     public void setEntity(String entity) {
         this.entity = entity;
+    }
+
+    public String[] getEntityList() {
+        return entityList;
+    }
+
+    public void setEntityList(String[] entityList) {
+        this.entityList = entityList;
     }
 
     public int getDownload() {

@@ -14,9 +14,8 @@ public class RecordController {
         this.recordService = recordService;
     }
 
-    @CrossOrigin
-    @PostMapping("/v1.0/public/record")
-    public void addEntityRecord(@RequestParam Map<String, Object> recordMap){
+    @PostMapping("/v1.0/private/record")
+    public void addRecord(@RequestBody Map<String, Object> recordMap){
         recordService.addRecord(recordMap);
     }
 }

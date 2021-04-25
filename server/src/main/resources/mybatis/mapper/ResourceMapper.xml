@@ -5,7 +5,7 @@
 <mapper namespace="cn.edu.njnu.mapper.ResourceMapper">
     <!-- 根据关键词查资源 -->
     <select id="queryResourceByKeywords" resultType="resource">
-        select id, resource_name, download, collection, `period`, grade, subject, url, entity, updateTime from t_resource where
+        select id, resource_name, download, collection, `period`, grade, subject, url, view_url, entity, updateTime from t_resource where
         <trim suffixOverrides="and">
             <if test="keyword!=null">entity like concat('%',#{keyword},'%') and </if>
             <if test="resourceType!=0">resource_type=#{resourceType} and </if>
@@ -30,7 +30,7 @@
     </select>
     <!-- 根据ID查资源 -->
     <select id="queryResourceByID" resultType="resource">
-         select id, resource_name, download, collection, `period`, grade, subject, url, entity from t_resource where id = #{resource_id}
+         select id, resource_name, download, collection, `period`, grade, subject, url, view_url, entity from t_resource where id = #{resource_id}
     </select>
     <!-- 获取资源类型 -->
     <select id="queryType" resultType="HashMap">
@@ -42,7 +42,7 @@
     </select>
     <!-- 通过实体找资源 -->
     <select id="queryResourceByEntity" resultType="resource">
-        select id, resource_name, download, collection, `period`, grade, subject, url, entity, updateTime from t_resource where entity like concat('%',#{entity},'%')
+        select id, resource_name, download, collection, `period`, grade, subject, url, view_url, entity, updateTime from t_resource where entity like concat('%',#{entity},'%')
     </select>
     <!-- 查教学目标和重难点 -->
     <select id="queryGoalAndKey" resultType="HashMap">
