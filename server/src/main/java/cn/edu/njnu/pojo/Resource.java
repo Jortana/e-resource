@@ -15,29 +15,11 @@ public class Resource {
     int download;
     int collection;
     int type;
-    int period;
-    int grade;
+    String period;
+    String grade;
     int subject;
 
     public Resource() {
-    }
-
-    public Resource(int id, String resourceName, String remark, String url, String viewUrl, String related_10, String keywords, String entity, String[] entityList, int download, int collection, int type, int period, int grade, int subject) {
-        this.id = id;
-        this.resourceName = resourceName;
-        this.remark = remark;
-        this.url = url;
-        this.viewUrl = viewUrl;
-        this.related_10 = related_10;
-        this.keywords = keywords;
-        this.entity = entity;
-        this.entityList = entityList;
-        this.download = download;
-        this.collection = collection;
-        this.type = type;
-        this.period = period;
-        this.grade = grade;
-        this.subject = subject;
     }
 
     @Override
@@ -55,10 +37,28 @@ public class Resource {
                 ", download=" + download +
                 ", collection=" + collection +
                 ", type=" + type +
-                ", period=" + period +
-                ", grade=" + grade +
+                ", period='" + period + '\'' +
+                ", grade='" + grade + '\'' +
                 ", subject=" + subject +
                 '}';
+    }
+
+    public Resource(int id, String resourceName, String remark, String url, String viewUrl, String related_10, String keywords, String entity, String[] entityList, int download, int collection, int type, String period, String grade, int subject) {
+        this.id = id;
+        this.resourceName = resourceName;
+        this.remark = remark;
+        this.url = url;
+        this.viewUrl = viewUrl;
+        this.related_10 = related_10;
+        this.keywords = keywords;
+        this.entity = entity;
+        this.entityList = entityList;
+        this.download = download;
+        this.collection = collection;
+        this.type = type;
+        this.period = period;
+        this.grade = grade;
+        this.subject = subject;
     }
 
     public int getId() {
@@ -157,19 +157,19 @@ public class Resource {
         this.type = type;
     }
 
-    public int getPeriod() {
+    public String getPeriod() {
         return period;
     }
 
-    public void setPeriod(int period) {
+    public void setPeriod(String period) {
         this.period = period;
     }
 
-    public int getGrade() {
+    public String getGrade() {
         return grade;
     }
 
-    public void setGrade(int grade) {
+    public void setGrade(String grade) {
         this.grade = grade;
     }
 
