@@ -6,7 +6,7 @@
       <h2 @click="addToCart(resource.id)">{{ resource['resourceName'] }}</h2>
       <div class="resource-name" v-if="resource['url'] !== undefined">{{ resource['url'].split('/').slice(-1)[0] }}</div>
       <!-- 资源展示组件 -->
-      <resource-viewer :url="String(resource.url)"></resource-viewer>
+      <resource-viewer :url="String(resource['viewUrl'])"></resource-viewer>
       <!-- ---------- -->
       <div class="related-resource">
         <h2>相关资源</h2>
@@ -135,9 +135,10 @@ export default {
 }
 
 .related-resource {
-  position: absolute;
-  left: 0;
-  bottom: 2rem;
+  /*position: absolute;*/
+  margin-top: 2rem;
+  /*left: 0;*/
+  /*bottom: 2rem;*/
 }
 
 /*@media only screen and (max-width : 768px) {*/
