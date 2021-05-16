@@ -10,9 +10,13 @@ import com.alibaba.fastjson.JSONObject;
 import org.ansj.domain.Term;
 import org.ansj.splitWord.analysis.ToAnalysis;
 import org.apache.catalina.webresources.AbstractSingleArchiveResource;
+import org.neo4j.driver.v1.*;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+
+import static org.neo4j.driver.v1.Values.isoDuration;
+import static org.neo4j.driver.v1.Values.parameters;
 
 @Service
 public class ResourceService {
@@ -108,5 +112,173 @@ public class ResourceService {
     public Resource entityList(Resource resource){
         resource.setEntityList(resource.getEntity().split("#"));
         return resource;
+    }
+    private static Driver createDrive(){
+        return GraphDatabase.driver( "bolt://223.2.50.241:7687", AuthTokens.basic( "neo4j", "123456" ) );
+    }
+    //更新资源相似度
+    public Result relatedResource(){
+        Driver driver = createDrive();
+        Session session = driver.session();
+        StatementResult result = session.run( "MATCH (n:resource) where n.subject='化学' " +
+                        "RETURN n.id AS ID order by ID",
+                parameters() );
+        while ( result.hasNext() )
+        {
+            Record record = result.next();
+            int resourceID = record.get( "ID" ).asInt();
+            HashMap<String, Integer> hm1 = new HashMap<String, Integer>();
+            StatementResult tfidf = session.run( "MATCH (n:resource)-[r]->(m:concept) where n.id={id} " +
+                        "RETURN m.name, r.tf",
+                parameters("id", resourceID) );
+            while ( tfidf.hasNext() )
+            {
+                Record tfidfRecord = tfidf.next();
+                String word = tfidfRecord.get("m.name").asString();
+                int tf = tfidfRecord.get("r.tf").asInt();
+                hm1.put(word, tf);
+            }
+            HashMap<Integer, HashMap<String, Integer>> map = new HashMap<Integer, HashMap<String, Integer>>();
+            map.put(resourceID,hm1);
+            StatementResult otherResource = session.run( "MATCH (n:resource) where n.subject='化学' and n.id<>{id}" +
+                            "RETURN n.id AS ID order by ID",
+                    parameters("id", resourceID) );
+            while ( otherResource.hasNext() )
+            {
+                Record other = otherResource.next();
+                int otherID = other.get( "ID" ).asInt();
+                StatementResult otherTFIDF = session.run( "MATCH (n:resource)-[r]->(m:concept) where n.id={id} " +
+                                "RETURN m.name, r.tf",
+                        parameters("id", otherID) );
+                HashMap<String, Integer> hm2 = new HashMap<String, Integer>();
+                while ( otherTFIDF.hasNext() )
+                {
+                    Record tfidfRecord = otherTFIDF.next();
+                    String word = tfidfRecord.get("m.name").asString();
+                    int tf = tfidfRecord.get("r.tf").asInt();
+                    hm2.put(word, tf);
+                }
+                HashMap<Integer, HashMap<String, Integer>> map1= new HashMap<Integer, HashMap<String, Integer>>();
+                map1.put(otherID,hm2);
+                resxsd( map, map1);
+            }
+        }
+        return ResultFactory.buildSuccessResult("资源相似度更新成功", null);
+    }
+    public static void resxsd(HashMap<Integer, HashMap<String, Integer>> keywords, HashMap<Integer, HashMap<String, Integer>> keywords1) {  //读取与Resid在同一个知识点下面的资源以及与该知识点直接相连的知识下的资源
+        Driver driver = createDrive();
+        Session session = driver.session();
+        for (Map.Entry<Integer, HashMap<String, Integer>> entrytemp : keywords.entrySet()) {
+            // nu = entrytemp.getKey();
+            System.out.println("待测资源"+keywords);}
+        for (Map.Entry<Integer, HashMap<String, Integer>> entry : keywords1.entrySet()) {//遍历每一个相关资源
+            System.out.println("相关资源"+entry);
+            int num=entry.getKey();
+            int nu=0;
+            HashMap<String, Integer> s = entry.getValue();
+            double fenmu1 = 0.0;
+            double fenmu2 = 0.0;
+            double fenzi = 0.0;
+            int flag=1;
+            for (HashMap.Entry<String, Integer> entry1 : s.entrySet()) {   //获取相关资源的关键词和tfidf值
+                fenmu1 += Math.pow(entry1.getValue(), 2);
+                for (Map.Entry<Integer, HashMap<String, Integer>> entrytemp : keywords.entrySet()) {
+                    nu = entrytemp.getKey();
+                    // System.out.println("待测资源"+keywords);
+                    HashMap<String, Integer> st = entrytemp.getValue();
+                    for (HashMap.Entry<String, Integer> entryt : st.entrySet()) {  //遍历待测资源
+                        if (flag == 1) {
+                            fenmu2 += Math.pow(entryt.getValue(), 2);
+                        }
+                        if (entryt.getKey().equals(entry1.getKey())) {
+                            System.out.println("相同关键词："+entryt.getKey()+"---"+entry1.getKey());
+                            fenzi += entryt.getValue() * entry1.getValue();
+                        }
+                    }
+                    flag = 0;
+                }
+            }
+            System.out.println(fenmu1 + "  " + fenmu2 + " " + fenzi);
+            double result = fenzi / (Math.sqrt(fenmu1) * Math.sqrt(fenmu2));
+            double xsd= 0.5*result+0.5;
+            System.out.println(nu + "  " + num + "的相似度为" +xsd);
+            if (num>nu){
+                session.run("MATCH (a:resource), (b:resource) " +
+                        "WHERE a.id = " + nu + " AND b.id = " + num
+                        + " CREATE (a)-[:similarity{weight:" + xsd + "}]->(b)");
+                session.run("MATCH (a:resource), (b:resource) " +
+                        "WHERE a.id = " + nu + " AND b.id = " + num
+                        + " CREATE (b)-[:similarity{weight:" + xsd + "}]->(a)");
+            }
+        }
+        session.close();
+        driver.close();
+    }
+
+    public Result recommendResource(Map<String, Object> IDMap){
+        int userID = Integer.parseInt((String) IDMap.get("userId"));
+        int resourceID = Integer.parseInt((String) IDMap.get("resourceID"));
+        Driver driver = createDrive();
+        Session session = driver.session();
+
+        StatementResult resourceWeight = session.run( "MATCH (n:resource)-[r]->(m:resource) where n.id={id} " +
+                        "RETURN m.id, r.weight order by r.weight desc limit 10",
+                parameters("id", resourceID) );
+        HashMap<Integer, Double> resourceMap = new HashMap<>();
+        while ( resourceWeight.hasNext() ) {
+            Record userRecord = resourceWeight.next();
+            int resID = userRecord.get("m.id").asInt();
+            double userResourceWeight = userRecord.get("r.weight").asDouble();
+            resourceMap.put(resID, userResourceWeight);
+        }
+        StatementResult userWeight = session.run( "MATCH (n:user)-[r]->(m:resource) where n.id={id} " +
+                        "RETURN m.id, r.weight order by r.weight desc limit 10",
+                parameters("id", userID) );
+        JSONArray recommendResource = new JSONArray();
+        HashMap<Integer, Double> userResourceMap = new HashMap<>();
+        while ( userWeight.hasNext() ) {
+            Record userRecord = userWeight.next();
+            int resID = userRecord.get("m.id").asInt();
+            double userResourceWeight = userRecord.get("r,weight").asDouble();
+            if (resourceMap.containsKey(resID)){
+                JSONObject resource = new JSONObject();
+                resource.put("resourceID", resID);
+
+                resource.put("weight", resourceMap.get(resID));
+                recommendResource.add(resource);
+                resourceMap.remove(resID);
+            }
+            else {
+                resourceMap.put(resID, userResourceWeight);
+            }
+        }
+        for (Integer key : resourceMap.keySet()) {
+            if (!userResourceMap.containsKey(key)){
+                userResourceMap.put(key, resourceMap.get(key));
+            }
+        }
+        List<Map.Entry<Integer, Double>> list = new ArrayList<Map.Entry<Integer, Double>>(userResourceMap.entrySet());
+        Collections.sort(list,new Comparator<Map.Entry<Integer, Double>>() {
+            //升序排序
+            public int compare(Map.Entry<Integer, Double> o1,
+                               Map.Entry<Integer, Double> o2) {
+                return o2.getValue().compareTo(o1.getValue());
+            }
+        });
+        for(Map.Entry<Integer, Double> mapping:list){
+            JSONObject resource = new JSONObject();
+            resource.put("resourceID", mapping.getKey());
+            resource.put("weight", mapping.getValue());
+            recommendResource.add(resource);
+        }
+
+        session.close();
+//        driver.close();
+        for(int i=0;i<recommendResource.size();i++) {
+            int id = (int) recommendResource.getJSONObject(i).get("resourceID");
+            double weight = (double) recommendResource.getJSONObject(i).get("weight");
+            System.out.println("资源ID:" + id + "  对用户ID:" + userID + " 的推荐度为: " + weight);
+        }
+        return ResultFactory.buildSuccessResult("Success", recommendResource);
     }
 }

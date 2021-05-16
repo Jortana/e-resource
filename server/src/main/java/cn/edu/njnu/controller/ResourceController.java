@@ -43,4 +43,15 @@ public class ResourceController {
         return resourceService.queryResource(resourceIDMap);
     }
 
+    @CrossOrigin
+    @PostMapping("/v1.0/public/relatedResource")
+    public Result relatedResource(){
+        return resourceService.relatedResource();
+    }
+
+    @CrossOrigin
+    @GetMapping("/v1.0/public/recommendResource")
+    public Result recommendResource(@RequestParam Map<String, Object> IDMap){
+        return resourceService.recommendResource(IDMap);
+    }
 }

@@ -107,18 +107,22 @@ public class UserService {
     private Driver createDrive(){
         return GraphDatabase.driver( "bolt://223.2.50.241:7687", AuthTokens.basic( "neo4j", "123456" ) );
     }
+
     //推荐算法 UPDATE 2021-4-7
     public Result relatedUser(){
         List<Map> userIdList = userMapper.queryUserID();
         JSONArray resArray = new JSONArray();
         int entityNum = 0;
-
         for(Map userIDMap : userIdList){
             int userID = (int) userIDMap.get("user_id");
             JSONObject userRecord = new JSONObject();
             userRecord.put("id", userID);
 //            List<Map> record = userMapper.browseRecord(userID);
             List<Map> record = userMapper.entityRecord(userID);
+//            System.out.println(record.size());
+            if (record.size()==0){ //如果用户没有记录就跳过
+                continue;
+            }
             JSONArray resourceList = new JSONArray();
             Driver driver = createDrive();
             Session session = driver.session();
@@ -153,6 +157,14 @@ public class UserService {
                 int resourceID = resourceList.get(j);
                 s[i][j+1] = resourceID;
             }
+        }
+        System.out.println("打印二维数组");
+        for (int i = 0; i < resArray.size(); i++)
+        {
+            for (int j = 0; j < col; j++){
+                System.out.print(s[i][j]+" ");
+            }
+            System.out.print("\n");
         }
         return relatedUser(s,s.length,col); //col 是数组的列数
     }
@@ -216,6 +228,8 @@ public class UserService {
         }
         Driver driver = createDrive();
         Session session = driver.session();
+        session.run("MATCH (a:user)-[r]->(b:user) delete r ");
+        session.run("MATCH (a:user) delete a ");
         for (int k = 0; k <userItemLength.size() ; k++) { //1-3
             int recommendUserId =idUser.get(k);
             JSONArray userArray = new JSONArray();  //存用户id与权重，便于后续排序
@@ -244,9 +258,9 @@ public class UserService {
                         session.run( "CREATE (a:user { id: {id} })",
                                 parameters( "id", idUser.get(j)) );
                     }
-                    session.run("MATCH (a:user)-[r]->(b:user) " +
-                            "WHERE a.id = " + idUser.get(j) + " AND b.id = " + recommendUserId
-                            + " delete r");
+//                    session.run("MATCH (a:user)-[r]->(b:user) " +
+//                            "WHERE a.id = " + idUser.get(j) + " AND b.id = " + recommendUserId
+//                            + " delete r");
                     session.run("MATCH (a:user), (b:user) " +
                             "WHERE a.id = " + idUser.get(j) + " AND b.id = " + recommendUserId
                             + " CREATE (a)-[:similarity{weight:" + xsduser + "}]->(b)");
@@ -283,10 +297,9 @@ public class UserService {
         return ResultFactory.buildSuccessResult("相似用户更新成功",null);
     }
     public Result recommend(Map<String, Object> userIDMap) {
-        int recommendUserID = Integer.parseInt((String)userIDMap.get("userid"));
+        int recommendUserID = Integer.parseInt((String)userIDMap.get("userId"));
         String userIdList = userMapper.queryRelatedUser(recommendUserID)+recommendUserID;
         String[] userList = userIdList.split("#");
-
         JSONArray resArray = new JSONArray();
         int col = 0;
         for(int i=0;i < userList.length;i++){
@@ -294,6 +307,9 @@ public class UserService {
             JSONObject userRecord = new JSONObject();
             userRecord.put("id", userID);
             List<Map> record = userMapper.browseRecord(userID);
+            if (record.size()==0){
+                continue;
+            }
             JSONArray resourceList = new JSONArray();
             for (Map singleRecord : record){
                 int resourceID = (int) singleRecord.get("resource_id");
@@ -315,6 +331,14 @@ public class UserService {
                 s[i][j+1] = resourceID;
             }
         }
+//        System.out.println("打印二维数组");
+//        for (int i = 0; i < resArray.size(); i++)
+//        {
+//            for (int j = 0; j < col; j++){
+//                System.out.print(s[i][j]+" ");
+//            }
+//            System.out.print("\n");
+//        }
         return userxsd(s,s.length,recommendUserID);
     }
 
@@ -395,7 +419,6 @@ public class UserService {
 //            }
 //            System.out.println();
 //        }
-
         //计算用户之间的相似度【余弦相似性】
         JSONArray resourceArray = new JSONArray();
         for (int k = 0; k <userItemLength.size() ; k++) { //1-3
@@ -420,7 +443,6 @@ public class UserService {
             for (Integer item : items) {
                 //遍历每一件资源
                 Set<Integer> users = itemUserCollection.get(item);
-
                 //得到购买当前资源的所有用户集合
                 if (!users.contains(recommendUserId)) {
                     //如果被推荐用户没有浏览当前资源，则进行推荐度计算
@@ -433,15 +455,13 @@ public class UserService {
                         user_entity.put(temp,itemRecommendDegree);
                         //  System.out.println(user_entity.entrySet());
                     }
-
-//                    System.out.println("The item " + item + " for " + recommendUserId + "'s recommended degree:" + itemRecommendDegree);
+                    System.out.println("The item " + item + " for " + recommendUserId + "'s recommended degree:" + itemRecommendDegree);
                     JSONObject userWeight = new JSONObject();
                     userWeight.put("resourceID", item);
                     userWeight.put("weight", itemRecommendDegree);
                     userArray.add(userWeight);
                 }
             }
-
             int userLength = userArray.size();
             double[] weightList = new double[userLength];  //用户权重数组
             int[] userList = new int[userLength];  //用户ID数组
@@ -461,7 +481,7 @@ public class UserService {
                 }
             }
             List<Map> record = userMapper.entityRecord(recommendUserId);
-            for (int i=0 ; i < userLength;i++){
+            for (int i = 0 ; i < userLength; i++){
                 int resourceID = userList[i];
                 Resource queryResource = resourceMapper.queryResourceByID(resourceID);
                 String entity = queryResource.getEntity();
@@ -471,6 +491,7 @@ public class UserService {
                         resourceArray.add(queryResource);
                         break;
                     }
+
                 }
             }
 //            System.out.println(user_entity.entrySet());
