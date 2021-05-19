@@ -1,12 +1,14 @@
 <template>
-<div>
+<div class="lg-container">
   <nav-menu></nav-menu>
   <div class="main-container flex">
     <div class="resource-info flex-1">
       <h2 @click="addToCart(resource.id)">{{ resource['resourceName'] }}</h2>
       <div class="resource-name" v-if="resource['url'] !== undefined">{{ resource['url'].split('/').slice(-1)[0] }}</div>
       <!-- 资源展示组件 -->
-      <resource-viewer :url="String(resource['viewUrl'])"></resource-viewer>
+      <div class="viewer">
+        <resource-viewer :url="String(resource['viewUrl'])"></resource-viewer>
+      </div>
       <!-- ---------- -->
       <div class="related-resource">
         <h2>相关资源</h2>
@@ -69,6 +71,7 @@ export default {
         // 获取相关资源
         related(resourceID)
           .then(response => {
+            console.log(response)
             if (response.data.code === 200) {
               this.relatedResources = response.data.data
             }
@@ -136,9 +139,14 @@ export default {
 
 .related-resource {
   /*position: absolute;*/
-  margin-top: 2rem;
+  /*margin-top: 2rem;*/
   /*left: 0;*/
   /*bottom: 2rem;*/
+}
+
+.viewer {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
 }
 
 /*@media only screen and (max-width : 768px) {*/

@@ -1,6 +1,6 @@
 <template>
 <div class="viewer">
-  <el-scrollbar style="height: 80vh">
+  <el-scrollbar :style="scrollerStyle">
     <pdf
       v-for="i in pdf.numPages"
       :key="i"
@@ -32,12 +32,19 @@ export default {
     },
     viewUrl () {
       return baseUrl + this.url
+    },
+    scrollerStyle () {
+      if (this.suffix === 'pdf') {
+        return 'height: 75vh;'
+      }
+      return ''
     }
   },
   watch: {
     suffix: {
       handler (suffix) {
         if (suffix === 'pdf') {
+          console.log(this.viewUrl)
           this.pdf.src = pdf.createLoadingTask(this.viewUrl)
           // console.log(this.pdf.src)
         }
@@ -46,10 +53,13 @@ export default {
     },
     url: {
       handler (url) {
+        console.log(url)
         if (url !== 'undefined') {
-          this.pdf.src.promise.then(pdf => {
-            this.pdf.numPages = pdf.numPages
-          })
+          if (this.suffix === 'pdf') {
+            this.pdf.src.promise.then(pdf => {
+              this.pdf.numPages = pdf.numPages
+            })
+          }
         }
       },
       immediate: true
@@ -66,7 +76,6 @@ export default {
     }
   },
   methods: {
-
   }
 }
 </script>

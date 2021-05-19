@@ -53,9 +53,31 @@
                     :key="resource.id"
                   >
                     <div class="resource-info">
-                      <span class="resource-name" @click="viewResource(resource['id'])">
-                        {{ resource['resourceName'] }}
-                      </span>
+                      <div class="info">
+                        <span class="resource-name" @click="viewResource(resource['id'])">
+                          {{ resource['resourceName'] }}
+                        </span>
+                        <div class="file-name">
+                          {{ `${resource['resourceName']}.${resource['url'].split('.').slice(-1)}` }}
+                        </div>
+                        <div class="entity-list">
+                          <el-button
+                            size="mini"
+                            v-for="entity in resource['entity'].split('#').slice(0, resource['entity'].split('#').length - 1)"
+                            :key = entity
+                          >
+                            {{ entity }}
+                          </el-button>
+                        </div>
+                      </div>
+                      <div class="operation">
+                        <div class="full-width">
+                          <el-button class="full-width" type="primary" size="medium" icon="el-icon-download">下载</el-button>
+                        </div>
+                        <div class="full-width">
+                          <el-button class="full-width" size="medium" >加入资源包</el-button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -198,6 +220,7 @@ export default {
         console.log(response.data)
         this.resetResource()
         if (response.data.code === 200) {
+          console.log(response.data.data)
           this.resources.resources = response.data.data.resources
           this.resources.total = response.data.data.total
           this.resources.pages = response.data.data.pages
@@ -281,6 +304,7 @@ export default {
 
 .resource-list {
   margin-top: 1rem;
+  border-top: 1px solid #dcdfe6;
 }
 
 .resource .subtitle {
@@ -318,9 +342,38 @@ export default {
   background: #fff;
 }
 
+.resource-info {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #dcdfe6;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.info {
+  flex-direction: column;
+}
+
+.entity-list {
+  margin-top: .5rem;
+}
+
+.operation {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  /*justify-content: center;*/
+  align-items: center;
+}
+
+.operation button {
+  margin-bottom: 10px;
+}
+
 .resource-name {
-  color: #1a0dab;
-  font-size: 1rem;
+  /*color: #1a0dab;*/
+  font-size: 1.2rem;
+  font-weight: bold;
   cursor: pointer;
 }
 
