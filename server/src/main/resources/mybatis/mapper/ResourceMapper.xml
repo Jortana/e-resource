@@ -42,7 +42,7 @@
     </select>
     <!-- 通过实体找资源 -->
     <select id="queryResourceByEntity" resultType="resource">
-        select id, resource_name, download, collection, `period`, grade, subject, url, view_url, entity, updateTime from t_resource where entity like concat('%',#{entity},'%')
+        select id, resource_name, download, collection, `period`, grade, subject, url, view_url, entity, updateTime from t_resource where entity like concat('%',#{entity},'%') limit #{start},#{end}
     </select>
     <!-- 查教学目标和重难点 -->
     <select id="queryGoalAndKey" resultType="HashMap">

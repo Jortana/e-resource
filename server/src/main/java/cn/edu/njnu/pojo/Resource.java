@@ -12,15 +12,13 @@ public class Resource {
     String keywords;
     String entity;
     String[] entityList;
+    String updateTime;
     int download;
     int collection;
     int type;
     String period;
     String grade;
     int subject;
-
-    public Resource() {
-    }
 
     @Override
     public String toString() {
@@ -34,6 +32,7 @@ public class Resource {
                 ", keywords='" + keywords + '\'' +
                 ", entity='" + entity + '\'' +
                 ", entityList=" + Arrays.toString(entityList) +
+                ", updateTime='" + updateTime + '\'' +
                 ", download=" + download +
                 ", collection=" + collection +
                 ", type=" + type +
@@ -41,24 +40,6 @@ public class Resource {
                 ", grade='" + grade + '\'' +
                 ", subject=" + subject +
                 '}';
-    }
-
-    public Resource(int id, String resourceName, String remark, String url, String viewUrl, String related_10, String keywords, String entity, String[] entityList, int download, int collection, int type, String period, String grade, int subject) {
-        this.id = id;
-        this.resourceName = resourceName;
-        this.remark = remark;
-        this.url = url;
-        this.viewUrl = viewUrl;
-        this.related_10 = related_10;
-        this.keywords = keywords;
-        this.entity = entity;
-        this.entityList = entityList;
-        this.download = download;
-        this.collection = collection;
-        this.type = type;
-        this.period = period;
-        this.grade = grade;
-        this.subject = subject;
     }
 
     public int getId() {
@@ -133,6 +114,14 @@ public class Resource {
         this.entityList = entityList;
     }
 
+    public String getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(String updateTime) {
+        this.updateTime = updateTime;
+    }
+
     public int getDownload() {
         return download;
     }
@@ -178,6 +167,28 @@ public class Resource {
     }
 
     public void setSubject(int subject) {
+        this.subject = subject;
+    }
+
+    public Resource() {
+    }
+
+    public Resource(int id, String resourceName, String remark, String url, String viewUrl, String related_10, String keywords, String entity, String[] entityList, String updateTime, int download, int collection, int type, String period, String grade, int subject) {
+        this.id = id;
+        this.resourceName = resourceName;
+        this.remark = remark;
+        this.url = url;
+        this.viewUrl = viewUrl;
+        this.related_10 = related_10;
+        this.keywords = keywords;
+        this.entity = entity;
+        this.entityList = entityList;
+        this.updateTime = updateTime;
+        this.download = download;
+        this.collection = collection;
+        this.type = type;
+        this.period = period;
+        this.grade = grade;
         this.subject = subject;
     }
 }

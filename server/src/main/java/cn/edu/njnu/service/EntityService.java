@@ -12,6 +12,7 @@ import org.neo4j.driver.v1.*;
 import static org.neo4j.driver.v1.Values.parameters;
 
 import org.springframework.stereotype.Service;
+import scala.collection.script.Start;
 
 import java.util.*;
 
@@ -88,8 +89,8 @@ public class EntityService {
         Driver driver = createDrive();
         Session session = driver.session();
         StatementResult result = session.run( "MATCH (a:concept) where a.name = {name} " +
-                        "RETURN properties(a) AS props order by a.name skip {skip} limit {limit}",
-                parameters( "name", keyword, "skip", skip, "limit", perPage ) );
+                        "RETURN properties(a) AS props order by a.name",
+                parameters( "name", keyword) );
         JSONObject resObject = new JSONObject();
         JSONArray resArray = new JSONArray();
         if (!result.hasNext()){
@@ -98,13 +99,13 @@ public class EntityService {
         int totalEntity = 0;
         while ( result.hasNext() )
         {
-            totalEntity ++;
             Record record = result.next();
             String entityName = record.get( "props" ).get( "name" ).asString();
             JSONObject similarEntity = new JSONObject();
             similarEntity.put("entityName", entityName);
             similarEntity.put("properties", record.get( "props" ).asMap());
-            similarEntity.put("resources", queryResource(entityName));
+            similarEntity.put("resources", queryResource(entityName,perPage,page));
+            totalEntity = totalEntity + queryResource(entityName,100000,1).size();
             similarEntity.put("goalAndKey", goalAndKey(entityName));
             resArray.add(similarEntity);
         }
@@ -116,9 +117,11 @@ public class EntityService {
         return ResultFactory.buildSuccessResult("查询成功", resObject);
     }
     //根据entity查资源
-    public JSONArray queryResource(String entityName) {
+    public JSONArray queryResource(String entityName,int perPage,int page) {
         String entity = entityName + '#';
-        ArrayList<Resource> queryResource = resourceMapper.queryResourceByEntity(entity);
+        int start = (page-1) * perPage;
+        int end = perPage;
+        ArrayList<Resource> queryResource = resourceMapper.queryResourceByEntity(entity, start, end);
         JSONArray resourceList = new JSONArray();
         for (Resource perResource : queryResource){
 //            perResource.setUrl(resourceRoot + perResource.getUrl());
@@ -141,70 +144,70 @@ public class EntityService {
         }
         return resArray;
     }
-    public Result getEntity_neo4j(Map<String, Object> keywordMap) {
-        String keyword = (String) keywordMap.get("keyword");
-        int page = Integer.parseInt( (String) keywordMap.get("page") );
-        int perPage = Integer.parseInt( (String) keywordMap.get("perPage") );
-        int skip = (page - 1) * perPage;
-        Driver driver = createDrive();
-        Session session = driver.session();
-        StatementResult result = session.run( "MATCH (a:concept) where a.name =~ {name} " +
-                        "RETURN properties(a) AS props order by a.name skip {skip} limit {limit}",
-                parameters( "name", ".*" + keyword + ".*", "skip", skip, "limit", perPage ) );
-        JSONObject resObject = new JSONObject();
-        JSONArray resArray = new JSONArray();
-        if (!result.hasNext()){
-            return ResultFactory.buildFailResult("未查询到相关知识点");
-        }
-        int totalEntity = 0;
-        while ( result.hasNext() )
-        {
-            totalEntity ++;
-            Record record = result.next();
-            String entityName = record.get( "props" ).get( "name" ).asString();
-            JSONObject similarEntity = new JSONObject();
-            similarEntity.put("entityName", entityName);
-            similarEntity.put("properties", record.get( "props" ).asMap());
-            similarEntity.put("resources", queryResource(entityName));
-            similarEntity.put("goalAndKey", goalAndKey_neo4j(entityName));
-            resArray.add(similarEntity);
-        }
-        resObject.put("resources", resArray);
-        resObject.put("total", totalEntity);
-        resObject.put("pages", (int)Math.ceil(totalEntity * 1.0 / perPage));
-        session.close();
-//        driver.close();
-        return ResultFactory.buildSuccessResult("查询成功", resObject);
-    }
-    //根据entity查找重难点,从neo4j里面查
-    public JSONObject goalAndKey_neo4j(String entityName){
-        JSONObject resArray = new JSONObject();
-        Driver driver = createDrive();
-        Session session = driver.session();
-        StatementResult keyResult = session.run( "MATCH (a:concept)-[k:key]->(m) where a.name = {name} " +
-                        "RETURN m.content AS content",
-                parameters( "name", entityName) );
-        JSONArray keyArray = new JSONArray();
-        while ( keyResult.hasNext() )
-        {
-            Record record = keyResult.next();
-            String key = record.get("content").asString();
-            keyArray.add(key);
-        }
-        resArray.put("key", keyArray);
-        StatementResult goalResult = session.run( "MATCH (a:concept)-[k:goal]->(m) where a.name = {name} " +
-                        "RETURN m.content AS content",
-                parameters( "name", entityName) );
-        JSONArray goalArray = new JSONArray();
-        while ( goalResult.hasNext() )
-        {
-            Record record = goalResult.next();
-            String goal = record.get("content").asString();
-            goalArray.add(goal);
-        }
-        resArray.put("goal", goalArray);
-        return resArray;
-    }
+//    public Result getEntity_neo4j(Map<String, Object> keywordMap) {
+//        String keyword = (String) keywordMap.get("keyword");
+//        int page = Integer.parseInt( (String) keywordMap.get("page") );
+//        int perPage = Integer.parseInt( (String) keywordMap.get("perPage") );
+//        int skip = (page - 1) * perPage;
+//        Driver driver = createDrive();
+//        Session session = driver.session();
+//        StatementResult result = session.run( "MATCH (a:concept) where a.name =~ {name} " +
+//                        "RETURN properties(a) AS props order by a.name skip {skip} limit {limit}",
+//                parameters( "name", ".*" + keyword + ".*", "skip", skip, "limit", perPage ) );
+//        JSONObject resObject = new JSONObject();
+//        JSONArray resArray = new JSONArray();
+//        if (!result.hasNext()){
+//            return ResultFactory.buildFailResult("未查询到相关知识点");
+//        }
+//        int totalEntity = 0;
+//        while ( result.hasNext() )
+//        {
+//            totalEntity ++;
+//            Record record = result.next();
+//            String entityName = record.get( "props" ).get( "name" ).asString();
+//            JSONObject similarEntity = new JSONObject();
+//            similarEntity.put("entityName", entityName);
+//            similarEntity.put("properties", record.get( "props" ).asMap());
+//            similarEntity.put("resources", queryResource(entityName));
+//            similarEntity.put("goalAndKey", goalAndKey_neo4j(entityName));
+//            resArray.add(similarEntity);
+//        }
+//        resObject.put("resources", resArray);
+//        resObject.put("total", totalEntity);
+//        resObject.put("pages", (int)Math.ceil(totalEntity * 1.0 / perPage));
+//        session.close();
+////        driver.close();
+//        return ResultFactory.buildSuccessResult("查询成功", resObject);
+//    }
+//    //根据entity查找重难点,从neo4j里面查
+//    public JSONObject goalAndKey_neo4j(String entityName){
+//        JSONObject resArray = new JSONObject();
+//        Driver driver = createDrive();
+//        Session session = driver.session();
+//        StatementResult keyResult = session.run( "MATCH (a:concept)-[k:key]->(m) where a.name = {name} " +
+//                        "RETURN m.content AS content",
+//                parameters( "name", entityName) );
+//        JSONArray keyArray = new JSONArray();
+//        while ( keyResult.hasNext() )
+//        {
+//            Record record = keyResult.next();
+//            String key = record.get("content").asString();
+//            keyArray.add(key);
+//        }
+//        resArray.put("key", keyArray);
+//        StatementResult goalResult = session.run( "MATCH (a:concept)-[k:goal]->(m) where a.name = {name} " +
+//                        "RETURN m.content AS content",
+//                parameters( "name", entityName) );
+//        JSONArray goalArray = new JSONArray();
+//        while ( goalResult.hasNext() )
+//        {
+//            Record record = goalResult.next();
+//            String goal = record.get("content").asString();
+//            goalArray.add(goal);
+//        }
+//        resArray.put("goal", goalArray);
+//        return resArray;
+//    }
     //获取知识点属性
     public Result getProperties(Map<String, Object> nameMap){
         String entityName = (String) nameMap.get("keyword");
