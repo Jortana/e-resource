@@ -21,7 +21,7 @@ public interface ResourceMapper {
     //根据ID查相关资源
     String queryRelated(int resource_id);
 
-    ArrayList<Resource> queryResourceByEntity(String entity);
+    ArrayList<Resource> queryResourceByEntity(String entity,int start,int end);
 
     List<Map> queryGoalAndKey(String entity);
 }
