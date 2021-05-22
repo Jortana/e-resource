@@ -1,11 +1,14 @@
 package cn.edu.njnu.service;
 
 import cn.edu.njnu.mapper.ResourceMapper;
+import cn.edu.njnu.mapper.UserMapper;
 import cn.edu.njnu.pojo.Resource;
 import cn.edu.njnu.pojo.Result;
 import cn.edu.njnu.pojo.ResultFactory;
+import cn.edu.njnu.pojo.User;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import org.ansj.domain.Term;
 import org.ansj.splitWord.analysis.ToAnalysis;
 import org.neo4j.driver.v1.*;
@@ -19,9 +22,11 @@ import static org.neo4j.driver.v1.Values.parameters;
 public class ResourceService {
 
     private final ResourceMapper resourceMapper;
+    private final UserMapper userMapper;
     String resourceRoot = "http://223.2.50.241:8082";
-    public ResourceService(ResourceMapper resourceMapper) {
+    public ResourceService(ResourceMapper resourceMapper, UserMapper userMapper) {
         this.resourceMapper = resourceMapper;
+        this.userMapper = userMapper;
     }
     //获取资源类型
     public Result getResourceType(){
@@ -114,7 +119,7 @@ public class ResourceService {
         return GraphDatabase.driver( "bolt://223.2.50.241:7687", AuthTokens.basic( "neo4j", "123456" ) );
     }
     //更新资源相似度
-    public Result relatedResource(){
+    public Result updateRelatedResource(){
         Driver driver = createDrive();
         Session session = driver.session();
         StatementResult result = session.run( "MATCH (n:resource) where n.subject='化学' " +
@@ -334,5 +339,42 @@ public class ResourceService {
             conditionArray.add(periodObject);
         }
         return ResultFactory.buildSuccessResult("筛选条件获取成功",conditionArray);
+    }
+
+    //获取相似资源
+    public Result relatedResource(Map<String, Object> resourceIDMap){
+        int resourceID = Integer.parseInt((String)resourceIDMap.get("resourceID"));
+        Driver driver = createDrive();
+        Session session = driver.session();
+        StatementResult resourceNode = session.run( "MATCH (n:resource)-[r]->(m:resource) where r.weight>0.5 and n.id = {resourceID} " +
+                        "RETURN m.id AS id order by r.weight",
+                parameters("resourceID", resourceID) );
+        int userID = 0;
+        if (resourceIDMap.containsKey("userId")){
+            userID = Integer.parseInt((String)resourceIDMap.get("userId"));
+        }
+        JSONArray resourceArray = new JSONArray();
+        int resourceNum = 0;
+        while ( resourceNode.hasNext() && resourceNum < 10)
+        {
+            Record resourceRecord = resourceNode.next();
+            int id = resourceRecord.get("id").asInt();
+            Resource resource = resourceMapper.queryResourceByID(id);
+            System.out.println(resource);
+            if (userID==0){
+                resourceArray.add(resource);
+                resourceNum++;
+            }
+            else {
+                User user = userMapper.queryUserByID(userID);
+                System.out.println(user);
+                if (Integer.parseInt(resource.getPeriod()) == user.getPeriod()){
+                    resourceArray.add(resource);
+                    resourceNum++;
+                }
+            }
+
+        }
+        return ResultFactory.buildSuccessResult("查询成功",resourceArray);
     }
 }

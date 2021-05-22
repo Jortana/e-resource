@@ -12,6 +12,9 @@
     <select id="queryUserByEmail" resultType="user">
         select user_id, username, user_email, user_type, user_password, salt from t_user where user_email = #{userEmail};
     </select>
+    <select id="queryUserByID" resultType="user">
+        select user_id, username, user_email, user_type, user_password, salt, period from t_user where user_id = #{user_id};
+    </select>
     <insert id="addUser" parameterType="user">
         insert into t_user (username, user_email, user_type, user_password, salt, period, grade, avatar) values (#{username}, #{userEmail}, #{userType}, #{userPassword}, #{salt}, #{period}, #{grade}, #{avatar});
     </insert>
