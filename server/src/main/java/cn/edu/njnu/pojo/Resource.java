@@ -15,10 +15,34 @@ public class Resource {
     String updateTime;
     int download;
     int collection;
+    int browse;
     int type;
     String period;
     String grade;
     int subject;
+
+    public Resource() {
+    }
+
+    public Resource(int id, String resourceName, String remark, String url, String viewUrl, String related_10, String keywords, String entity, String[] entityList, String updateTime, int download, int collection, int browse, int type, String period, String grade, int subject) {
+        this.id = id;
+        this.resourceName = resourceName;
+        this.remark = remark;
+        this.url = url;
+        this.viewUrl = viewUrl;
+        this.related_10 = related_10;
+        this.keywords = keywords;
+        this.entity = entity;
+        this.entityList = entityList;
+        this.updateTime = updateTime;
+        this.download = download;
+        this.collection = collection;
+        this.browse = browse;
+        this.type = type;
+        this.period = period;
+        this.grade = grade;
+        this.subject = subject;
+    }
 
     @Override
     public String toString() {
@@ -35,6 +59,7 @@ public class Resource {
                 ", updateTime='" + updateTime + '\'' +
                 ", download=" + download +
                 ", collection=" + collection +
+                ", browse=" + browse +
                 ", type=" + type +
                 ", period='" + period + '\'' +
                 ", grade='" + grade + '\'' +
@@ -138,6 +163,14 @@ public class Resource {
         this.collection = collection;
     }
 
+    public int getBrowse() {
+        return browse;
+    }
+
+    public void setBrowse(int browse) {
+        this.browse = browse;
+    }
+
     public int getType() {
         return type;
     }
@@ -167,28 +200,6 @@ public class Resource {
     }
 
     public void setSubject(int subject) {
-        this.subject = subject;
-    }
-
-    public Resource() {
-    }
-
-    public Resource(int id, String resourceName, String remark, String url, String viewUrl, String related_10, String keywords, String entity, String[] entityList, String updateTime, int download, int collection, int type, String period, String grade, int subject) {
-        this.id = id;
-        this.resourceName = resourceName;
-        this.remark = remark;
-        this.url = url;
-        this.viewUrl = viewUrl;
-        this.related_10 = related_10;
-        this.keywords = keywords;
-        this.entity = entity;
-        this.entityList = entityList;
-        this.updateTime = updateTime;
-        this.download = download;
-        this.collection = collection;
-        this.type = type;
-        this.period = period;
-        this.grade = grade;
         this.subject = subject;
     }
 }
