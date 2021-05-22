@@ -3,19 +3,16 @@ package cn.edu.njnu.service;
 import cn.edu.njnu.mapper.ResourceMapper;
 import cn.edu.njnu.pojo.Resource;
 import cn.edu.njnu.pojo.Result;
-import cn.edu.njnu.pojo.ResultCode;
 import cn.edu.njnu.pojo.ResultFactory;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.ansj.domain.Term;
 import org.ansj.splitWord.analysis.ToAnalysis;
-import org.apache.catalina.webresources.AbstractSingleArchiveResource;
 import org.neo4j.driver.v1.*;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-import static org.neo4j.driver.v1.Values.isoDuration;
 import static org.neo4j.driver.v1.Values.parameters;
 
 @Service
@@ -280,5 +277,62 @@ public class ResourceService {
             System.out.println("资源ID:" + id + "  对用户ID:" + userID + " 的推荐度为: " + weight);
         }
         return ResultFactory.buildSuccessResult("Success", recommendResource);
+    }
+
+    //获取资源筛选条件
+    public Result selectCondition(){
+        JSONArray conditionArray = new JSONArray();
+        Driver driver = createDrive();
+        Session session = driver.session();
+        StatementResult periodNode = session.run( "MATCH (n:period)" +
+                        "RETURN n.name AS name",
+                parameters() );
+        while ( periodNode.hasNext() )
+        {
+            JSONObject periodObject = new JSONObject();
+            Record periodRecord = periodNode.next();
+            String periodName = periodRecord.get("name").asString();
+            periodObject.put("period", periodName);
+            StatementResult subjectNode = session.run( "MATCH (n:period)-[]->(m:subject) where n.name={periodName} " +
+                            "RETURN m.name AS name",
+                    parameters("periodName", periodName) );
+            JSONArray subjectArray = new JSONArray();
+            while ( subjectNode.hasNext() )
+            {
+                JSONObject subject = new JSONObject();
+                Record subjectRecord = subjectNode.next();
+                String subjectName = subjectRecord.get("name").asString();
+                subject.put("subject", subjectName);
+                StatementResult editionNode = session.run( "MATCH (n:subject)-[]->(m:edition) where n.name={subjectName} " +
+                                "RETURN m.name AS name",
+                        parameters("subjectName", subjectName) );
+                JSONArray editionArray = new JSONArray();
+                while ( editionNode.hasNext() )
+                {
+                    JSONObject edition = new JSONObject();
+                    Record editionRecord = editionNode.next();
+                    String editionName = editionRecord.get("name").asString();
+                    edition.put("edition", editionName);
+                    StatementResult gradeNode = session.run( "MATCH (n:edition)-[]->(m:grade) where n.name={editionName} " +
+                                    "RETURN m.name AS name",
+                            parameters("editionName", editionName) );
+                    JSONArray grade = new JSONArray();
+                    while ( gradeNode.hasNext() )
+                    {
+                        Record gradeRecord = gradeNode.next();
+                        String gradeName = gradeRecord.get("name").asString();
+                        grade.add(gradeName);
+                    }
+                    edition.put("grade", grade);
+                    editionArray.add(edition);
+                }
+                subject.put("editions", editionArray);
+                subjectArray.add(subject);
+            }
+
+            periodObject.put("subjects", subjectArray);
+            conditionArray.add(periodObject);
+        }
+        return ResultFactory.buildSuccessResult("筛选条件获取成功",conditionArray);
     }
 }

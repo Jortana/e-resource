@@ -60,4 +60,10 @@ public class ResourceController {
     public Result recommendResource(@RequestParam Map<String, Object> IDMap){
         return resourceService.recommendResource(IDMap);
     }
+
+    @CrossOrigin
+    @GetMapping("/v1.0/public/condition")
+    public Result condition(){
+        return resourceService.selectCondition();
+    }
 }
