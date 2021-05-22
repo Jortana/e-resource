@@ -38,6 +38,15 @@ const http = {
     }
     if (params) config.params = params
     return request(config)
+  },
+  download (url, params) {
+    const config = {
+      method: 'get',
+      url: url,
+      responseType: 'blob'
+    }
+    if (params) config.params = params
+    return request(config)
   }
 }
 // 导出

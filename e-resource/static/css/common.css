@@ -21,6 +21,6 @@
 
 /*空出nav-menu的位置*/
 .main-container {
-  height: calc(100vh - 100px);
+  /*height: calc(100vh - 100px);*/
   margin-top: 1rem;
 }

@@ -41,3 +41,7 @@ export const resourceInfo = (resourceID) => {
 export const related = (resourceID) => {
   return http.get(`${baseURL}/public/queryRelated?resourceID=${resourceID}`)
 }
+
+export const download = (url) => {
+  return http.download(`${baseURL}/public/download?url=${url}`)
+}
