@@ -243,11 +243,7 @@ public class ResourceService {
             int resID = userRecord.get("m.id").asInt();
             double userResourceWeight = userRecord.get("r,weight").asDouble();
             if (resourceMap.containsKey(resID)){
-                JSONObject resource = new JSONObject();
-                resource.put("resourceID", resID);
-
-                resource.put("weight", resourceMap.get(resID));
-                recommendResource.add(resource);
+                recommendResource.add(resourceMapper.queryResourceByID(resID));
                 resourceMap.remove(resID);
             }
             else {
@@ -268,19 +264,11 @@ public class ResourceService {
             }
         });
         for(Map.Entry<Integer, Double> mapping:list){
-            JSONObject resource = new JSONObject();
-            resource.put("resourceID", mapping.getKey());
-            resource.put("weight", mapping.getValue());
-            recommendResource.add(resource);
+            recommendResource.add(resourceMapper.queryResourceByID(mapping.getKey()));
         }
 
         session.close();
 //        driver.close();
-        for(int i=0;i<recommendResource.size();i++) {
-            int id = (int) recommendResource.getJSONObject(i).get("resourceID");
-            double weight = (double) recommendResource.getJSONObject(i).get("weight");
-            System.out.println("资源ID:" + id + "  对用户ID:" + userID + " 的推荐度为: " + weight);
-        }
         return ResultFactory.buildSuccessResult("Success", recommendResource);
     }
 
