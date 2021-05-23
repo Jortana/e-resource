@@ -11,7 +11,6 @@ import java.util.Map;
 public class ResourceController {
 
     private final ResourceService resourceService;
-
     public ResourceController(ResourceService resourceService) {
         this.resourceService = resourceService;
     }
