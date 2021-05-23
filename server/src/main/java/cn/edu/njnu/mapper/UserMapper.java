@@ -26,4 +26,5 @@ public interface UserMapper {
     List<Map> entityRecord(int user_id);
     void updateRelated(int user_id, String related_user);
     String queryRelatedUser(int user_id);
+    User queryUserByID(int user_id);
 }

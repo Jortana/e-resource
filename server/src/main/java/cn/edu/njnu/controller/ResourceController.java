@@ -50,9 +50,9 @@ public class ResourceController {
     }
 
     @CrossOrigin
-    @PostMapping("/v1.0/public/relatedResource")
-    public Result relatedResource(){
-        return resourceService.relatedResource();
+    @PostMapping("/v1.0/public/updateRelatedResource")
+    public Result updateRelatedResource(){
+        return resourceService.updateRelatedResource();
     }
 
     @CrossOrigin
@@ -65,5 +65,11 @@ public class ResourceController {
     @GetMapping("/v1.0/public/condition")
     public Result condition(){
         return resourceService.selectCondition();
+    }
+
+    @CrossOrigin
+    @PostMapping("/v1.0/public/relatedResource")
+    public Result relatedResource(@RequestParam Map<String, Object> resourceIDMap){
+        return resourceService.relatedResource(resourceIDMap);
     }
 }
