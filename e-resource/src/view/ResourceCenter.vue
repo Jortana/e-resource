@@ -54,9 +54,10 @@
                   >
                     <div class="resource-info">
                       <div class="info">
-                        <span class="resource-name" @click="viewResource(resource['id'])">
-                          {{ resource['resourceName'] }}
-                        </span>
+                        <resource-link :resource="resource"></resource-link>
+<!--                        <span class="resource-name" @click="viewResource(resource['id'])">-->
+<!--                          {{ resource['resourceName'] }}-->
+<!--                        </span>-->
                         <div class="file-name">
                           {{ `${resource['resourceName']}.${resource['url'].split('.').slice(-1)}` }}
                         </div>
@@ -82,12 +83,12 @@
                           </el-button>
                         </div>
                         <div class="full-width">
-                          <el-button class="full-width" size="medium">
+                          <el-button class="full-width" size="medium" icon="el-icon-document-add">
                             加入资源包
                           </el-button>
                         </div>
                         <div class="full-width">
-                          <el-button class="full-width" size="medium">
+                          <el-button class="full-width" size="medium" icon="el-icon-star-off">
                             收藏
                           </el-button>
                         </div>
@@ -99,6 +100,7 @@
               </div>
             </div>
             <!-- 隐藏的a元素，用来在新窗口打开资源页面 -->
+            <!-- 这个本来应该和资源名称一起封装在ResourceLink里了，但是教学重难点还需要使用，懒得封装了，也包括下面的ViewResource method -->
             <a class="resource-target" ref="resourceTarget" href="" target="_blank" v-show="false"></a>
             <!-- 触发下载测试 -->
             <a ref="download" href="" target="_blank" download v-show="false"></a>
@@ -124,6 +126,7 @@
 <script>
 import NavMenu from '@/components/NavMenu'
 import KnowledgeCard from '@/components/KnowledgeCard'
+import ResourceLink from '@/components/ResourceLink'
 import { record } from '@/api/record'
 // import { download } from '@/api/resource'
 import { searchEntity, relatedEntity } from '@/api/entity'
@@ -134,7 +137,8 @@ export default {
   components: {
     NavMenu,
     KGChart,
-    KnowledgeCard
+    KnowledgeCard,
+    ResourceLink
   },
   mounted () {
     this.goSearch()
@@ -303,10 +307,6 @@ export default {
       record({
         resourceID: resourceID
       })
-        .then(response => {
-          console.log(response)
-        })
-        .catch()
       target.setAttribute('href', `${window.location.origin}/resource/${resourceID}`)
       target.click()
     },

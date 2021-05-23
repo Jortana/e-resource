@@ -15,6 +15,6 @@ let baseURL = '/v1.0'
 export const record = (recordInfo) => {
   if (store.state.user !== '') {
     recordInfo['userId'] = store.state.user['userId']
-    return http.post(`${baseURL}/private/record`, recordInfo)
   }
+  return http.post(`${baseURL}/public/record`, recordInfo)
 }

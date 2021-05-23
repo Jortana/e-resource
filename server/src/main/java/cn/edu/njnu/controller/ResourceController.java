@@ -68,7 +68,7 @@ public class ResourceController {
     }
 
     @CrossOrigin
-    @PostMapping("/v1.0/public/relatedResource")
+    @GetMapping("/v1.0/public/relatedResource")
     public Result relatedResource(@RequestParam Map<String, Object> resourceIDMap){
         return resourceService.relatedResource(resourceIDMap);
     }
