@@ -35,7 +35,7 @@ export default {
     },
     scrollerStyle () {
       if (this.suffix === 'pdf') {
-        return 'height: 75vh;'
+        return 'height: calc(100vh - 150px - 2rem);'
       }
       return ''
     }

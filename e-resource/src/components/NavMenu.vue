@@ -6,7 +6,17 @@
       <search class="search" :searchContent.sync="searchInfo.content" @search="search"></search>
     </div>
   </div>
-  <avatar v-if="this.$store.state.user" class="avatar"></avatar>
+  <div class="user-info" v-if="this.$store.state.user">
+    <div class="resource-package">
+      <el-popover
+        placement="bottom"
+        trigger="click">
+        <div>资源包是空的</div>
+        <el-button slot="reference">我的资源包</el-button>
+      </el-popover>
+    </div>
+    <avatar class="avatar"></avatar>
+  </div>
   <el-button v-else class="avatar login-btn" @click="gotoLogin">登 录</el-button>
 </div>
 </template>
@@ -96,6 +106,15 @@ export default {
 
 .search-container >>> .el-select {
   min-width: 80px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
+.resource-package {
+  margin-right: 1rem;
 }
 
 .avatar {

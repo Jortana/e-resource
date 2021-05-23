@@ -1,9 +1,15 @@
 package cn.edu.njnu.controller;
 
 import cn.edu.njnu.pojo.Result;
+import cn.edu.njnu.pojo.ResultFactory;
 import cn.edu.njnu.service.ResourceService;
+import org.apache.tomcat.jni.FileInfo;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.util.Map;
 
 @RestController
@@ -61,7 +67,7 @@ public class ResourceController {
     }
 
     @CrossOrigin
-    @PostMapping("/v1.0/public/relatedResource")
+    @GetMapping("/v1.0/public/relatedResource")
     public Result relatedResource(@RequestParam Map<String, Object> resourceIDMap){
         return resourceService.relatedResource(resourceIDMap);
     }

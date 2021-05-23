@@ -1,23 +1,25 @@
 <template>
-  <div
-    class="avatar"
-    @mouseenter="showCard"
-    @mouseleave="hideCard">
-    <el-avatar class="img" size="medium" icon="el-icon-user-solid" :src="userInfo !== '' ? userInfo['avatar'] : ''"></el-avatar>
-    <transition name="el-fade-in-linear">
-      <el-card v-show="cardVisible" class="submenu-card" :body-style="{ padding: 0 }">
-        <div slot="header" class="clearfix">
-          <el-avatar icon="el-icon-user-solid" :src="userInfo !== '' ? userInfo['avatar'] : ''"></el-avatar>
-          <div class="username">{{ this.$store.state.user['username'] }}</div>
-          <div class="email">{{ this.$store.state.user['userEmail'] }}</div>
-        </div>
-        <div class="submenus">
-          <div class="submenu" v-for="submenu in submenus" :key="submenu.index" @click="jumpTo(submenu.index)">
-            <i class="icon" :class="submenu.icon"></i> <span v-html="submenu.label"></span>
+  <div>
+    <div
+      class="avatar"
+      @mouseenter="showCard"
+      @mouseleave="hideCard">
+      <el-avatar class="img" size="medium" icon="el-icon-user-solid" :src="userInfo !== '' ? userInfo['avatar'] : ''"></el-avatar>
+      <transition name="el-fade-in-linear">
+        <el-card v-show="cardVisible" class="submenu-card" :body-style="{ padding: 0 }">
+          <div slot="header" class="clearfix">
+            <el-avatar icon="el-icon-user-solid" :src="userInfo !== '' ? userInfo['avatar'] : ''"></el-avatar>
+            <div class="username">{{ this.$store.state.user['username'] }}</div>
+            <div class="email">{{ this.$store.state.user['userEmail'] }}</div>
           </div>
-        </div>
-      </el-card>
-    </transition>
+          <div class="submenus">
+            <div class="submenu" v-for="submenu in submenus" :key="submenu.index" @click="jumpTo(submenu.index)">
+              <i class="icon" :class="submenu.icon"></i> <span v-html="submenu.label"></span>
+            </div>
+          </div>
+        </el-card>
+      </transition>
+    </div>
   </div>
 </template>
 

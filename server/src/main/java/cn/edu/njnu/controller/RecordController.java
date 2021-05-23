@@ -14,7 +14,7 @@ public class RecordController {
         this.recordService = recordService;
     }
 
-    @PostMapping("/v1.0/private/record")
+    @PostMapping("/v1.0/public/record")
     public void addRecord(@RequestBody Map<String, Object> recordMap){
         recordService.addRecord(recordMap);
     }
