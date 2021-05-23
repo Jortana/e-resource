@@ -22,8 +22,8 @@
   height: calc(100vh - 100px);
 }
 
-/* main container 下面的div */
-.out-first-screen {
-  margin-left: 176px;
-  margin-top: 1rem;
-}
+/*!* main container 下面的div *!*/
+/*.out-first-screen {*/
+/*  margin-left: 176px;*/
+/*  margin-top: 1rem;*/
+/*}*/

@@ -82,7 +82,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 1rem;
+  padding-top: 1rem;
 }
 
 .left {

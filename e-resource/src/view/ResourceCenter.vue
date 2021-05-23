@@ -78,9 +78,7 @@
                       </div>
                       <div class="operation">
                         <div class="full-width">
-                          <el-button class="full-width" type="primary" size="medium" icon="el-icon-download" @click="download(resource['url'])">
-                            下载
-                          </el-button>
+                          <download-button :resourceID="resource['id']"></download-button>
                         </div>
                         <div class="full-width">
                           <el-button class="full-width" size="medium" icon="el-icon-document-add">
@@ -127,6 +125,7 @@
 import NavMenu from '@/components/NavMenu'
 import KnowledgeCard from '@/components/KnowledgeCard'
 import ResourceLink from '@/components/ResourceLink'
+import DownloadButton from '@/components/DownloadButton'
 import { record } from '@/api/record'
 // import { download } from '@/api/resource'
 import { searchEntity, relatedEntity } from '@/api/entity'
@@ -138,7 +137,8 @@ export default {
     NavMenu,
     KGChart,
     KnowledgeCard,
-    ResourceLink
+    ResourceLink,
+    DownloadButton
   },
   mounted () {
     this.goSearch()
@@ -309,16 +309,6 @@ export default {
       })
       target.setAttribute('href', `${window.location.origin}/resource/${resourceID}`)
       target.click()
-    },
-    download (url) {
-      console.log('download')
-      // download(url)
-      //   .then(response => {
-      //     console.log(response)
-      //   })
-      // let target = this.$refs.download
-      // target.setAttribute('href', `http://223.2.50.241:8082${url}`)
-      // target.click()
     }
   }
 }

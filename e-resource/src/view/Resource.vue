@@ -10,9 +10,7 @@
         </div>
         <div class="operation flex flex-1">
           <div class="operation-button">
-            <el-button class="full-width" type="primary" size="medium" icon="el-icon-download" @click="download(resource['url'])">
-              下载
-            </el-button>
+            <download-button :resourceID="Number(resourceID)"></download-button>
           </div>
           <div class="operation-button">
             <el-button class="full-width" size="medium" icon="el-icon-document-add">
@@ -30,31 +28,34 @@
       <div class="viewer">
         <resource-viewer :url="String(resource['viewUrl'])"></resource-viewer>
       </div>
+      <!-- 相关资源 -->
+      <div class="related-resource flex-1">
+        <h2>相关资源</h2>
+        <div
+          class="flex"
+          v-for="resource in relatedResources"
+          :key="resource.id">
+          <svg class="type-icon" aria-hidden="true">
+            <use v-if="resource.suffix === 'doc' || resource.suffix === 'docx'" xlink:href="#e-resource-icon-word"></use>
+            <use v-else-if="resource.suffix === 'ppt' || resource.suffix === 'pptx'" xlink:href="#e-resource-icon-ppt"></use>
+            <use v-else-if="resource.suffix === 'pdf'" xlink:href="#e-resource-icon-pdf"></use>
+            <use v-else xlink:href="#e-resource-icon-unknown"></use>
+          </svg>
+          <resource-link class="related-resource-name" :resource="resource"></resource-link>
+        </div>
+      </div>
       <!-- ---------- -->
     </div>
-    <div class="graph flex-1">
-      <k-g-chart :entities="entities.entities" ref="chart"></k-g-chart>
-    </div>
-  </div>
-  <!-- 推荐资源 -->
-  <div class="out-first-screen flex">
-    <div class="related-resource flex-1">
-      <h2>相关资源</h2>
-      <div
-        class="flex"
-        v-for="resource in relatedResources"
-        :key="resource.id">
-        <svg class="type-icon" aria-hidden="true">
-          <use v-if="resource.suffix === 'doc' || resource.suffix === 'docx'" xlink:href="#e-resource-icon-word"></use>
-          <use v-else-if="resource.suffix === 'ppt' || resource.suffix === 'pptx'" xlink:href="#e-resource-icon-ppt"></use>
-          <use v-else-if="resource.suffix === 'pdf'" xlink:href="#e-resource-icon-pdf"></use>
-          <use v-else xlink:href="#e-resource-icon-unknown"></use>
-        </svg>
-        <resource-link class="related-resource-name" :resource="resource"></resource-link>
-      </div>
-    </div>
     <div class="flex-1">
-      <h2>推荐资源</h2>
+      <div class="graph">
+        <k-g-chart :entities="entities.entities" ref="chart"></k-g-chart>
+      </div>
+      <!-- 推荐资源 -->
+      <div class="recommend-container flex">
+        <div class="flex-1">
+          <h2>推荐资源</h2>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -65,6 +66,7 @@ import NavMenu from '@/components/NavMenu'
 import KGChart from '@/components/Chart/KGChart'
 import ResourceViewer from '@/components/ViewResource/ResourceViewer'
 import ResourceLink from '@/components/ResourceLink'
+import DownloadButton from '@/components/DownloadButton'
 import { resourceInfo, related } from '@/api/resource'
 import { relatedEntity } from '@/api/entity'
 import { authentication } from '@/api/auth'
@@ -76,7 +78,8 @@ export default {
     NavMenu,
     KGChart,
     ResourceViewer,
-    ResourceLink
+    ResourceLink,
+    DownloadButton
   },
   props: {
   },
@@ -163,8 +166,7 @@ export default {
 
 <style scoped>
 .main-container {
-  margin-bottom: 1rem;
-  border-bottom: 1px solid #dcdfe6;
+  /*border-bottom: 1px solid #dcdfe6;*/
 }
 
 .operation {
@@ -181,7 +183,7 @@ export default {
 
 .resource-info {
   position: relative;
-  border-right: 1px solid #DCDFE6;
+  border-right: 1px solid #dcdfe6;
 }
 
 .resource-info >>> h2 {
@@ -194,18 +196,23 @@ export default {
 
 .viewer {
   margin-top: 1rem;
-  margin-bottom: 2rem;
+  padding-bottom: .4rem;
 }
 
-.out-first-screen {
+.related-resource,
+.recommend-container {
+  padding-top: 1rem;
+  padding-bottom: 2rem;
 }
 
-.out-first-screen h2 {
+.related-resource h2,
+.recommend-container h2 {
   margin-bottom: 1rem;
 }
 
-.related-resource {
-  margin-bottom: 2rem;
+.related-resource,
+.recommend-container {
+  border-top: 1px solid #dcdfe6;
 }
 
 .related-resource div {
@@ -218,6 +225,11 @@ export default {
   color: #409eff;
   cursor: pointer;
 }
+
+/*.recommend-container {*/
+/*  margin-left: -.5px;*/
+/*  border-left: 1px solid #dcdfe6;*/
+/*}*/
 
 .type-icon {
   height: 1.2rem;

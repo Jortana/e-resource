@@ -1,13 +1,18 @@
 <template>
 <div class="viewer">
-  <el-scrollbar :style="scrollerStyle">
-    <pdf
-      v-for="i in pdf.numPages"
-      :key="i"
-      :src="pdf.src"
-      :page="i"
-    ></pdf>
-  </el-scrollbar>
+  <div v-if="suffix === 'pdf'">
+    <el-scrollbar :style="scrollerStyle">
+      <pdf
+        v-for="i in pdf.numPages"
+        :key="i"
+        :src="pdf.src"
+        :page="i"
+      ></pdf>
+    </el-scrollbar>
+  </div>
+  <div v-else>
+    该资源暂不支持预览，请下载后进行学习
+  </div>
 </div>
 </template>
 
