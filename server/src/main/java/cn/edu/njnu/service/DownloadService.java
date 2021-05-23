@@ -82,9 +82,11 @@ public class DownloadService {
             if (is == null) {
                 return ResultFactory.buildFailResult("下载附件失败，请检查文件“" + fileName + "”是否存在");
             }
+            resourceMapper.updateDownload(resource.getDownload()+1,resourceID);
             //复制
             IOUtils.copy(is, response.getOutputStream());
             response.getOutputStream().flush();
+
         } catch (IOException e) {
             return ResultFactory.buildFailResult("下载附件失败,error:"+e.getMessage());
         }
@@ -106,7 +108,7 @@ public class DownloadService {
                 System.out.println(e);
             }
         }
-        return null;
+        return ResultFactory.buildSuccessResult("下载成功",null);
     }
     public static String encode(String url) {
         try {
