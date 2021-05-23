@@ -51,6 +51,11 @@ export default {
   height: 3rem;
 }
 
+.main-search >>> .el-input-group__append,
+.main-search >>> input {
+  background-color: #fff !important;
+}
+
 .main-search >>> input {
   height: 100%;
   border-top-left-radius: 2rem;

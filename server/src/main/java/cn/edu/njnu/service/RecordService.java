@@ -16,6 +16,7 @@ public class RecordService {
         this.recordMapper = recordMapper;
         this.resourceMapper = resourceMapper;
     }
+
     public void addRecord(Map recordMap){
         Date date = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");

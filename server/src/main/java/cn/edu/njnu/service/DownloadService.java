@@ -74,7 +74,8 @@ public class DownloadService {
             os = response.getOutputStream();
             // 清空输出流
             response.reset();
-            response.setContentType("application/x-download;charset=GBK");
+            // response.setContentType("application/x-download;charset=GBK");
+            response.setContentType("application/octet-stream");
             response.setHeader("Content-Disposition", "attachment;filename="+ new String(fileName.getBytes("utf-8"), "iso-8859-1"));
             //读取流
             File f = new File("D:\\download\\"+fileName);

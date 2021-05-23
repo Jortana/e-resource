@@ -39,5 +39,15 @@ export const resourceInfo = (resourceID) => {
  * @param {String} resourceID
  */
 export const related = (resourceID) => {
-  return http.get(`${baseURL}/public/queryRelated?resourceID=${resourceID}`)
+  return http.get(`${baseURL}/public/relatedResource?resourceID=${resourceID}`)
+}
+
+/**
+ * 根据资源ID下载资源
+ * - id 资源ID
+ * @param {Number} resourceID
+ */
+export const download = (resourceID) => {
+  window.location.href = `http://127.0.0.1:9000/e-resource/api${baseURL}/public/download?resourceID=${resourceID}`
+  // return http.download(`${baseURL}/public/download?resourceID=${resourceID}`)
 }

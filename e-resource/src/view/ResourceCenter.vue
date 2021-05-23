@@ -13,7 +13,7 @@
       </el-tabs>
       <!-- -------------------------------------------------------------------------------- -->
       <div class="resources">
-        <div class="resource-list flex-1">
+        <div class="flex-1">
           <!-- 知识卡片 -->
           <knowledge-card class="knowledge-card" :entityInfo="cardInfo" v-if="JSON.stringify(cardInfo) !== '{}'"></knowledge-card>
           <!-- 找到的实体和资源信息 -->
@@ -54,28 +54,41 @@
                   >
                     <div class="resource-info">
                       <div class="info">
-                        <span class="resource-name" @click="viewResource(resource['id'])">
-                          {{ resource['resourceName'] }}
-                        </span>
+                        <resource-link :resource="resource"></resource-link>
+<!--                        <span class="resource-name" @click="viewResource(resource['id'])">-->
+<!--                          {{ resource['resourceName'] }}-->
+<!--                        </span>-->
                         <div class="file-name">
                           {{ `${resource['resourceName']}.${resource['url'].split('.').slice(-1)}` }}
                         </div>
                         <div class="entity-list">
-                          <el-button
-                            size="mini"
+                          <div
                             v-for="entity in resource['entity'].split('#').slice(0, resource['entity'].split('#').length - 1)"
                             :key = entity
                           >
-                            {{ entity }}
-                          </el-button>
+                            <el-button size="mini">
+                              {{ entity }}
+                            </el-button>
+                          </div>
+                        </div>
+                        <div class="extra">
+                          <div class="extra-info"><i class="el-icon-time"></i> {{ resource['updateTime'] }}</div>
+                          <div class="extra-info"><i class="el-icon-download"></i> {{ resource['download'] }} 下载</div>
                         </div>
                       </div>
                       <div class="operation">
                         <div class="full-width">
-                          <el-button class="full-width" type="primary" size="medium" icon="el-icon-download">下载</el-button>
+                          <download-button :resourceID="resource['id']"></download-button>
                         </div>
                         <div class="full-width">
-                          <el-button class="full-width" size="medium" >加入资源包</el-button>
+                          <el-button class="full-width" size="medium" icon="el-icon-document-add">
+                            加入资源包
+                          </el-button>
+                        </div>
+                        <div class="full-width">
+                          <el-button class="full-width" size="medium" icon="el-icon-star-off">
+                            收藏
+                          </el-button>
                         </div>
                       </div>
                     </div>
@@ -85,7 +98,10 @@
               </div>
             </div>
             <!-- 隐藏的a元素，用来在新窗口打开资源页面 -->
+            <!-- 这个本来应该和资源名称一起封装在ResourceLink里了，但是教学重难点还需要使用，懒得封装了，也包括下面的ViewResource method -->
             <a class="resource-target" ref="resourceTarget" href="" target="_blank" v-show="false"></a>
+            <!-- 触发下载测试 -->
+            <a ref="download" href="" target="_blank" download v-show="false"></a>
           </div>
           <div class="pages" v-if="resources.total > 10">
             <el-pagination
@@ -108,7 +124,10 @@
 <script>
 import NavMenu from '@/components/NavMenu'
 import KnowledgeCard from '@/components/KnowledgeCard'
-// import { resource } from '@/api/resource'
+import ResourceLink from '@/components/ResourceLink'
+import DownloadButton from '@/components/DownloadButton'
+import { record } from '@/api/record'
+// import { download } from '@/api/resource'
 import { searchEntity, relatedEntity } from '@/api/entity'
 import merge from 'webpack-merge'
 import KGChart from '@/components/Chart/KGChart'
@@ -117,7 +136,9 @@ export default {
   components: {
     NavMenu,
     KGChart,
-    KnowledgeCard
+    KnowledgeCard,
+    ResourceLink,
+    DownloadButton
   },
   mounted () {
     this.goSearch()
@@ -283,6 +304,9 @@ export default {
     },
     viewResource (resourceID) {
       let target = this.$refs.resourceTarget
+      record({
+        resourceID: resourceID
+      })
       target.setAttribute('href', `${window.location.origin}/resource/${resourceID}`)
       target.click()
     }
@@ -343,6 +367,7 @@ export default {
 }
 
 .resource-info {
+  height: 190px;
   display: flex;
   justify-content: space-between;
   border-bottom: 1px solid #dcdfe6;
@@ -351,18 +376,44 @@ export default {
 }
 
 .info {
+  display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .entity-list {
-  margin-top: .5rem;
+  /* 这里的间距要减去按钮设置的间距，但不完全减 */
+  margin-top: calc(.5rem - 5px);
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.entity-list div {
+  margin-right: 10px;
+  margin-top: 10px;
+}
+
+.extra {
+  display: flex;
+  margin-top: .8rem;
+  position: absolute;
+  bottom: 0;
+  min-width: 220px;
+}
+
+.extra .extra-info {
+  color: #909399;
+  font-size: .9rem;
+  line-height: 1rem;
+  margin-right: 1rem;
 }
 
 .operation {
   display: flex;
   flex-direction: column;
   height: 100%;
-  /*justify-content: center;*/
+  margin-left: .8rem;
+  justify-content: center;
   align-items: center;
 }
 
@@ -406,6 +457,7 @@ export default {
 
 .graph {
   padding-left: 2rem;
+  height: 500px;
   min-height: 500px;
 }
 

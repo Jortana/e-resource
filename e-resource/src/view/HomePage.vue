@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="main">
     <nav-menu class="menu"></nav-menu>
     <main>
       <div @keyup.enter="search">
@@ -39,6 +39,13 @@ export default {
 </script>
 
 <style scoped>
+.main {
+  background-image: url('~@/assets/background.jpg');
+  background-size: 100%;
+  height: 100vh;
+  background-repeat:no-repeat;
+}
+
 main {
   height: calc(100vh - 70px);
   display: flex;
