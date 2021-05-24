@@ -119,13 +119,39 @@ public class EntityService {
         similarEntity.put("properties", record.get( "props" ).asMap());
         if (sort != 0){
             similarEntity.put("resources", queryResource(entityName,perPage,page,sort,type));
-            totalEntity = totalEntity + queryResource(entityName,100000,1, sort, type).size();
+            totalEntity = queryResource(entityName,100000,1, sort, type).size();
         }
         else {
             int skip = (page-1)*perPage;
-            StatementResult resourceNode = session.run( "MATCH (p:resource)-[r]->(a:concept) where p.id>0 and a.name = {name} " +
-                            "RETURN p.id AS id order by r.tfidf skip {skip} limit {limit}",
-                    parameters( "name", keyword,"skip",skip,"limit",perPage) );
+            StatementResult resourceNode = null;
+            if (type == 0){
+                resourceNode = session.run( "MATCH (p:resource)-[r]->(a:concept) where p.id>0 and a.name = {name}" +
+                                "RETURN p.id AS id order by r.tfidf skip {skip} limit {limit}",
+                        parameters( "name", keyword,"skip",skip,"limit",perPage) );
+                StatementResult count = session.run( "MATCH (p:resource)-[r]->(a:concept) where p.id>0 and a.name = {name} " +
+                                "RETURN count(*) as num",
+                        parameters( "name", keyword) );
+                if ( count.hasNext() )
+                {
+                    Record countRecord = count.next();
+                    totalEntity = countRecord.get( "num" ).asInt();
+                }
+            }
+            else {
+                resourceNode = session.run( "MATCH (p:resource)-[r]->(a:concept) where p.id>0 and a.name = {name} and p.type = {type} " +
+                                "RETURN p.id AS id order by r.tfidf skip {skip} limit {limit}",
+                        parameters( "name", keyword,"skip",skip,"limit",perPage,"type", type) );
+                StatementResult count = session.run( "MATCH (p:resource)-[r]->(a:concept) where p.id>0 and a.name = {name} and p.type = {type} " +
+                                "RETURN count(*) as num",
+                        parameters( "name", keyword, "type", type) );
+                if ( count.hasNext() )
+                {
+                    Record countRecord = count.next();
+                    totalEntity = countRecord.get( "num" ).asInt();
+                }
+
+            }
+
             JSONArray resourceArray = new JSONArray();
             while ( resourceNode.hasNext() )
             {
@@ -135,14 +161,7 @@ public class EntityService {
                 resourceArray.add(resource);
             }
             similarEntity.put("resources", resourceArray);
-            StatementResult count = session.run( "MATCH (p:resource)-[r]->(a:concept) where p.id>0 and a.name = {name} " +
-                            "RETURN count(*) as num",
-                    parameters( "name", keyword) );
-            if ( count.hasNext() )
-            {
-                Record countRecord = count.next();
-                totalEntity = countRecord.get( "num" ).asInt();
-            }
+
         }
         similarEntity.put("goalAndKey", goalAndKey(entityName));
         resArray.add(similarEntity);
