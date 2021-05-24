@@ -228,7 +228,7 @@ export default {
       cardInfo: {},
       goal: [],
       key: [],
-      sort: 0,
+      sort: this.$route.query.sort === undefined ? 0 : this.$route.query.sort,
       activeEntity: ''
     }
   },
@@ -247,6 +247,7 @@ export default {
       searchEntity({
         keyword: this.searchInfo.content,
         type: this.searchInfo.type,
+        sort: this.sort,
         page: this.pageInfo.page,
         perPage: this.pageInfo.perPage
       }).then(response => {
@@ -289,12 +290,13 @@ export default {
     },
     changeSort (sort) {
       console.log(sort)
-      // this.$router.push({
-      //   query: merge(this.$route.query, {
-      //     'type': this.searchInfo.type,
-      //     'page': 1
-      //   })
-      // })
+      this.$router.push({
+        query: merge(this.$route.query, {
+          'type': this.searchInfo.type,
+          'page': 1,
+          'sort': sort
+        })
+      })
     },
     resetResource () {
       this.resources.resources = []
