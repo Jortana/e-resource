@@ -90,11 +90,19 @@ public class EntityService {
             int userId = Integer.parseInt((String) keywordMap.get("userId"));
             recordMapper.addEntityRecord(userId,browseDate,keyword);
         }
+        int sort = 0;  //0默认，1最热，2最新
+        int type = 0;  //0全部
+        if (keywordMap.containsKey("sort")){
+            sort = Integer.parseInt((String) keywordMap.get("sort"));
+        }
+        if (keywordMap.containsKey("type")){
+            type = Integer.parseInt((String) keywordMap.get("type"));
+        }
         int page = Integer.parseInt( (String) keywordMap.get("page") );
         int perPage = Integer.parseInt( (String) keywordMap.get("perPage") );
-        int skip = (page - 1) * perPage;
         Driver driver = createDrive();
         Session session = driver.session();
+
         StatementResult result = session.run( "MATCH (a:concept) where a.name = {name} " +
                         "RETURN properties(a) AS props order by a.name",
                 parameters( "name", keyword) );
@@ -104,18 +112,40 @@ public class EntityService {
             return ResultFactory.buildFailResult("未查询到相关知识点");
         }
         int totalEntity = 0;
-        while ( result.hasNext() )
-        {
-            Record record = result.next();
-            String entityName = record.get( "props" ).get( "name" ).asString();
-            JSONObject similarEntity = new JSONObject();
-            similarEntity.put("entityName", entityName);
-            similarEntity.put("properties", record.get( "props" ).asMap());
-            similarEntity.put("resources", queryResource(entityName,perPage,page));
-            totalEntity = totalEntity + queryResource(entityName,100000,1).size();
-            similarEntity.put("goalAndKey", goalAndKey(entityName));
-            resArray.add(similarEntity);
+        Record record = result.next();
+        String entityName = record.get( "props" ).get( "name" ).asString();
+        JSONObject similarEntity = new JSONObject();
+        similarEntity.put("entityName", entityName);
+        similarEntity.put("properties", record.get( "props" ).asMap());
+        if (sort != 0){
+            similarEntity.put("resources", queryResource(entityName,perPage,page,sort,type));
+            totalEntity = totalEntity + queryResource(entityName,100000,1, sort, type).size();
         }
+        else {
+            int skip = (page-1)*perPage;
+            StatementResult resourceNode = session.run( "MATCH (p:resource)-[r]->(a:concept) where p.id>0 and a.name = {name} " +
+                            "RETURN p.id AS id order by r.tfidf skip {skip} limit {limit}",
+                    parameters( "name", keyword,"skip",skip,"limit",perPage) );
+            JSONArray resourceArray = new JSONArray();
+            while ( resourceNode.hasNext() )
+            {
+                Record ResourceRecord = resourceNode.next();
+                int resourceID = ResourceRecord.get( "id" ).asInt();
+                Resource resource = resourceMapper.queryResourceByID(resourceID);
+                resourceArray.add(resource);
+            }
+            similarEntity.put("resources", resourceArray);
+            StatementResult count = session.run( "MATCH (p:resource)-[r]->(a:concept) where p.id>0 and a.name = {name} " +
+                            "RETURN count(*) as num",
+                    parameters( "name", keyword) );
+            if ( count.hasNext() )
+            {
+                Record countRecord = count.next();
+                totalEntity = countRecord.get( "num" ).asInt();
+            }
+        }
+        similarEntity.put("goalAndKey", goalAndKey(entityName));
+        resArray.add(similarEntity);
         resObject.put("resources", resArray);
         resObject.put("total", totalEntity);
         resObject.put("pages", (int)Math.ceil(totalEntity * 1.0 / perPage));
@@ -124,11 +154,11 @@ public class EntityService {
         return ResultFactory.buildSuccessResult("查询成功", resObject);
     }
     //根据entity查资源
-    public JSONArray queryResource(String entityName,int perPage,int page) {
+    public JSONArray queryResource(String entityName,int perPage,int page,int sort,int type) {
         String entity = entityName + '#';
         int start = (page-1) * perPage;
         int end = perPage;
-        ArrayList<Resource> queryResource = resourceMapper.queryResourceByEntity(entity, start, end);
+        ArrayList<Resource> queryResource = resourceMapper.queryResource(entity, start, end, sort, type);
         JSONArray resourceList = new JSONArray();
         for (Resource perResource : queryResource){
 //            perResource.setUrl(resourceRoot + perResource.getUrl());
