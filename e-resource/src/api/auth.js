@@ -32,7 +32,7 @@ export const login = (params) => {
  * 登出
  */
 export const logout = () => {
-  return http.get(`${baseURL}/private/logout`)
+  return http.get(`${baseURL}/public/logout`)
 }
 
 /**

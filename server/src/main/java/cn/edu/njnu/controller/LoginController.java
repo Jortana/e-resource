@@ -40,7 +40,7 @@ public class LoginController {
     }
 
 
-    @GetMapping("/v1.0/private/logout")
+    @GetMapping("/v1.0/public/logout")
     public Result logout() {
         Subject subject = SecurityUtils.getSubject();
         subject.logout();

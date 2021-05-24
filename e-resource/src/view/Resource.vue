@@ -29,20 +29,9 @@
         <resource-viewer :url="String(resource['viewUrl'])"></resource-viewer>
       </div>
       <!-- 相关资源 -->
-      <div class="related-resource flex-1">
+      <div class="related-resource flex-1" v-if="relatedResources.length !== 0">
         <h2>相关资源</h2>
-        <div
-          class="flex"
-          v-for="resource in relatedResources"
-          :key="resource.id">
-          <svg class="type-icon" aria-hidden="true">
-            <use v-if="resource.suffix === 'doc' || resource.suffix === 'docx'" xlink:href="#e-resource-icon-word"></use>
-            <use v-else-if="resource.suffix === 'ppt' || resource.suffix === 'pptx'" xlink:href="#e-resource-icon-ppt"></use>
-            <use v-else-if="resource.suffix === 'pdf'" xlink:href="#e-resource-icon-pdf"></use>
-            <use v-else xlink:href="#e-resource-icon-unknown"></use>
-          </svg>
-          <resource-link class="related-resource-name" :resource="resource"></resource-link>
-        </div>
+        <resource-list :resourceList="relatedResources"></resource-list>
       </div>
       <!-- ---------- -->
     </div>
@@ -51,9 +40,10 @@
         <k-g-chart :entities="entities.entities" ref="chart"></k-g-chart>
       </div>
       <!-- 推荐资源 -->
-      <div class="recommend-container flex">
+      <div class="recommend-container flex" v-if="recommendResources.length !== 0">
         <div class="flex-1">
           <h2>推荐资源</h2>
+          <resource-list :resourceList="recommendResources"></resource-list>
         </div>
       </div>
     </div>
@@ -67,10 +57,12 @@ import KGChart from '@/components/Chart/KGChart'
 import ResourceViewer from '@/components/ViewResource/ResourceViewer'
 import ResourceLink from '@/components/ResourceLink'
 import DownloadButton from '@/components/DownloadButton'
+import ResourceList from '@/components/ResourceList'
 import { resourceInfo, related } from '@/api/resource'
 import { relatedEntity } from '@/api/entity'
 import { authentication } from '@/api/auth'
 import { record } from '@/api/record'
+import { recommendByResourceUser } from '@/api/recommend'
 
 export default {
   name: 'Resource',
@@ -79,7 +71,8 @@ export default {
     KGChart,
     ResourceViewer,
     ResourceLink,
-    DownloadButton
+    DownloadButton,
+    ResourceList
   },
   props: {
   },
@@ -123,6 +116,8 @@ export default {
           })
         // 上传用户访问记录
         this.record()
+        // 获取推荐资源
+        this.getRecommendResources()
       },
       immediate: true
     }
@@ -133,7 +128,8 @@ export default {
       entities: {
         entities: []
       },
-      relatedResources: []
+      relatedResources: [],
+      recommendResources: []
     }
   },
   methods: {
@@ -159,6 +155,25 @@ export default {
       record({
         resourceID: Number(this.resourceID)
       })
+    },
+    // 获取推荐信息
+    getRecommendResources () {
+      authentication()
+        .then(response => {
+          if (response.data.code === 200) {
+            recommendByResourceUser(Number(this.resourceID))
+              .then(response => {
+                if (response.data.code === 200) {
+                  let resources = response.data.data
+                  resources.forEach(resource => {
+                    let suffix = resource.url.split('.').slice(-1)[0]
+                    resource.suffix = suffix
+                  })
+                  this.recommendResources = resources
+                }
+              })
+          }
+        })
     }
   }
 }
@@ -190,7 +205,7 @@ export default {
   color: #222226;
 }
 
-.resource-info .resource-name {
+.resource-name {
   color: #606266;
 }
 
@@ -215,31 +230,10 @@ export default {
   border-top: 1px solid #dcdfe6;
 }
 
-.related-resource div {
-  margin-bottom: .5rem;
-}
-
-.related-resource-name {
-  font-size: 1rem;
-  line-height: 1.5rem;
-  color: #409eff;
-  cursor: pointer;
-}
-
 /*.recommend-container {*/
 /*  margin-left: -.5px;*/
 /*  border-left: 1px solid #dcdfe6;*/
 /*}*/
-
-.type-icon {
-  height: 1.2rem;
-  width: 1.2rem;
-  margin-right: .2rem;
-}
-
-.related-resource-name:hover {
-  color: #66b1ff;
-}
 
 /*@media only screen and (max-width : 768px) {*/
 /*  .main-container {*/

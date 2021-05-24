@@ -2,16 +2,6 @@
   <div>
     <nav-menu :searchInfo.sync="searchInfo"></nav-menu>
     <div class="main-container resource-container">
-      <!-- ------------------------------暂不显示---------------------------------------- -->
-      <el-tabs v-if="false" v-model="searchInfo.type" @tab-click="changeType">
-        <el-tab-pane
-          v-for="type in resourceTypes"
-          :key="type.code"
-          :label="type.label"
-          :name="String(type.code)">
-        </el-tab-pane>
-      </el-tabs>
-      <!-- -------------------------------------------------------------------------------- -->
       <div class="resources">
         <div class="flex-1">
           <!-- 知识卡片 -->
@@ -19,15 +9,14 @@
           <!-- 找到的实体和资源信息 -->
           <div class="resource">
             <div>
+              <!-- 这里的v-for的数组实际上是只有一个元素的，后端问题，之前的想法和现在不一样，我发现这个问题的时候已经写了很多了，改起来太麻烦了，懒得改了 -->
               <div
-                v-for="(entity, index) in resources.resources"
-                :key="index"
               >
                 <!-- 教学目标和教学重难点 -->
-                <div v-if="entity.goal.length > 0">
+                <div v-if="goal.length > 0">
                   <div class="subtitle">教学目标</div>
                   <div
-                    v-for="(goal, index) in entity.goal"
+                    v-for="(goal, index) in goal"
                     :key="index"
                     v-if="index < 5"
                     :class="goal.content.length > 43 ? 'content-link overflow-content' : 'content-link'"
@@ -35,10 +24,10 @@
                     {{ goal.content }}
                   </div>
                 </div>
-                <div v-if="entity.key.length > 0">
+                <div v-if="key.length > 0">
                   <div class="subtitle">教学重难点</div>
                   <div
-                    v-for="(key, index) in entity.key"
+                    v-for="(key, index) in key"
                     :key="'key' + index"
                     v-if="index < 5"
                     :class="key.content.length > 43 ? 'content-link overflow-content' : 'content-link'"
@@ -47,9 +36,27 @@
                   </div>
                 </div>
                 <!-- ----------------- -->
-                <div class="resource-list" v-if="entity.resources.length > 0">
+                <!-- ------------------------------ 筛选 ---------------------------------------- -->
+                <el-tabs v-model="searchInfo.type" @tab-click="changeType">
+                  <el-tab-pane
+                    v-for="type in resourceTypes"
+                    :key="type.code"
+                    :label="type.label"
+                    :name="String(type.code)">
+                  </el-tab-pane>
+                </el-tabs>
+                <div class="sort">
+                  <el-radio-group v-model="sort" size="mini" @change="changeSort">
+                    <el-radio-button label="0">综合</el-radio-button>
+                    <el-radio-button label="1">最热</el-radio-button>
+                    <el-radio-button label="2">最新</el-radio-button>
+                  </el-radio-group>
+                </div>
+                <!-- -------------------------------------------------------------------------------- -->
+<!--                {{ resources.resources.resources }}-->
+                <div class="resource-list" v-if="resources.resources.length > 0">
                   <div
-                    v-for="resource in entity.resources"
+                    v-for="resource in resources.resources"
                     :key="resource.id"
                   >
                     <div class="resource-info">
@@ -94,7 +101,7 @@
                     </div>
                   </div>
                 </div>
-                <div v-else>无相关资源</div>
+                <div v-else>{{ noResourceHint }}</div>
               </div>
             </div>
             <!-- 隐藏的a元素，用来在新窗口打开资源页面 -->
@@ -127,6 +134,7 @@ import KnowledgeCard from '@/components/KnowledgeCard'
 import ResourceLink from '@/components/ResourceLink'
 import DownloadButton from '@/components/DownloadButton'
 import { record } from '@/api/record'
+// import { recommendByUserEntity } from '@/api/recommend'
 // import { download } from '@/api/resource'
 import { searchEntity, relatedEntity } from '@/api/entity'
 import merge from 'webpack-merge'
@@ -156,12 +164,14 @@ export default {
       handler (newQuery, oldQuery) {
         console.log('query changed')
         this.resetResource()
-        this.resetEntity()
-        // this.searchInfo.type = newQuery.type === undefined ? 0 : newQuery.type
+        this.searchInfo.type = newQuery.type === undefined ? 0 : newQuery.type
         this.searchInfo.content = newQuery.q === undefined ? 0 : newQuery.q
         this.pageInfo.page = newQuery.page === undefined ? 1 : newQuery.page
         this.goSearch()
         if (oldQuery === undefined || newQuery.q !== oldQuery.q) {
+          this.resetCardInfo()
+          this.resetEntity()
+          this.resetGoalAndKey()
           this.getRelatedEntity(newQuery.q)
         }
       },
@@ -177,7 +187,7 @@ export default {
     console.log(this.$route.query)
     return {
       searchInfo: {
-        // type: this.$route.query.type === undefined ? 0 : this.$route.query.type,
+        type: this.$route.query.type === undefined ? 0 : this.$route.query.type,
         content: this.$route.query.q
       },
       pageInfo: {
@@ -207,14 +217,18 @@ export default {
         code: 6
       }],
       resources: {
-        resources: [],
+        resources: {},
         total: 0,
         pages: 0
       },
+      noResourceHint: '',
       entities: {
         entities: []
       },
       cardInfo: {},
+      goal: [],
+      key: [],
+      sort: 0,
       activeEntity: ''
     }
   },
@@ -222,19 +236,17 @@ export default {
     changeType (tab) {
       this.searchInfo.type = tab.name
       this.$router.push({
-        path: '/search',
-        query: {
-          q: this.searchInfo.content,
-          type: this.searchInfo.type
-        }
-      }).catch(() => {
-        this.$router.go(0)
+        query: merge(this.$route.query, {
+          'type': this.searchInfo.type,
+          'page': 1
+        })
       })
-      // this.goSearch()
     },
     goSearch () {
+      this.noResourceHint = ''
       searchEntity({
         keyword: this.searchInfo.content,
+        type: this.searchInfo.type,
         page: this.pageInfo.page,
         perPage: this.pageInfo.perPage
       }).then(response => {
@@ -242,43 +254,58 @@ export default {
         this.resetResource()
         if (response.data.code === 200) {
           console.log(response.data.data)
-          this.resources.resources = response.data.data.resources
+          let resource = response.data.data.resources[0]
           this.resources.total = response.data.data.total
           this.resources.pages = response.data.data.pages
           // 提取出教学目标和重难点以数组的形式存储
-          this.resources.resources.forEach(resource => {
-            let goal = []
-            let key = []
-            resource['goalAndKey'].forEach(goalAndKey => {
-              if (goalAndKey['objectives'] !== null) {
-                goal.push({
-                  content: goalAndKey['objectives'],
-                  resourceID: goalAndKey['resourceID']
-                })
-              }
-              if (goalAndKey['keyPoint'] !== null) {
-                key.push({
-                  content: goalAndKey['keyPoint'],
-                  resourceID: goalAndKey['resourceID']
-                })
-              }
-            })
-            resource.goal = goal
-            resource.key = key
-          })
-          // 找到和关键词一致的知识点
-          response.data.data.resources.forEach(resource => {
-            if (resource.entityName === this.searchInfo.content) {
-              this.cardInfo = resource.properties
+          let goal = []
+          let key = []
+          resource['goalAndKey'].forEach(goalAndKey => {
+            if (goalAndKey['objectives'] !== null) {
+              goal.push({
+                content: goalAndKey['objectives'],
+                resourceID: goalAndKey['resourceID']
+              })
+            }
+            if (goalAndKey['keyPoint'] !== null) {
+              key.push({
+                content: goalAndKey['keyPoint'],
+                resourceID: goalAndKey['resourceID']
+              })
             }
           })
+          this.goal = goal
+          this.key = key
+          // 找到和关键词一致的知识点
+          if (resource.entityName === this.searchInfo.content) {
+            this.cardInfo = resource.properties
+          }
+          this.resources.resources = resource.resources
+          console.log(this.resources)
+        } else {
+          this.noResourceHint = '未查询到相关资源'
         }
       })
+    },
+    changeSort (sort) {
+      console.log(sort)
+      // this.$router.push({
+      //   query: merge(this.$route.query, {
+      //     'type': this.searchInfo.type,
+      //     'page': 1
+      //   })
+      // })
     },
     resetResource () {
       this.resources.resources = []
       this.resources.total = 0
       this.resources.pages = 0
+    },
+    resetGoalAndKey () {
+      this.goal = []
+      this.key = []
+    },
+    resetCardInfo () {
       this.cardInfo = {}
     },
     resetEntity () {
@@ -315,6 +342,11 @@ export default {
 </script>
 
 <style scoped>
+.sort {
+  margin-top: -.5rem;
+  margin-bottom: .5rem;
+}
+
 .resources {
   display: flex;
   margin-top: 1rem;
@@ -327,7 +359,6 @@ export default {
 }
 
 .resource-list {
-  margin-top: 1rem;
   border-top: 1px solid #dcdfe6;
 }
 
@@ -443,6 +474,7 @@ export default {
 }
 
 .knowledge-card {
+  margin-top: 1rem;
   margin-bottom: 1rem;
 }
 

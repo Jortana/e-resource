@@ -63,6 +63,7 @@ export default {
                   duration: 1500
                 })
                 this.$store.commit('logout')
+                this.$router.go(0)
               } else {
                 this.$message.error(response.data.message)
               }

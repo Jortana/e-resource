@@ -1,6 +1,6 @@
 <template>
 <span class="resource-name" @click="viewResource(resource['id'])">
-  {{ resource['resourceName'] }}
+  <span>{{ resource['resourceName'] }}</span>
   <!-- 隐藏的a元素，用来在新窗口打开资源页面 -->
   <a class="resource-target" ref="resourceTarget" href="" target="_blank" v-show="false"></a>
 </span>
