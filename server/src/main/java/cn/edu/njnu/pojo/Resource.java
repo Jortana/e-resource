@@ -16,7 +16,7 @@ public class Resource {
     int download;
     int collection;
     int browse;
-    int type;
+    int resourceType;
     String period;
     String grade;
     int subject;
@@ -38,7 +38,7 @@ public class Resource {
         this.download = download;
         this.collection = collection;
         this.browse = browse;
-        this.type = type;
+        this.resourceType = resourceType;
         this.period = period;
         this.grade = grade;
         this.subject = subject;
@@ -60,7 +60,7 @@ public class Resource {
                 ", download=" + download +
                 ", collection=" + collection +
                 ", browse=" + browse +
-                ", type=" + type +
+                ", resourceType=" + resourceType +
                 ", period='" + period + '\'' +
                 ", grade='" + grade + '\'' +
                 ", subject=" + subject +
@@ -171,12 +171,12 @@ public class Resource {
         this.browse = browse;
     }
 
-    public int getType() {
-        return type;
+    public int getResourceType() {
+        return resourceType;
     }
 
-    public void setType(int type) {
-        this.type = type;
+    public void setResourceType(int resourceType) {
+        this.resourceType = resourceType;
     }
 
     public String getPeriod() {

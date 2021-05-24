@@ -20,7 +20,7 @@ public interface ResourceMapper {
     List<Map> queryType();
     //根据ID查相关资源
     String queryRelated(int resource_id);
-    ArrayList<Resource> queryResourceByEntity(String entity,int start,int end);
+    ArrayList<Resource> queryResource(String entity,int start,int end, int sort, int type);
     List<Map> queryGoalAndKey(String entity);
     //更新资源浏览次数
     boolean updateBrowse(int browse, int resourceID);

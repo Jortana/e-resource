@@ -41,8 +41,17 @@
         select related_10 from t_resource where id = #{resource_id}
     </select>
     <!-- 通过实体找资源 -->
-    <select id="queryResourceByEntity" resultType="resource">
-        select id, resource_name, download, collection, `period`, grade, subject, url, view_url, entity, updateTime from t_resource where entity like concat('%',#{entity},'%') limit #{start},#{end}
+    <select id="queryResource" resultType="resource">
+        select id, resource_name, download, collection, `period`, grade, subject, url, view_url, entity, updateTime, resource_type, browse from t_resource where
+        <trim suffixOverrides="and">
+            <if test="entity!=null">entity like concat('%',#{entity},'%') and </if>
+            <if test="type!=0">resource_type =#{type} and </if>
+        </trim>
+        <trim>
+            <if test="sort == 1">order by browse desc</if>
+            <if test="sort == 2">order by updateTime desc</if>
+        </trim>
+        limit #{start},#{end};
     </select>
     <!-- 查教学目标和重难点 -->
     <select id="queryGoalAndKey" resultType="HashMap">
