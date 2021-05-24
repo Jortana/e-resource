@@ -1,27 +1,27 @@
 package cn.edu.njnu.service;
 
+import cn.edu.njnu.mapper.RecordMapper;
 import cn.edu.njnu.mapper.ResourceMapper;
 import cn.edu.njnu.pojo.Resource;
 import cn.edu.njnu.pojo.Result;
 import cn.edu.njnu.pojo.ResultFactory;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.neo4j.cypherdsl.core.Limit;
 import org.neo4j.driver.v1.*;
 import static org.neo4j.driver.v1.Values.parameters;
 
 import org.springframework.stereotype.Service;
-import scala.collection.script.Start;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
 public class EntityService {
     private final ResourceMapper resourceMapper;
-
-    public EntityService(ResourceMapper resourceMapper) {
+    private final RecordMapper recordMapper;
+    public EntityService(ResourceMapper resourceMapper, RecordMapper recordMapper) {
         this.resourceMapper = resourceMapper;
+        this.recordMapper = recordMapper;
     }
     String resourceRoot = "http://223.2.50.241:8082";
     private Driver createDrive(){
@@ -82,7 +82,14 @@ public class EntityService {
         return ResultFactory.buildSuccessResult("查询成功", resArray);
     }
     public Result getEntity(Map<String, Object> keywordMap) {
+        Date date = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String browseDate = formatter.format(date);
         String keyword = (String) keywordMap.get("keyword");
+        if (keywordMap.containsKey("userId")){
+            int userId = Integer.parseInt((String) keywordMap.get("userId"));
+            recordMapper.addEntityRecord(userId,browseDate,keyword);
+        }
         int page = Integer.parseInt( (String) keywordMap.get("page") );
         int perPage = Integer.parseInt( (String) keywordMap.get("perPage") );
         int skip = (page - 1) * perPage;

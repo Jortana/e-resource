@@ -52,6 +52,18 @@
     <update id="updateBrowse">
         update t_resource set browse = #{browse} where id = #{resourceID}
     </update>
+    <!-- 更新资源下载次数 -->
+    <update id="updateDownload">
+        update t_resource set download = #{download} where id = #{resourceID}
+    </update>
+    <!-- 查热门资源 -->
+    <select id="queryHot" resultType="resource">
+        select id, resource_name, download, collection, `period`, grade, subject, url, view_url, entity, updateTime from t_resource order by browse limit 10
+    </select>
+    <!-- 查最新资源 -->
+    <select id="queryTime" resultType="resource">
+        select id, resource_name, download, collection, `period`, grade, subject, url, view_url, entity, updateTime from t_resource order by updateTime desc limit 10
+    </select>
 </mapper>
 
 

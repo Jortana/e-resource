@@ -456,44 +456,46 @@ public class UserService {
                         //  System.out.println(user_entity.entrySet());
                     }
                     System.out.println("The item " + item + " for " + recommendUserId + "'s recommended degree:" + itemRecommendDegree);
+                    resourceArray.add(resourceMapper.queryResourceByID(item));
                     JSONObject userWeight = new JSONObject();
                     userWeight.put("resourceID", item);
                     userWeight.put("weight", itemRecommendDegree);
                     userArray.add(userWeight);
                 }
             }
-            int userLength = userArray.size();
-            double[] weightList = new double[userLength];  //用户权重数组
-            int[] userList = new int[userLength];  //用户ID数组
-            for (int i = 0;i < userLength;i++){  //循环，根据权重对用户ID进行排序
-                int uid = (int) userArray.getJSONObject(i).get("resourceID");
-                double weight = (double) userArray.getJSONObject(i).get("weight");
-                for (int j = 0; j < userLength; j++){
-                    if (weight > weightList[j]){
-                        for (int l = userLength-1;l>j;l--){
-                            weightList[l] = weightList[l-1];
-                            userList[l] = userList[l-1];
-                        }
-                        weightList[j]=weight;
-                        userList[j] = uid;
-                        break;
-                    }
-                }
-            }
-            List<Map> record = userMapper.entityRecord(recommendUserId);
-            for (int i = 0 ; i < userLength; i++){
-                int resourceID = userList[i];
-                Resource queryResource = resourceMapper.queryResourceByID(resourceID);
-                String entity = queryResource.getEntity();
-                for (Map entityNameMap : record){
-                    String entityName = (String) entityNameMap.get("entity_name");
-                    if (entity.contains(entityName)){
-                        resourceArray.add(queryResource);
-                        break;
-                    }
-
-                }
-            }
+//            int userLength = userArray.size();
+//            double[] weightList = new double[userLength];  //用户权重数组
+//            int[] userList = new int[userLength];  //用户ID数组
+//            for (int i = 0;i < userLength;i++){  //循环，根据权重对用户ID进行排序
+//                int uid = (int) userArray.getJSONObject(i).get("resourceID");
+//                double weight = (double) userArray.getJSONObject(i).get("weight");
+//                for (int j = 0; j < userLength; j++){
+//                    if (weight > weightList[j]){
+//                        for (int l = userLength-1;l>j;l--){
+//                            weightList[l] = weightList[l-1];
+//                            userList[l] = userList[l-1];
+//                        }
+//                        weightList[j]=weight;
+//                        userList[j] = uid;
+//                        break;
+//                    }
+//                }
+//            }
+//            List<Map> record = userMapper.entityRecord(recommendUserId);
+//            for (int i = 0 ; i < userLength; i++){
+//                int resourceID = userList[i];
+//                System.out.println(resourceID);
+//                Resource queryResource = resourceMapper.queryResourceByID(resourceID);
+//                String entity = queryResource.getEntity();
+//                for (Map entityNameMap : record){
+//                    String entityName = (String) entityNameMap.get("entity_name");
+//                    if (entity.contains(entityName)){
+//                        resourceArray.add(queryResource);
+//                        break;
+//                    }
+//
+//                }
+//            }
 //            System.out.println(user_entity.entrySet());
         }
         return ResultFactory.buildSuccessResult("成功查询推荐资源", resourceArray);

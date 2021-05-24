@@ -24,4 +24,10 @@ public interface ResourceMapper {
     List<Map> queryGoalAndKey(String entity);
     //更新资源浏览次数
     boolean updateBrowse(int browse, int resourceID);
+    //更新资源浏览次数
+    boolean updateDownload(int download, int resourceID);
+    //根据条件查询资源
+    ArrayList<Resource> queryHot();
+    //根据条件查询资源
+    ArrayList<Resource> queryTime();
 }

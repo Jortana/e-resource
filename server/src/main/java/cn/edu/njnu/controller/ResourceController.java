@@ -71,4 +71,14 @@ public class ResourceController {
     public Result relatedResource(@RequestParam Map<String, Object> resourceIDMap){
         return resourceService.relatedResource(resourceIDMap);
     }
+
+    @GetMapping("/v1.0/public/queryHot")
+    public Result queryHot(){
+        return resourceService.queryHot();
+    }
+
+    @GetMapping("/v1.0/public/queryTime")
+    public Result queryTime(){
+        return resourceService.queryTime();
+    }
 }
