@@ -24,7 +24,8 @@ public class RecordService {
         if (recordMap.containsKey("resourceID")){
             int resourceID = (int) recordMap.get("resourceID");
             int browse = resourceMapper.queryResourceByID(resourceID).getBrowse() + 1;
-            resourceMapper.updateBrowse(browse,resourceID);
+            System.out.println(browse);
+            resourceMapper.updateBrowse(browse, resourceID);
         }
         if (recordMap.containsKey("userId")){
             int userID = (int) recordMap.get("userId");
