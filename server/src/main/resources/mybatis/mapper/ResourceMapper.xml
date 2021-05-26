@@ -30,7 +30,7 @@
     </select>
     <!-- 根据ID查资源 -->
     <select id="queryResourceByID" resultType="resource">
-         select id, resource_name, download, collection, `period`, grade, subject, url, view_url, entity, updateTime from t_resource where id = #{resource_id}
+         select id, resource_name, download, collection, browse, `period`, grade, subject, url, view_url, entity, updateTime from t_resource where id = #{resource_id}
     </select>
     <!-- 获取资源类型 -->
     <select id="queryType" resultType="HashMap">
@@ -67,7 +67,7 @@
     </update>
     <!-- 查热门资源 -->
     <select id="queryHot" resultType="resource">
-        select id, resource_name, download, collection, `period`, grade, subject, url, view_url, entity, updateTime from t_resource order by browse limit 10
+        SELECT id, resource_name, download, collection, `period`, grade, browse, `subject`, url, view_url, entity, updateTime FROM t_resource ORDER BY browse DESC LIMIT 10
     </select>
     <!-- 查最新资源 -->
     <select id="queryTime" resultType="resource">

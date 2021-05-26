@@ -108,6 +108,7 @@ public class ResourceService {
     public Result queryResource(Map<String, Object> ResourceIDMap){
         int resourceID = Integer.parseInt ((String) ResourceIDMap.get("resourceID"));
         Resource queryResource = resourceMapper.queryResourceByID(resourceID);
+        resourceMapper.updateBrowse(queryResource.getBrowse()+1,queryResource.getId());
         return ResultFactory.buildSuccessResult("查询成功",entityList(queryResource));
     }
     //将数据库entity转换为List类型
