@@ -71,7 +71,7 @@
     </select>
     <!-- 查最新资源 -->
     <select id="queryTime" resultType="resource">
-        select id, resource_name, download, collection, `period`, grade, subject, url, view_url, entity, updateTime from t_resource order by updateTime desc limit 10
+        select id, resource_name, download, collection, `period`, grade, browse, `subject`, url, view_url, entity, updateTime from t_resource order by updateTime desc limit 10
     </select>
 </mapper>
 
