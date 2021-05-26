@@ -7,8 +7,6 @@
 </template>
 
 <script>
-import {record} from '@/api/record'
-
 export default {
   name: 'ResourceLink',
   props: {
@@ -17,9 +15,6 @@ export default {
   methods: {
     viewResource (resourceID) {
       let target = this.$refs.resourceTarget
-      record({
-        resourceID: resourceID
-      })
       target.setAttribute('href', `${window.location.origin}/resource/${resourceID}`)
       target.click()
     }

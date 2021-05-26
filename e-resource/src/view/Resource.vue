@@ -85,6 +85,7 @@ export default {
     resourceID: {
       handler (resourceID) {
         // 获取资源信息
+        console.log('query resource')
         resourceInfo(resourceID)
           .then(response => {
             if (response.data.code === 200) {
