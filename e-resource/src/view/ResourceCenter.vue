@@ -283,7 +283,8 @@ export default {
           }
           this.resources.resources = resource.resources
           console.log(this.resources)
-        } else {
+        }
+        if (this.resources.resources.length === 0) {
           this.noResourceHint = '未查询到相关资源'
         }
       })
