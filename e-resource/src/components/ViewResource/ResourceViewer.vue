@@ -10,15 +10,15 @@
       ></pdf>
     </el-scrollbar>
   </div>
-  <iframe
-    class="b-video"
-    src="//player.bilibili.com/player.html?aid=714853065&bvid=BV1tX4y1G795&cid=317189977&page=1"
-    scrolling="no"
-    border="0"
-    frameborder="no"
-    framespacing="0"
-    allowfullscreen="true">
-  </iframe>
+<!--  <iframe-->
+<!--    class="b-video"-->
+<!--    src="//player.bilibili.com/player.html?aid=714853065&bvid=BV1tX4y1G795&cid=317189977&page=1"-->
+<!--    scrolling="no"-->
+<!--    border="0"-->
+<!--    frameborder="no"-->
+<!--    framespacing="0"-->
+<!--    allowfullscreen="true">-->
+<!--  </iframe>-->
 <!--  <div v-else>-->
 <!--    该资源暂不支持预览，请下载后进行学习-->
 <!--  </div>-->

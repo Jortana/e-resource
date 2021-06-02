@@ -54,53 +54,7 @@
                 </div>
                 <!-- -------------------------------------------------------------------------------- -->
 <!--                {{ resources.resources.resources }}-->
-                <div class="resource-list" v-if="resources.resources.length > 0">
-                  <div
-                    v-for="resource in resources.resources"
-                    :key="resource.id"
-                  >
-                    <div class="resource-info">
-                      <div class="info">
-                        <resource-link :resource="resource"></resource-link>
-<!--                        <span class="resource-name" @click="viewResource(resource['id'])">-->
-<!--                          {{ resource['resourceName'] }}-->
-<!--                        </span>-->
-                        <div class="file-name">
-                          {{ `${resource['resourceName']}.${resource['url'].split('.').slice(-1)}` }}
-                        </div>
-                        <div class="entity-list">
-                          <div
-                            v-for="entity in resource['entity'].split('#').slice(0, resource['entity'].split('#').length - 1)"
-                            :key = entity
-                          >
-                            <el-button size="mini">
-                              {{ entity }}
-                            </el-button>
-                          </div>
-                        </div>
-                        <div class="extra">
-                          <div class="extra-info"><i class="el-icon-time"></i> {{ resource['updateTime'] }}</div>
-                          <div class="extra-info"><i class="el-icon-download"></i> {{ resource['download'] }} 下载</div>
-                        </div>
-                      </div>
-                      <div class="operation">
-                        <div class="full-width">
-                          <download-button :resourceID="resource['id']"></download-button>
-                        </div>
-                        <div class="full-width">
-                          <el-button class="full-width" size="medium" icon="el-icon-document-add">
-                            加入资源包
-                          </el-button>
-                        </div>
-                        <div class="full-width">
-                          <el-button class="full-width" size="medium" icon="el-icon-star-off">
-                            收藏
-                          </el-button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <resource-list-with-info v-if="resources.resources.length > 0" :resources="resources.resources"></resource-list-with-info>
                 <div v-else>{{ noResourceHint }}</div>
               </div>
             </div>
@@ -133,6 +87,7 @@ import NavMenu from '@/components/NavMenu'
 import KnowledgeCard from '@/components/KnowledgeCard'
 import ResourceLink from '@/components/ResourceLink'
 import DownloadButton from '@/components/DownloadButton'
+import ResourceListWithInfo from '@/components/ResourceListWithInfo'
 import { record } from '@/api/record'
 // import { recommendByUserEntity } from '@/api/recommend'
 // import { download } from '@/api/resource'
@@ -146,7 +101,8 @@ export default {
     KGChart,
     KnowledgeCard,
     ResourceLink,
-    DownloadButton
+    DownloadButton,
+    ResourceListWithInfo
   },
   mounted () {
     this.goSearch()
@@ -455,7 +411,6 @@ export default {
 }
 
 .resource-name {
-  /*color: #1a0dab;*/
   font-size: 1.2rem;
   font-weight: bold;
   cursor: pointer;
