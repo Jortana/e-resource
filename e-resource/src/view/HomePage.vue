@@ -128,7 +128,7 @@ main {
   width: 50vw;
   height: 3rem;
   max-width: 580px;
-  transform: translateY(30%);
+  transform: translateY(20%);
 }
 
 .main-search >>> .el-input__prefix,
@@ -146,7 +146,7 @@ main {
   );
   border-radius: 1rem;
   backdrop-filter: blur(2rem);
-  transform: translateY(25%);
+  transform: translateY(15%);
 }
 
 .wide {

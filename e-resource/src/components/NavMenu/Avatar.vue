@@ -32,6 +32,7 @@ export default {
       submenus: [
         { label: '个人中心', index: '/account', icon: 'el-icon-user' },
         { label: '我的收藏', index: '/favourite', icon: 'el-icon-folder-opened' },
+        { label: '历史记录', index: '/history', icon: 'el-icon-time' },
         { label: '退出', index: 'logout', icon: 'el-icon-switch-button' }
       ],
       cardVisible: false,

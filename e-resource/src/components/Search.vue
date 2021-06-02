@@ -47,7 +47,7 @@ export default {
 
 <style scoped>
 .main-search {
-  width: 50vw;
+  /*width: 50vw;*/
   height: 3rem;
 }
 

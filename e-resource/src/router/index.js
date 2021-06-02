@@ -36,6 +36,12 @@ const routes = [
       }
     ]
   },
+  // 收藏
+  {
+    path: '/favourite',
+    name: 'Favourite',
+    component: () => import('@/view/Favourite')
+  },
   // 资源页面
   {
     path: '/resource/:resourceID',

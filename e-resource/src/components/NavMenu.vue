@@ -98,10 +98,7 @@ export default {
 .search-container {
   display: flex;
   align-items: center;
-}
-
-.search-container {
-  width: 50%;
+  max-width: 50%;
 }
 
 .search-container >>> .el-select {

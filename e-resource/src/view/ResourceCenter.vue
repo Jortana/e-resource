@@ -162,7 +162,6 @@ export default {
   watch: {
     query: {
       handler (newQuery, oldQuery) {
-        console.log('query changed')
         this.resetResource()
         this.searchInfo.type = newQuery.type === undefined ? 0 : newQuery.type
         this.searchInfo.content = newQuery.q === undefined ? 0 : newQuery.q

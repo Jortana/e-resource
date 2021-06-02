@@ -10,8 +10,31 @@
       ></pdf>
     </el-scrollbar>
   </div>
-  <div v-else>
-    该资源暂不支持预览，请下载后进行学习
+  <iframe
+    class="b-video"
+    src="//player.bilibili.com/player.html?aid=714853065&bvid=BV1tX4y1G795&cid=317189977&page=1"
+    scrolling="no"
+    border="0"
+    frameborder="no"
+    framespacing="0"
+    allowfullscreen="true">
+  </iframe>
+<!--  <div v-else>-->
+<!--    该资源暂不支持预览，请下载后进行学习-->
+<!--  </div>-->
+  <!-- 评分 -->
+  <div class="rate">
+    <el-rate
+      v-model="rate"
+      disabled
+      show-score
+      text-color="#ff9900"
+      score-template="{value}">
+    </el-rate>
+  </div>
+  <!-- 打分和评论 -->
+  <div class="comment">
+    <h2>评论</h2>
   </div>
 </div>
 </template>
@@ -77,7 +100,12 @@ export default {
       pdf: {
         src: '',
         numPages: undefined
-      }
+      },
+      comment: {
+        rate: '',
+        content: ''
+      },
+      rate: 4.5
     }
   },
   methods: {
@@ -88,5 +116,20 @@ export default {
 <style scoped>
 .viewer >>> .el-scrollbar__wrap {
   overflow-x: hidden;
+}
+
+.b-video {
+  width: 100%;
+  height: 500px;
+}
+
+.comment {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e4e7ed;
+}
+
+.comment h2 {
+  font-weight: 500;
 }
 </style>
