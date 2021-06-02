@@ -228,6 +228,7 @@ public class EntityService {
                         resource.setAid((String) bvideoInfo.get("aid"));
                         resource.setBvid((String) bvideoInfo.get("bvid"));
                         resource.setCid((String) bvideoInfo.get("cid"));
+                        resource.setPage((int)bvideoInfo.get("page"));
                         break;
                     case 2:
                         Map documentInfo = resourceMapper.queryDocument(extendID);

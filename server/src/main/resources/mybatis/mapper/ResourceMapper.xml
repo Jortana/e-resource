@@ -30,12 +30,12 @@
     </select>
     <!-- 根据ID查资源 -->
     <select id="queryResourceByID" resultType="resource" >
-         select id, resource_name, download, collection, browse, `period`, grade, subject, updateTime, `table`, tableResourceID, resource_type from t_resource where id = #{id}
+         select id, resource_name, download, collection, browse, `period`, grade, subject, updateTime, `table`, tableResourceID, resource_type, rate from t_resource where id = #{id}
     </select>
 
     <!-- 根据ID查资源 -->
     <select id="queryResourceByIDList" resultType="resource" >
-        select id, resource_name, download, collection, browse, `period`, grade, subject, updateTime, `table`, tableResourceID, resource_type from t_resource
+        select id, resource_name, download, collection, browse, `period`, grade, subject, updateTime, `table`, tableResourceID, resource_type, rate from t_resource
         <where>
             <foreach item="id"  collection="list">or (id = #{id})</foreach>
         </where>
@@ -50,7 +50,7 @@
     </select>
     <!-- 通过实体找资源 -->
     <select id="queryResource" resultType="resource">
-        select id, resource_name, download, collection, `period`, grade, subject, url, view_url, entity, updateTime, resource_type, browse from t_resource where
+        select id, resource_name, download, collection, `period`, grade, subject, url, view_url, entity, updateTime, resource_type, browse, rate from t_resource where
         <trim suffixOverrides="and">
             <if test="entity!=null">entity like concat('%',#{entity},'%') and </if>
             <if test="type!=0">resource_type =#{type} and </if>

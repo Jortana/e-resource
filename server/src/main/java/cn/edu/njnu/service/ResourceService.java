@@ -127,6 +127,7 @@ public class ResourceService {
                 queryResource.setAid((String) bvideoInfo.get("aid"));
                 queryResource.setBvid((String) bvideoInfo.get("bvid"));
                 queryResource.setCid((String) bvideoInfo.get("cid"));
+                queryResource.setPage((int)bvideoInfo.get("page"));
                 break;
             case 2:
                 Map documentInfo = resourceMapper.queryDocument(extendID);
