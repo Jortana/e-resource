@@ -7,6 +7,7 @@ import cn.edu.njnu.pojo.Result;
 import cn.edu.njnu.pojo.ResultFactory;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.neo4j.cypherdsl.core.Case;
 import org.neo4j.driver.v1.*;
 import static org.neo4j.driver.v1.Values.parameters;
 
@@ -81,6 +82,97 @@ public class EntityService {
 
         return ResultFactory.buildSuccessResult("查询成功", resArray);
     }
+//    public Result getEntity(Map<String, Object> keywordMap) {
+//        Date date = new Date();
+//        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+//        String browseDate = formatter.format(date);
+//        String keyword = (String) keywordMap.get("keyword");
+//        if (keywordMap.containsKey("userId")){
+//            int userId = Integer.parseInt((String) keywordMap.get("userId"));
+//            recordMapper.addEntityRecord(userId,browseDate,keyword);
+//        }
+//        int sort = 0;  //0默认，1最热，2最新
+//        int type = 0;  //0全部
+//        if (keywordMap.containsKey("sort")){
+//            sort = Integer.parseInt((String) keywordMap.get("sort"));
+//        }
+//        if (keywordMap.containsKey("type")){
+//            type = Integer.parseInt((String) keywordMap.get("type"));
+//        }
+//        int page = Integer.parseInt( (String) keywordMap.get("page") );
+//        int perPage = Integer.parseInt( (String) keywordMap.get("perPage") );
+//        Driver driver = createDrive();
+//        Session session = driver.session();
+//
+//        StatementResult result = session.run( "MATCH (a:concept) where a.name = {name} " +
+//                        "RETURN properties(a) AS props order by a.name",
+//                parameters( "name", keyword) );
+//        JSONObject resObject = new JSONObject();
+//        JSONArray resArray = new JSONArray();
+//        if (!result.hasNext()){
+//            return ResultFactory.buildFailResult("未查询到相关知识点");
+//        }
+//        int totalEntity = 0;
+//        Record record = result.next();
+//        String entityName = record.get( "props" ).get( "name" ).asString();
+//        JSONObject similarEntity = new JSONObject();
+//        similarEntity.put("entityName", entityName);
+//        similarEntity.put("properties", record.get( "props" ).asMap());
+//        if (sort != 0){
+//            similarEntity.put("resources", queryResource(entityName,perPage,page,sort,type));
+//            totalEntity = queryResource(entityName,100000,1, sort, type).size();
+//        }
+//        else {
+//            int skip = (page-1)*perPage;
+//            StatementResult resourceNode = null;
+//            if (type == 0){
+//                resourceNode = session.run( "MATCH (p:resource)-[r]->(a:concept) where a.name = {name}" +
+//                                "RETURN p.id AS id order by r.tfidf skip {skip} limit {limit}",
+//                        parameters( "name", keyword,"skip",skip,"limit",perPage) );
+//                StatementResult count = session.run( "MATCH (p:resource)-[r]->(a:concept) where p.id>0 and a.name = {name} " +
+//                                "RETURN count(*) as num",
+//                        parameters( "name", keyword) );
+//                if ( count.hasNext() )
+//                {
+//                    Record countRecord = count.next();
+//                    totalEntity = countRecord.get( "num" ).asInt();
+//                }
+//            }
+//            else {
+//                resourceNode = session.run( "MATCH (p:resource)-[r]->(a:concept) where p.id>0 and a.name = {name} and p.type = {type} " +
+//                                "RETURN p.id AS id order by r.tfidf skip {skip} limit {limit}",
+//                        parameters( "name", keyword,"skip",skip,"limit",perPage,"type", type) );
+//                StatementResult count = session.run( "MATCH (p:resource)-[r]->(a:concept) where p.id>0 and a.name = {name} and p.type = {type} " +
+//                                "RETURN count(*) as num",
+//                        parameters( "name", keyword, "type", type) );
+//                if ( count.hasNext() )
+//                {
+//                    Record countRecord = count.next();
+//                    totalEntity = countRecord.get( "num" ).asInt();
+//                }
+//
+//            }
+//
+//            JSONArray resourceArray = new JSONArray();
+//            while ( resourceNode.hasNext() )
+//            {
+//                Record ResourceRecord = resourceNode.next();
+//                int resourceID = ResourceRecord.get( "id" ).asInt();
+//                Resource resource = resourceMapper.queryResourceByID(resourceID);
+//                resourceArray.add(resource);
+//            }
+//            similarEntity.put("resources", resourceArray);
+//
+//        }
+//        similarEntity.put("goalAndKey", goalAndKey(entityName));
+//        resArray.add(similarEntity);
+//        resObject.put("resources", resArray);
+//        resObject.put("total", totalEntity);
+//        resObject.put("pages", (int)Math.ceil(totalEntity * 1.0 / perPage));
+//        session.close();
+////        driver.close();
+//        return ResultFactory.buildSuccessResult("查询成功", resObject);
+//    }
     public Result getEntity(Map<String, Object> keywordMap) {
         Date date = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
@@ -117,51 +209,59 @@ public class EntityService {
         JSONObject similarEntity = new JSONObject();
         similarEntity.put("entityName", entityName);
         similarEntity.put("properties", record.get( "props" ).asMap());
-        if (sort != 0){
-            similarEntity.put("resources", queryResource(entityName,perPage,page,sort,type));
-            totalEntity = queryResource(entityName,100000,1, sort, type).size();
-        }
-        else {
-            int skip = (page-1)*perPage;
-            StatementResult resourceNode = null;
-            if (type == 0){
-                resourceNode = session.run( "MATCH (p:resource)-[r]->(a:concept) where p.id>0 and a.name = {name}" +
-                                "RETURN p.id AS id order by r.tfidf skip {skip} limit {limit}",
-                        parameters( "name", keyword,"skip",skip,"limit",perPage) );
-                StatementResult count = session.run( "MATCH (p:resource)-[r]->(a:concept) where p.id>0 and a.name = {name} " +
-                                "RETURN count(*) as num",
-                        parameters( "name", keyword) );
-                if ( count.hasNext() )
-                {
-                    Record countRecord = count.next();
-                    totalEntity = countRecord.get( "num" ).asInt();
-                }
-            }
-            else {
-                resourceNode = session.run( "MATCH (p:resource)-[r]->(a:concept) where p.id>0 and a.name = {name} and p.type = {type} " +
-                                "RETURN p.id AS id order by r.tfidf skip {skip} limit {limit}",
-                        parameters( "name", keyword,"skip",skip,"limit",perPage,"type", type) );
-                StatementResult count = session.run( "MATCH (p:resource)-[r]->(a:concept) where p.id>0 and a.name = {name} and p.type = {type} " +
-                                "RETURN count(*) as num",
-                        parameters( "name", keyword, "type", type) );
-                if ( count.hasNext() )
-                {
-                    Record countRecord = count.next();
-                    totalEntity = countRecord.get( "num" ).asInt();
-                }
-
-            }
-
+        int skip = (page-1)*perPage;
+        if (sort == 0){
+            StatementResult resourceNode = session.run( "MATCH (m:resource)-[r]->(a:concept) where a.name = {name} " +
+                            "RETURN m.id AS id order by r.tfidf",
+                    parameters( "name", keyword) );
             JSONArray resourceArray = new JSONArray();
             while ( resourceNode.hasNext() )
             {
                 Record ResourceRecord = resourceNode.next();
                 int resourceID = ResourceRecord.get( "id" ).asInt();
                 Resource resource = resourceMapper.queryResourceByID(resourceID);
-                resourceArray.add(resource);
+                int extendID = resource.getTableResourceID();
+                int tableID = resource.getTable();
+                switch (tableID) {
+                    case 1:
+                        Map bvideoInfo = resourceMapper.queryBvideo(extendID);
+                        resource.setAid((String) bvideoInfo.get("aid"));
+                        resource.setBvid((String) bvideoInfo.get("bvid"));
+                        resource.setCid((String) bvideoInfo.get("cid"));
+                        break;
+                    case 2:
+                        Map documentInfo = resourceMapper.queryDocument(extendID);
+                        resource.setUrl((String) documentInfo.get("url"));
+                        resource.setViewUrl((String) documentInfo.get("view_url"));
+                        break;
+                }
+                if (type == 0 || resource.getResourceType() == type){
+                    resourceArray.add(resource);
+                    totalEntity++;
+                }
             }
-            similarEntity.put("resources", resourceArray);
-
+            JSONArray resourceTotal = new JSONArray();
+            for (int i = skip;i<skip+perPage && i<totalEntity;i++){
+                resourceTotal.add(resourceArray.get(i));
+            }
+            similarEntity.put("resources", resourceTotal);
+        }
+        else if(sort == 1){
+            StatementResult resourceNode = session.run( "MATCH (m:resource)-[r]->(a:concept) where a.name = {name} " +
+                            "RETURN m.id AS id order by r.tfidf",
+                    parameters( "name", keyword) );
+            JSONArray resourceArray = new JSONArray();
+            ArrayList<Integer> idList = new ArrayList<>();
+            while ( resourceNode.hasNext() )
+            {
+                Record ResourceRecord = resourceNode.next();
+                int resourceID = ResourceRecord.get( "id" ).asInt();
+                idList.add(resourceID);
+            }
+            ArrayList<Resource> resourceArrayList = resourceMapper.queryResourceByIDList(idList);
+            System.out.println(resourceArrayList);
+        }
+        else{
         }
         similarEntity.put("goalAndKey", goalAndKey(entityName));
         resArray.add(similarEntity);

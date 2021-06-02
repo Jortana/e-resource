@@ -29,8 +29,16 @@
         </trim>
     </select>
     <!-- 根据ID查资源 -->
-    <select id="queryResourceByID" resultType="resource">
-         select id, resource_name, download, collection, browse, `period`, grade, subject, url, view_url, entity, updateTime from t_resource where id = #{resource_id}
+    <select id="queryResourceByID" resultType="resource" >
+         select id, resource_name, download, collection, browse, `period`, grade, subject, updateTime, `table`, tableResourceID, resource_type from t_resource where id = #{id}
+    </select>
+
+    <!-- 根据ID查资源 -->
+    <select id="queryResourceByIDList" resultType="resource" >
+        select id, resource_name, download, collection, browse, `period`, grade, subject, updateTime, `table`, tableResourceID, resource_type from t_resource
+        <where>
+            <foreach item="id"  collection="list">or (id = #{id})</foreach>
+        </where>
     </select>
     <!-- 获取资源类型 -->
     <select id="queryType" resultType="HashMap">
@@ -55,7 +63,7 @@
     </select>
     <!-- 查教学目标和重难点 -->
     <select id="queryGoalAndKey" resultType="HashMap">
-        select distinct t_goal, t_key, resource_id from t_instruction_plan_clips inner join t_resource on t_instruction_plan_clips.resource_id = t_resource.id where entity like concat('%',#{entity},'%')
+        select distinct t_goal, t_key from t_instruction_plan_clips
     </select>
     <!-- 更新资源浏览次数 -->
     <update id="updateBrowse">
@@ -67,11 +75,21 @@
     </update>
     <!-- 查热门资源 -->
     <select id="queryHot" resultType="resource">
-        SELECT id, resource_name, download, collection, `period`, grade, browse, `subject`, url, view_url, entity, updateTime FROM t_resource ORDER BY browse DESC LIMIT 10
+        SELECT id, resource_name, download, collection, `period`, grade, browse, `subject`, url, view_url, updateTime FROM t_resource ORDER BY browse DESC LIMIT 10
     </select>
     <!-- 查最新资源 -->
     <select id="queryTime" resultType="resource">
-        select id, resource_name, download, collection, `period`, grade, browse, `subject`, url, view_url, entity, updateTime from t_resource order by updateTime desc limit 10
+        select id, resource_name, download, collection, `period`, grade, browse, `subject`, url, view_url, updateTime from t_resource order by updateTime desc limit 10
+    </select>
+
+    <!-- 查文档url -->
+    <select id="queryDocument" resultType="HashMap">
+        select *from t_document where id = #{id}
+    </select>
+
+    <!-- 查bilibili -->
+    <select id="queryBvideo" resultType="HashMap">
+        select *from t_bvideo where id = #{id}
     </select>
 </mapper>
 

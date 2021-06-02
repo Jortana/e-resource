@@ -123,15 +123,18 @@ public class ResourceService {
     public Result updateRelatedResource(){
         Driver driver = createDrive();
         Session session = driver.session();
-        StatementResult result = session.run( "MATCH (n:resource) where n.subject='化学' " +
-                        "RETURN n.id AS ID order by ID",
+//        StatementResult result = session.run( "MATCH (n:resource) where n.subject='化学' " +
+//                        "RETURN n.id AS ID order by ID",
+//                parameters() );
+        StatementResult result = session.run( "MATCH (n:resource)" +
+                        "RETURN id(n) AS ID order by ID",
                 parameters() );
         while ( result.hasNext() )
         {
             Record record = result.next();
             int resourceID = record.get( "ID" ).asInt();
             HashMap<String, Integer> hm1 = new HashMap<String, Integer>();
-            StatementResult tfidf = session.run( "MATCH (n:resource)-[r]->(m:concept) where n.id={id} " +
+            StatementResult tfidf = session.run( "MATCH (n:resource)-[r]->(m:concept) where id(n)={id} " +
                         "RETURN m.name, r.tf",
                 parameters("id", resourceID) );
             while ( tfidf.hasNext() )
@@ -143,14 +146,17 @@ public class ResourceService {
             }
             HashMap<Integer, HashMap<String, Integer>> map = new HashMap<Integer, HashMap<String, Integer>>();
             map.put(resourceID,hm1);
-            StatementResult otherResource = session.run( "MATCH (n:resource) where n.subject='化学' and n.id<>{id}" +
-                            "RETURN n.id AS ID order by ID",
+//            StatementResult otherResource = session.run( "MATCH (n:resource) where n.subject='化学' and n.id<>{id}" +
+//                            "RETURN n.id AS ID order by ID",
+//                    parameters("id", resourceID) );
+            StatementResult otherResource = session.run( "MATCH (n:resource) where id(n)<>{id}" +
+                            "RETURN id(n) AS ID order by ID",
                     parameters("id", resourceID) );
             while ( otherResource.hasNext() )
             {
                 Record other = otherResource.next();
                 int otherID = other.get( "ID" ).asInt();
-                StatementResult otherTFIDF = session.run( "MATCH (n:resource)-[r]->(m:concept) where n.id={id} " +
+                StatementResult otherTFIDF = session.run( "MATCH (n:resource)-[r]->(m:concept) where id(n)={id} " +
                                 "RETURN m.name, r.tf",
                         parameters("id", otherID) );
                 HashMap<String, Integer> hm2 = new HashMap<String, Integer>();
@@ -207,10 +213,10 @@ public class ResourceService {
             System.out.println(nu + "  " + num + "的相似度为" +xsd);
             if (num>nu){
                 session.run("MATCH (a:resource), (b:resource) " +
-                        "WHERE a.id = " + nu + " AND b.id = " + num
+                        "WHERE id(a) = " + nu + " AND id(b) = " + num
                         + " CREATE (a)-[:similarity{weight:" + xsd + "}]->(b)");
                 session.run("MATCH (a:resource), (b:resource) " +
-                        "WHERE a.id = " + nu + " AND b.id = " + num
+                        "WHERE id(a) = " + nu + " AND id(b) = " + num
                         + " CREATE (b)-[:similarity{weight:" + xsd + "}]->(a)");
             }
         }

@@ -16,7 +16,8 @@ public interface ResourceMapper {
     ArrayList<Resource> queryResourceByKeywords(String keyword, int resourceType, int period, int grade, int subject, String updateTime, int limit, int perPage);
     int queryResourceNumByKeywords(String keyword, int resourceType, int period, int grade, int subject, String updateTime);
     //通过ID获取资源信息
-    Resource queryResourceByID(int resource_id);
+    Resource queryResourceByID(int id);
+    ArrayList<Resource> queryResourceByIDList(ArrayList<Integer> IDList);
     List<Map> queryType();
     //根据ID查相关资源
     String queryRelated(int resource_id);
@@ -30,4 +31,7 @@ public interface ResourceMapper {
     ArrayList<Resource> queryHot();
     //根据条件查询资源
     ArrayList<Resource> queryTime();
+
+    Map queryDocument(int id);
+    Map queryBvideo(int id);
 }

@@ -6,8 +6,14 @@ public class Resource {
     int id;
     String resourceName;
     String remark;
+
     String url;
     String viewUrl;
+
+    String aid;
+    String bvid;
+    String cid;
+
     String related_10;
     String keywords;
     String entity;
@@ -21,15 +27,21 @@ public class Resource {
     String grade;
     int subject;
 
+    int table;
+    Integer tableResourceID;
+
     public Resource() {
     }
 
-    public Resource(int id, String resourceName, String remark, String url, String viewUrl, String related_10, String keywords, String entity, String[] entityList, String updateTime, int download, int collection, int browse, int type, String period, String grade, int subject) {
+    public Resource(int id, String resourceName, String remark, String url, String viewUrl, String aid, String bvid, String cid, String related_10, String keywords, String entity, String[] entityList, String updateTime, int download, int collection, int browse, int resourceType, String period, String grade, int subject, int table, Integer tableResourceID) {
         this.id = id;
         this.resourceName = resourceName;
         this.remark = remark;
         this.url = url;
         this.viewUrl = viewUrl;
+        this.aid = aid;
+        this.bvid = bvid;
+        this.cid = cid;
         this.related_10 = related_10;
         this.keywords = keywords;
         this.entity = entity;
@@ -42,6 +54,8 @@ public class Resource {
         this.period = period;
         this.grade = grade;
         this.subject = subject;
+        this.table = table;
+        this.tableResourceID = tableResourceID;
     }
 
     @Override
@@ -52,6 +66,9 @@ public class Resource {
                 ", remark='" + remark + '\'' +
                 ", url='" + url + '\'' +
                 ", viewUrl='" + viewUrl + '\'' +
+                ", aid='" + aid + '\'' +
+                ", bvid='" + bvid + '\'' +
+                ", cid='" + cid + '\'' +
                 ", related_10='" + related_10 + '\'' +
                 ", keywords='" + keywords + '\'' +
                 ", entity='" + entity + '\'' +
@@ -64,6 +81,8 @@ public class Resource {
                 ", period='" + period + '\'' +
                 ", grade='" + grade + '\'' +
                 ", subject=" + subject +
+                ", table=" + table +
+                ", tableResourceID=" + tableResourceID +
                 '}';
     }
 
@@ -105,6 +124,30 @@ public class Resource {
 
     public void setViewUrl(String viewUrl) {
         this.viewUrl = viewUrl;
+    }
+
+    public String getAid() {
+        return aid;
+    }
+
+    public void setAid(String aid) {
+        this.aid = aid;
+    }
+
+    public String getBvid() {
+        return bvid;
+    }
+
+    public void setBvid(String bvid) {
+        this.bvid = bvid;
+    }
+
+    public String getCid() {
+        return cid;
+    }
+
+    public void setCid(String cid) {
+        this.cid = cid;
     }
 
     public String getRelated_10() {
@@ -201,5 +244,21 @@ public class Resource {
 
     public void setSubject(int subject) {
         this.subject = subject;
+    }
+
+    public int getTable() {
+        return table;
+    }
+
+    public void setTable(int table) {
+        this.table = table;
+    }
+
+    public Integer getTableResourceID() {
+        return tableResourceID;
+    }
+
+    public void setTableResourceID(Integer tableResourceID) {
+        this.tableResourceID = tableResourceID;
     }
 }
