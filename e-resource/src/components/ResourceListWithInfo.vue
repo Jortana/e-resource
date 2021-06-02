@@ -5,40 +5,46 @@
       :key="resource.id"
     >
       <div class="resource-info">
-        <div class="info">
-          <resource-link :resource="resource"></resource-link>
-          <div class="file-name">
-            <span v-if="resource['url'] == null"></span>
-            <span v-else>{{ `${resource['resourceName']}.${resource['url'].split('.').slice(-1)}` }}</span>
-          </div>
-          <div class="entity-list" v-if="resource['entity'] !== null">
-            <div
-              v-for="entity in resource['entity'].split('#').slice(0, resource['entity'].split('#').length - 1)"
-              :key = entity
-            >
-              <el-button size="mini">
-                {{ entity }}
-              </el-button>
+        <div class="thumbnail-container flex">
+          <el-image class="thumbnail">
+          </el-image>
+        </div>
+        <div class="right-side flex">
+          <div class="info">
+            <resource-link :resource="resource"></resource-link>
+            <div class="file-name">
+              <span v-if="resource['url'] == null"></span>
+              <span v-else>{{ `${resource['resourceName']}.${resource['url'].split('.').slice(-1)}` }}</span>
+            </div>
+            <div class="entity-list" v-if="resource['entity'] !== null">
+              <div
+                v-for="entity in resource['entity'].split('#').slice(0, resource['entity'].split('#').length - 1)"
+                :key = entity
+              >
+                <el-button size="mini">
+                  {{ entity }}
+                </el-button>
+              </div>
+            </div>
+            <div class="extra">
+              <div class="extra-info"><i class="el-icon-time"></i> {{ resource['updateTime'] }}</div>
+              <div class="extra-info"><i class="el-icon-download"></i> {{ resource['download'] }} 下载</div>
             </div>
           </div>
-          <div class="extra">
-            <div class="extra-info"><i class="el-icon-time"></i> {{ resource['updateTime'] }}</div>
-            <div class="extra-info"><i class="el-icon-download"></i> {{ resource['download'] }} 下载</div>
-          </div>
-        </div>
-        <div class="operation">
-          <div class="full-width">
-            <download-button :resourceID="resource['id']"></download-button>
-          </div>
-          <div class="full-width">
-            <el-button class="full-width" size="medium" icon="el-icon-document-add">
-              加入资源包
-            </el-button>
-          </div>
-          <div class="full-width">
-            <el-button class="full-width" size="medium" icon="el-icon-star-off">
-              收藏
-            </el-button>
+          <div class="operation">
+            <div class="full-width">
+              <download-button :resourceID="resource['id']"></download-button>
+            </div>
+            <div class="full-width">
+              <el-button class="full-width" size="medium" icon="el-icon-document-add">
+                加入资源包
+              </el-button>
+            </div>
+            <div class="full-width">
+              <el-button class="full-width" size="medium" icon="el-icon-star-off">
+                收藏
+              </el-button>
+            </div>
           </div>
         </div>
       </div>
@@ -63,16 +69,32 @@ export default {
 .resource-info {
   height: 190px;
   display: flex;
-  justify-content: space-between;
   border-bottom: 1px solid #dcdfe6;
   padding-top: 1rem;
   padding-bottom: 1rem;
+}
+
+.resource-info .right-side {
+  justify-content: space-between;
+  width: 100%;
+}
+
+.thumbnail-container {
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.thumbnail {
+  width: 100px;
+  height: 100px;
 }
 
 .info {
   display: flex;
   flex-direction: column;
   position: relative;
+  margin-left: 1rem;
 }
 
 .entity-list {

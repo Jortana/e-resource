@@ -10,15 +10,16 @@
       ></pdf>
     </el-scrollbar>
   </div>
-<!--  <iframe-->
-<!--    class="b-video"-->
-<!--    src="//player.bilibili.com/player.html?aid=714853065&bvid=BV1tX4y1G795&cid=317189977&page=1"-->
-<!--    scrolling="no"-->
-<!--    border="0"-->
-<!--    frameborder="no"-->
-<!--    framespacing="0"-->
-<!--    allowfullscreen="true">-->
-<!--  </iframe>-->
+  <iframe
+    v-else-if="bInfo.bvid !== null"
+    class="b-video"
+    :src=bSrc
+    scrolling="no"
+    border="0"
+    frameborder="no"
+    framespacing="0"
+    allowfullscreen="true">
+  </iframe>
 <!--  <div v-else>-->
 <!--    该资源暂不支持预览，请下载后进行学习-->
 <!--  </div>-->
@@ -32,10 +33,7 @@
       score-template="{value}">
     </el-rate>
   </div>
-  <!-- 打分和评论 -->
-  <div class="comment">
-    <h2>评论</h2>
-  </div>
+
 </div>
 </template>
 
@@ -48,9 +46,12 @@ export default {
     pdf
   },
   props: {
+    id: Number,
     url: {
-      type: String,
-      required: true
+      type: String
+    },
+    bInfo: {
+      type: Object
     }
   },
   computed: {
@@ -66,6 +67,9 @@ export default {
         return 'height: calc(100vh - 150px - 2rem);'
       }
       return ''
+    },
+    bSrc () {
+      return `//player.bilibili.com/player.html?aid=${this.bInfo.aid}&bvid=${this.bInfo.bvid}&cid=${this.bInfo.cid}&page=${this.bInfo.page}`
     }
   },
   watch: {
@@ -123,13 +127,7 @@ export default {
   height: 500px;
 }
 
-.comment {
+.rate {
   margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid #e4e7ed;
-}
-
-.comment h2 {
-  font-weight: 500;
 }
 </style>

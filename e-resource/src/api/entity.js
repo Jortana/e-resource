@@ -33,8 +33,6 @@ export const searchEntity = (params) => {
  * @returns {AxiosPromise}
  */
 export const relatedEntity = (keyword) => {
-  // 用%23替换#，否则后端无法接收
-  keyword = keyword.replaceAll('#', '%23')
   return http.get(`${baseURL}/public/relatedEntity?keyword=${keyword}`)
 }
 

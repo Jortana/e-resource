@@ -6,7 +6,7 @@
       <div class="flex">
         <div class="basic-info flex-1">
           <h2 @click="addToCart(resource.id)">{{ resource['resourceName'] }}</h2>
-          <div class="resource-name" v-if="resource['url'] !== undefined">{{ resource['url'].split('/').slice(-1)[0] }}</div>
+          <div class="resource-name" v-if="resource['url'] !== undefined && resource['url'] !== null">{{ resource['url'].split('/').slice(-1)[0] }}</div>
         </div>
         <div class="operation flex flex-1">
           <div class="operation-button">
@@ -26,7 +26,10 @@
       </div>
       <!-- 资源展示组件 -->
       <div class="viewer">
-        <resource-viewer :url="String(resource['viewUrl'])"></resource-viewer>
+        <resource-viewer :url="String(resource['viewUrl'])" :bInfo="{ aid: resource['aid'], bvid: resource['bvid'], cid: resource['cid'], page: 1 }"></resource-viewer>
+      </div>
+      <div>
+        <comment class="comment-container" :id="resource.id"></comment>
       </div>
       <!-- 相关资源 -->
       <div class="related-resource flex-1" v-if="relatedResources.length !== 0">
@@ -58,6 +61,7 @@ import ResourceViewer from '@/components/ViewResource/ResourceViewer'
 import ResourceLink from '@/components/ResourceLink'
 import DownloadButton from '@/components/DownloadButton'
 import ResourceList from '@/components/ResourceList'
+import Comment from '@/components/Comment'
 import { resourceInfo, related } from '@/api/resource'
 import { relatedEntity } from '@/api/entity'
 import { authentication } from '@/api/auth'
@@ -72,7 +76,8 @@ export default {
     ResourceViewer,
     ResourceLink,
     DownloadButton,
-    ResourceList
+    ResourceList,
+    Comment
   },
   props: {
   },
@@ -91,7 +96,7 @@ export default {
               this.resource = response.data.data
               console.log(this.resource)
               // 获取相关实体
-              relatedEntity(response.data.data['entity'])
+              relatedEntity(response.data.data['entityList'])
                 .then(entityResponse => {
                   if (entityResponse.data.code === 200) {
                     this.entities.entities = entityResponse.data.data
@@ -229,6 +234,12 @@ export default {
 .related-resource,
 .recommend-container {
   border-top: 1px solid #dcdfe6;
+}
+
+.comment-container {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e4e7ed;
 }
 
 /*.recommend-container {*/
