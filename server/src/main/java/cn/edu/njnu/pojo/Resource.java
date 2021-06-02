@@ -1,6 +1,8 @@
 package cn.edu.njnu.pojo;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class Resource {
     int id;
@@ -17,7 +19,7 @@ public class Resource {
     String related_10;
     String keywords;
     String entity;
-    String[] entityList;
+    ArrayList<String> entityList;
     String updateTime;
     int download;
     int collection;
@@ -33,7 +35,7 @@ public class Resource {
     public Resource() {
     }
 
-    public Resource(int id, String resourceName, String remark, String url, String viewUrl, String aid, String bvid, String cid, String related_10, String keywords, String entity, String[] entityList, String updateTime, int download, int collection, int browse, int resourceType, String period, String grade, int subject, int table, Integer tableResourceID) {
+    public Resource(int id, String resourceName, String remark, String url, String viewUrl, String aid, String bvid, String cid, String related_10, String keywords, String entity, ArrayList<String> entityList, String updateTime, int download, int collection, int browse, int resourceType, String period, String grade, int subject, int table, Integer tableResourceID) {
         this.id = id;
         this.resourceName = resourceName;
         this.remark = remark;
@@ -72,7 +74,7 @@ public class Resource {
                 ", related_10='" + related_10 + '\'' +
                 ", keywords='" + keywords + '\'' +
                 ", entity='" + entity + '\'' +
-                ", entityList=" + Arrays.toString(entityList) +
+                ", entityList=" + entityList +
                 ", updateTime='" + updateTime + '\'' +
                 ", download=" + download +
                 ", collection=" + collection +
@@ -174,11 +176,11 @@ public class Resource {
         this.entity = entity;
     }
 
-    public String[] getEntityList() {
+    public ArrayList<String> getEntityList() {
         return entityList;
     }
 
-    public void setEntityList(String[] entityList) {
+    public void setEntityList(ArrayList<String> entityList) {
         this.entityList = entityList;
     }
 

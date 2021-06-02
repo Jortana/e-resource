@@ -78,7 +78,6 @@ public class ResourceService {
         resultData.put("total", total);
         JSONArray resources = new JSONArray();
         for (Resource perResource : resourceList){
-            perResource.setEntityList(perResource.getEntity().split("#"));
 //            perResource.setUrl(resourceRoot + perResource.getUrl());
 //            perResource.setViewUrl(resourceRoot + perResource.getViewUrl());
             resources.add(perResource);
@@ -100,21 +99,43 @@ public class ResourceService {
         for (String perResourceID : relatedID){
             int id = Integer.parseInt(perResourceID);
             Resource singleResource = resourceMapper.queryResourceByID(id);
-            resourcesList.add(entityList(singleResource));
+            resourcesList.add(singleResource);
         }
         return ResultFactory.buildSuccessResult("查询成功", resourcesList);
     }
     //根据ID查资源属性
     public Result queryResource(Map<String, Object> ResourceIDMap){
+        Driver driver = createDrive();
+        Session session = driver.session();
         int resourceID = Integer.parseInt ((String) ResourceIDMap.get("resourceID"));
         Resource queryResource = resourceMapper.queryResourceByID(resourceID);
+        StatementResult conceptNode = session.run( "MATCH (m:resource)-[r]->(a:concept) where m.id = {id} " +
+                        "RETURN a.name as concept",
+                parameters( "id", resourceID) );
+        ArrayList<String> entityList = new ArrayList<>();
+        while ( conceptNode.hasNext() ) {
+            Record conceptRecord = conceptNode.next();
+            String entityName = conceptRecord.get("concept").asString();
+            entityList.add(entityName);
+        }
+        queryResource.setEntityList(entityList);
+        int extendID = queryResource.getTableResourceID();
+        int tableID = queryResource.getTable();
+        switch (tableID) {
+            case 1:
+                Map bvideoInfo = resourceMapper.queryBvideo(extendID);
+                queryResource.setAid((String) bvideoInfo.get("aid"));
+                queryResource.setBvid((String) bvideoInfo.get("bvid"));
+                queryResource.setCid((String) bvideoInfo.get("cid"));
+                break;
+            case 2:
+                Map documentInfo = resourceMapper.queryDocument(extendID);
+                queryResource.setUrl((String) documentInfo.get("url"));
+                queryResource.setViewUrl((String) documentInfo.get("view_url"));
+                break;
+        }
 //        resourceMapper.updateBrowse(queryResource.getBrowse() + 1,queryResource.getId());
-        return ResultFactory.buildSuccessResult("查询成功",entityList(queryResource));
-    }
-    //将数据库entity转换为List类型
-    public Resource entityList(Resource resource){
-        resource.setEntityList(resource.getEntity().split("#"));
-        return resource;
+        return ResultFactory.buildSuccessResult("查询成功",queryResource);
     }
     private static Driver createDrive(){
         return GraphDatabase.driver( "bolt://223.2.50.241:7687", AuthTokens.basic( "neo4j", "123456" ) );
