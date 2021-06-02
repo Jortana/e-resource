@@ -15,6 +15,7 @@ public class Resource {
     String aid;
     String bvid;
     String cid;
+    int page;
 
     String related_10;
     String keywords;
@@ -32,61 +33,7 @@ public class Resource {
     int table;
     Integer tableResourceID;
 
-    public Resource() {
-    }
-
-    public Resource(int id, String resourceName, String remark, String url, String viewUrl, String aid, String bvid, String cid, String related_10, String keywords, String entity, ArrayList<String> entityList, String updateTime, int download, int collection, int browse, int resourceType, String period, String grade, int subject, int table, Integer tableResourceID) {
-        this.id = id;
-        this.resourceName = resourceName;
-        this.remark = remark;
-        this.url = url;
-        this.viewUrl = viewUrl;
-        this.aid = aid;
-        this.bvid = bvid;
-        this.cid = cid;
-        this.related_10 = related_10;
-        this.keywords = keywords;
-        this.entity = entity;
-        this.entityList = entityList;
-        this.updateTime = updateTime;
-        this.download = download;
-        this.collection = collection;
-        this.browse = browse;
-        this.resourceType = resourceType;
-        this.period = period;
-        this.grade = grade;
-        this.subject = subject;
-        this.table = table;
-        this.tableResourceID = tableResourceID;
-    }
-
-    @Override
-    public String toString() {
-        return "Resource{" +
-                "id=" + id +
-                ", resourceName='" + resourceName + '\'' +
-                ", remark='" + remark + '\'' +
-                ", url='" + url + '\'' +
-                ", viewUrl='" + viewUrl + '\'' +
-                ", aid='" + aid + '\'' +
-                ", bvid='" + bvid + '\'' +
-                ", cid='" + cid + '\'' +
-                ", related_10='" + related_10 + '\'' +
-                ", keywords='" + keywords + '\'' +
-                ", entity='" + entity + '\'' +
-                ", entityList=" + entityList +
-                ", updateTime='" + updateTime + '\'' +
-                ", download=" + download +
-                ", collection=" + collection +
-                ", browse=" + browse +
-                ", resourceType=" + resourceType +
-                ", period='" + period + '\'' +
-                ", grade='" + grade + '\'' +
-                ", subject=" + subject +
-                ", table=" + table +
-                ", tableResourceID=" + tableResourceID +
-                '}';
-    }
+    double rate;
 
     public int getId() {
         return id;
@@ -150,6 +97,14 @@ public class Resource {
 
     public void setCid(String cid) {
         this.cid = cid;
+    }
+
+    public int getPage() {
+        return page;
+    }
+
+    public void setPage(int page) {
+        this.page = page;
     }
 
     public String getRelated_10() {
@@ -262,5 +217,73 @@ public class Resource {
 
     public void setTableResourceID(Integer tableResourceID) {
         this.tableResourceID = tableResourceID;
+    }
+
+    public double getRate() {
+        return rate;
+    }
+
+    public void setRate(double rate) {
+        this.rate = rate;
+    }
+
+    @Override
+    public String toString() {
+        return "Resource{" +
+                "id=" + id +
+                ", resourceName='" + resourceName + '\'' +
+                ", remark='" + remark + '\'' +
+                ", url='" + url + '\'' +
+                ", viewUrl='" + viewUrl + '\'' +
+                ", aid='" + aid + '\'' +
+                ", bvid='" + bvid + '\'' +
+                ", cid='" + cid + '\'' +
+                ", page=" + page +
+                ", related_10='" + related_10 + '\'' +
+                ", keywords='" + keywords + '\'' +
+                ", entity='" + entity + '\'' +
+                ", entityList=" + entityList +
+                ", updateTime='" + updateTime + '\'' +
+                ", download=" + download +
+                ", collection=" + collection +
+                ", browse=" + browse +
+                ", resourceType=" + resourceType +
+                ", period='" + period + '\'' +
+                ", grade='" + grade + '\'' +
+                ", subject=" + subject +
+                ", table=" + table +
+                ", tableResourceID=" + tableResourceID +
+                ", rate=" + rate +
+                '}';
+    }
+
+    public Resource() {
+    }
+
+    public Resource(int id, String resourceName, String remark, String url, String viewUrl, String aid, String bvid, String cid, int page, String related_10, String keywords, String entity, ArrayList<String> entityList, String updateTime, int download, int collection, int browse, int resourceType, String period, String grade, int subject, int table, Integer tableResourceID, double rate) {
+        this.id = id;
+        this.resourceName = resourceName;
+        this.remark = remark;
+        this.url = url;
+        this.viewUrl = viewUrl;
+        this.aid = aid;
+        this.bvid = bvid;
+        this.cid = cid;
+        this.page = page;
+        this.related_10 = related_10;
+        this.keywords = keywords;
+        this.entity = entity;
+        this.entityList = entityList;
+        this.updateTime = updateTime;
+        this.download = download;
+        this.collection = collection;
+        this.browse = browse;
+        this.resourceType = resourceType;
+        this.period = period;
+        this.grade = grade;
+        this.subject = subject;
+        this.table = table;
+        this.tableResourceID = tableResourceID;
+        this.rate = rate;
     }
 }
