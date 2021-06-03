@@ -10,4 +10,5 @@ import java.util.ArrayList;
 @Repository
 public interface CommentMapper {
     ArrayList<Comment> queryComment(int resourceID);
+    boolean addComment(Comment comment);
 }
