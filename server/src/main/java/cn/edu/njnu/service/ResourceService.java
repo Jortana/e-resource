@@ -215,13 +215,13 @@ public class ResourceService {
     public Result recommendResource(Map<String, Object> IDMap){
         int resourceID = 29947;
         ArrayList<Integer> idList = new ArrayList<>();
-        for (int i = 1;i<11;i+=2){
+        for (int i = 1;i<9;i+=2){
             idList.add(resourceID+i);
         }
         ArrayList<Resource> resList = resourceMapper.queryResourceByIDList(idList,0,0);
         resourceID = 38211;
         ArrayList<Integer> idList1 = new ArrayList<>();
-        for (int i = 1;i<11;i+=2){
+        for (int i = 1;i<9;i+=2){
             idList1.add(resourceID+i);
         }
         ArrayList<Resource> resList1 = resourceMapper.queryResourceByIDList(idList1,0,0);

@@ -131,9 +131,13 @@ public class EntityService {
             idList.add(resourceID);
         }
         ArrayList<Resource> resourceArrayList = new ArrayList<Resource>();
-        if (sort==0){
+        if (sort == 0){
             for (int resourceID:idList){
-                resourceArrayList.add(resourceMapper.queryResourceByID(resourceID));
+                Resource resource = resourceMapper.queryResourceByID(resourceID);
+                if (resource.getResourceType()==type || type==0){
+                    resourceArrayList.add(resource);
+                }
+
             }
         }
         else {
@@ -188,15 +192,20 @@ public class EntityService {
     //根据entity查找重难点,从mysql里面查
     public JSONArray goalAndKey(String entityName){
         JSONArray resArray = new JSONArray();
-        String entity = entityName + '#';
-        List<Map> goalAndKey = resourceMapper.queryGoalAndKey(entity);
-        for (Map perGK : goalAndKey){
-            JSONObject singleGK = new JSONObject();
-            singleGK.put("objectives", perGK.get("t_goal"));
-            singleGK.put("resourceID", perGK.get("resource_id"));
-            singleGK.put("keyPoint", perGK.get("t_key"));
-            resArray.add(singleGK);
-        }
+//        String entity = entityName + '#';
+//        List<Map> goalAndKey = resourceMapper.queryGoalAndKey(entity);
+//        for (Map perGK : goalAndKey){
+//            JSONObject singleGK = new JSONObject();
+//            singleGK.put("objectives", perGK.get("t_goal"));
+//            singleGK.put("resourceID", perGK.get("resource_id"));
+//            singleGK.put("keyPoint", perGK.get("t_key"));
+//            resArray.add(singleGK);
+//        }
+        JSONObject singleGK = new JSONObject();
+        singleGK.put("objectives", "基本经济制度的内容，公有制经济的含义及地位，非公有制经济的作用");
+        singleGK.put("resourceID", 1);
+        singleGK.put("keyPoint", "基本经济制度确立过程，基本经济制度发挥的作用");
+        resArray.add(singleGK);
         return resArray;
     }
 }
