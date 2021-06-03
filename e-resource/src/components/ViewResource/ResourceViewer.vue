@@ -23,16 +23,6 @@
 <!--  <div v-else>-->
 <!--    该资源暂不支持预览，请下载后进行学习-->
 <!--  </div>-->
-  <!-- 评分 -->
-  <div class="rate">
-    <el-rate
-      v-model="rate"
-      disabled
-      show-score
-      text-color="#ff9900"
-      score-template="{value}">
-    </el-rate>
-  </div>
 
 </div>
 </template>
@@ -108,8 +98,7 @@ export default {
       comment: {
         rate: '',
         content: ''
-      },
-      rate: 4.5
+      }
     }
   },
   methods: {
@@ -125,9 +114,5 @@ export default {
 .b-video {
   width: 100%;
   height: 500px;
-}
-
-.rate {
-  margin-top: 1rem;
 }
 </style>
