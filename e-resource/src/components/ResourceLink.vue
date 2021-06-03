@@ -1,9 +1,9 @@
 <template>
-<span class="resource-name" @click="viewResource(resource['id'])">
-  <span>{{ resource['resourceName'] }}</span>
+<div class="resource-name" @click="viewResource(resource['id'])">
+  <div class="inline-resource-name">{{ resource['resourceName'] }}</div>
   <!-- 隐藏的a元素，用来在新窗口打开资源页面 -->
   <a class="resource-target" ref="resourceTarget" href="" target="_blank" v-show="false"></a>
-</span>
+</div>
 </template>
 
 <script>
@@ -23,5 +23,9 @@ export default {
 </script>
 
 <style scoped>
-
+.inline-resource-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 </style>

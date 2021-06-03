@@ -16,9 +16,9 @@
               <span v-if="resource['url'] == null"></span>
               <span v-else>{{ `${resource['resourceName']}.${resource['url'].split('.').slice(-1)}` }}</span>
             </div>
-            <div class="entity-list" v-if="resource['entity'] !== null">
+            <div class="entity-list" v-if="resource['entityList'] !== null">
               <div
-                v-for="entity in resource['entity'].split('#').slice(0, resource['entity'].split('#').length - 1)"
+                v-for="entity in resource['entityList']"
                 :key = entity
               >
                 <el-button size="mini">

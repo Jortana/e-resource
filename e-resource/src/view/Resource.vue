@@ -48,7 +48,7 @@
       </div>
       <!-- ---------- -->
     </div>
-    <div class="flex-1">
+    <div class="flex-1 right-side">
       <div class="graph">
         <k-g-chart :entities="entities.entities" ref="chart"></k-g-chart>
       </div>
@@ -72,11 +72,11 @@ import ResourceLink from '@/components/ResourceLink'
 import DownloadButton from '@/components/DownloadButton'
 import ResourceList from '@/components/ResourceList'
 import Comment from '@/components/Comment'
-import { resourceInfo, related } from '@/api/resource'
-import { relatedEntity } from '@/api/entity'
-import { authentication } from '@/api/auth'
-import { record } from '@/api/record'
-import { recommendByResourceUser } from '@/api/recommend'
+import {related, resourceInfo} from '@/api/resource'
+import {relatedEntity} from '@/api/entity'
+import {authentication} from '@/api/auth'
+import {record} from '@/api/record'
+import {recommendByResourceUser} from '@/api/recommend'
 
 export default {
   name: 'Resource',
@@ -126,15 +126,9 @@ export default {
         // 获取相关资源
         related(resourceID)
           .then(response => {
-            // console.log(response)
+            console.log(response)
             if (response.data.code === 200) {
-              let resources = response.data.data
-              resources.forEach(resource => {
-                // console.log(resource)
-                let suffix = resource.url.split('.').slice(-1)[0]
-                resource.suffix = suffix
-              })
-              this.relatedResources = resources
+              this.relatedResources = response.data.data
             }
           })
         // 上传用户访问记录
@@ -188,12 +182,7 @@ export default {
             recommendByResourceUser(Number(this.resourceID))
               .then(response => {
                 if (response.data.code === 200) {
-                  let resources = response.data.data
-                  resources.forEach(resource => {
-                    let suffix = resource.url.split('.').slice(-1)[0]
-                    resource.suffix = suffix
-                  })
-                  this.recommendResources = resources
+                  this.recommendResources = response.data.data
                 }
               })
           }
@@ -206,6 +195,10 @@ export default {
 <style scoped>
 .main-container {
   /*border-bottom: 1px solid #dcdfe6;*/
+}
+
+.right-side {
+  margin-left: 1rem;
 }
 
 .operation {

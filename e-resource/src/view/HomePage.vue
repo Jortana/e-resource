@@ -33,8 +33,8 @@
 import Search from '@/components/Search'
 import NavMenu from '@/components/NavMenu'
 import ResourceList from '@/components/ResourceList'
-import { authentication } from '@/api/auth'
-import { hotResource, newResource, userRecommendResource } from '@/api/recommend'
+import {authentication} from '@/api/auth'
+import {hotResource, newResource, userRecommendResource} from '@/api/recommend'
 
 export default {
   name: 'HomePage',
@@ -75,33 +75,19 @@ export default {
       hotResource()
         .then(response => {
           if (response.data.code === 200) {
-            let resources = response.data.data
-            resources.forEach(resource => {
-              resource.suffix = resource.url.split('.').slice(-1)[0]
-            })
-            console.log(resources)
-            this.hotResources = resources
+            this.hotResources = response.data.data
           }
         })
       newResource()
         .then(response => {
           if (response.data.code === 200) {
-            let resources = response.data.data
-            console.log(response.data.data)
-            resources.forEach(resource => {
-              resource.suffix = resource.url.split('.').slice(-1)[0]
-            })
-            this.newResources = resources
+            this.newResources = response.data.data
           }
         })
       if (this.isLogin === true) {
         userRecommendResource()
           .then(response => {
-            let resources = response.data.data
-            resources.forEach(resource => {
-              resource.suffix = resource.url.split('.').slice(-1)[0]
-            })
-            this.recommendResources = resources
+            this.recommendResources = response.data.data
           })
       }
     }
@@ -168,6 +154,9 @@ main {
   );
   border-radius: .6rem;
   box-shadow: 6px 6px 20px rgba(122, 122, 122, 0.1);
+  overflow: hidden;
+  /*text-overflow: ellipsis;*/
+  /*white-space: nowrap;*/
 }
 
 .card:last-child {

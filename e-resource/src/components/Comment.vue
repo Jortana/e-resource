@@ -93,6 +93,7 @@ export default {
       getComment(this.id)
         .then(response => {
           if (response.data.code === 200) {
+            console.log(response.data.data)
             response.data.data.forEach(comment => {
               comment['avatar'] = fileBaseURL + comment['avatar']
             })
