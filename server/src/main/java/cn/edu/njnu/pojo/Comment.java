@@ -8,17 +8,9 @@ public class Comment {
     String date;
     double rate;
     String avatar;
+    String userName;
 
     public Comment() {
-    }
-
-    public Comment(int userID, int resourceID, String content, String date, double rate, String avatar) {
-        this.userID = userID;
-        this.resourceID = resourceID;
-        this.content = content;
-        this.date = date;
-        this.rate = rate;
-        this.avatar = avatar;
     }
 
     @Override
@@ -30,7 +22,18 @@ public class Comment {
                 ", date='" + date + '\'' +
                 ", rate=" + rate +
                 ", avatar='" + avatar + '\'' +
+                ", userName='" + userName + '\'' +
                 '}';
+    }
+
+    public Comment(int userID, int resourceID, String content, String date, double rate, String avatar, String userName) {
+        this.userID = userID;
+        this.resourceID = resourceID;
+        this.content = content;
+        this.date = date;
+        this.rate = rate;
+        this.avatar = avatar;
+        this.userName = userName;
     }
 
     public int getUserID() {
@@ -53,8 +56,8 @@ public class Comment {
         return content;
     }
 
-    public void setContent(String comment) {
-        this.content = comment;
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public String getDate() {
@@ -79,5 +82,13 @@ public class Comment {
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

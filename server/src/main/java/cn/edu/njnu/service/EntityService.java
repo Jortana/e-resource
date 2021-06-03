@@ -210,60 +210,42 @@ public class EntityService {
         similarEntity.put("entityName", entityName);
         similarEntity.put("properties", record.get( "props" ).asMap());
         int skip = (page-1)*perPage;
-        if (sort == 0){
-            StatementResult resourceNode = session.run( "MATCH (m:resource)-[r]->(a:concept) where a.name = {name} " +
-                            "RETURN m.id AS id order by r.tfidf",
-                    parameters( "name", keyword) );
-            JSONArray resourceArray = new JSONArray();
-            while ( resourceNode.hasNext() )
-            {
-                Record ResourceRecord = resourceNode.next();
-                int resourceID = ResourceRecord.get( "id" ).asInt();
-                Resource resource = resourceMapper.queryResourceByID(resourceID);
-                int extendID = resource.getTableResourceID();
-                int tableID = resource.getTable();
-                switch (tableID) {
-                    case 1:
-                        Map bvideoInfo = resourceMapper.queryBvideo(extendID);
-                        resource.setAid((String) bvideoInfo.get("aid"));
-                        resource.setBvid((String) bvideoInfo.get("bvid"));
-                        resource.setCid((String) bvideoInfo.get("cid"));
-                        resource.setPage((int)bvideoInfo.get("page"));
-                        break;
-                    case 2:
-                        Map documentInfo = resourceMapper.queryDocument(extendID);
-                        resource.setUrl((String) documentInfo.get("url"));
-                        resource.setViewUrl((String) documentInfo.get("view_url"));
-                        break;
-                }
-                if (type == 0 || resource.getResourceType() == type){
-                    resourceArray.add(resource);
-                    totalEntity++;
-                }
-            }
-            JSONArray resourceTotal = new JSONArray();
-            for (int i = skip;i<skip+perPage && i<totalEntity;i++){
-                resourceTotal.add(resourceArray.get(i));
-            }
-            similarEntity.put("resources", resourceTotal);
+        StatementResult resourceNode = session.run( "MATCH (m:resource)-[r]->(a:concept) where a.name = {name} " +
+                        "RETURN m.id AS id order by r.tfidf",
+                parameters( "name", keyword) );
+        JSONArray resourceArray = new JSONArray();
+        ArrayList<Integer> idList = new ArrayList<>();
+        while ( resourceNode.hasNext() )
+        {
+            Record ResourceRecord = resourceNode.next();
+            int resourceID = ResourceRecord.get( "id" ).asInt();
+            idList.add(resourceID);
         }
-        else if(sort == 1){
-            StatementResult resourceNode = session.run( "MATCH (m:resource)-[r]->(a:concept) where a.name = {name} " +
-                            "RETURN m.id AS id order by r.tfidf",
-                    parameters( "name", keyword) );
-            JSONArray resourceArray = new JSONArray();
-            ArrayList<Integer> idList = new ArrayList<>();
-            while ( resourceNode.hasNext() )
-            {
-                Record ResourceRecord = resourceNode.next();
-                int resourceID = ResourceRecord.get( "id" ).asInt();
-                idList.add(resourceID);
+        ArrayList<Resource> resourceArrayList = resourceMapper.queryResourceByIDList(idList,sort,type);
+        for (Resource resource:resourceArrayList){
+            totalEntity++;
+            int extendID = resource.getTableResourceID();
+            int tableID = resource.getTable();
+            switch (tableID) {
+                case 1:
+                    Map bvideoInfo = resourceMapper.queryBvideo(extendID);
+                    resource.setAid((String) bvideoInfo.get("aid"));
+                    resource.setBvid((String) bvideoInfo.get("bvid"));
+                    resource.setCid((String) bvideoInfo.get("cid"));
+                    resource.setPage((int)bvideoInfo.get("page"));
+                    break;
+                case 2:
+                    Map documentInfo = resourceMapper.queryDocument(extendID);
+                    resource.setUrl((String) documentInfo.get("url"));
+                    resource.setViewUrl((String) documentInfo.get("view_url"));
+                    break;
             }
-            ArrayList<Resource> resourceArrayList = resourceMapper.queryResourceByIDList(idList);
-            System.out.println(resourceArrayList);
         }
-        else{
+        JSONArray resourceTotal = new JSONArray();
+        for (int i = skip;i<skip+perPage && i<totalEntity;i++){
+            resourceTotal.add(resourceArrayList.get(i));
         }
+        similarEntity.put("resources", resourceTotal);
         similarEntity.put("goalAndKey", goalAndKey(entityName));
         resArray.add(similarEntity);
         resObject.put("resources", resArray);
