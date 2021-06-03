@@ -104,11 +104,18 @@ export default {
           .then(response => {
             if (response.data.code === 200) {
               this.resource = response.data.data
-              console.log(this.resource)
+              console.log(response.data.data)
+              // 先处理一下entityList
+              let entityList = response.data.data['entityList']
+              let keyword = ''
+              entityList.forEach(entity => {
+                keyword += entity + '#'
+              })
               // 获取相关实体
-              relatedEntity(response.data.data['entityList'])
+              relatedEntity(keyword)
                 .then(entityResponse => {
                   if (entityResponse.data.code === 200) {
+                    console.log(entityResponse.data.data)
                     this.entities.entities = entityResponse.data.data
                   }
                 })

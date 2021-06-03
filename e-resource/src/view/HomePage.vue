@@ -87,6 +87,7 @@ export default {
         .then(response => {
           if (response.data.code === 200) {
             let resources = response.data.data
+            console.log(response.data.data)
             resources.forEach(resource => {
               resource.suffix = resource.url.split('.').slice(-1)[0]
             })
