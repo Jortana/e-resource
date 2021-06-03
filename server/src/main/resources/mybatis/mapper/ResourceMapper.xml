@@ -3,39 +3,13 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.edu.njnu.mapper.ResourceMapper">
-    <!-- 根据关键词查资源 -->
-    <select id="queryResourceByKeywords" resultType="resource">
-        select id, resource_name, download, collection, `period`, grade, subject, url, view_url, entity, updateTime from t_resource where
-        <trim suffixOverrides="and">
-            <if test="keyword!=null">entity like concat('%',#{keyword},'%') and </if>
-            <if test="resourceType!=0">resource_type=#{resourceType} and </if>
-            <if test="period!=0">`period` = #{period} and </if>
-            <if test="grade!=0">grade = #{grade} and </if>
-            <if test="subject!=0">subject = #{subject} and </if>
-            <if test="updateTime!=null">updateTime >= #{updateTime}and </if>
-        </trim>
-        limit #{limit},#{perPage};
-    </select>
-    <!-- 根据关键词查资源个数 -->
-    <select id="queryResourceNumByKeywords" resultType="int">
-        select count(id) from t_resource where
-        <trim suffixOverrides="and">
-            <if test="keyword!=null">entity like concat('%',#{keyword},'%') and </if>
-            <if test="resourceType!=0">resource_type=#{resourceType} and </if>
-            <if test="period!=0">period = #{period} and </if>
-            <if test="grade!=0">grade = #{grade}and </if>
-            <if test="subject!=0">subject = #{subject} and </if>
-            <if test="updateTime!=null">updateTime >= #{updateTime} and </if>
-        </trim>
-    </select>
     <!-- 根据ID查资源 -->
     <select id="queryResourceByID" resultType="resource" >
-         select id, resource_name, download, collection, browse, `period`, grade, subject, updateTime, `table`, tableResourceID, resource_type, rate from t_resource where id = #{id}
+         select id, resource_name, download, collection, browse, `period`, grade, subject, updateTime, `table`, tableResourceID, resource_type, rate, file_type from t_resource where id = #{id}
     </select>
-
     <!-- 根据ID查资源 -->
     <select id="queryResourceByIDList" resultType="resource" >
-        select id, resource_name, download, collection, browse, `period`, grade, subject, updateTime, `table`, tableResourceID, resource_type, rate from t_resource
+        select id, resource_name, download, collection, browse, `period`, grade, subject, updateTime, `table`, tableResourceID, resource_type, rate, file_type from t_resource
         <where>
             <if test="type!=0">resource_type =#{type} and </if>
             (
@@ -53,13 +27,9 @@
     <select id="queryType" resultType="HashMap">
         select type_id, resource_type from t_resource_type
     </select>
-    <!-- 根据资源ID查找相关资源 -->
-    <select id="queryRelated" resultType="string">
-        select related_10 from t_resource where id = #{resource_id}
-    </select>
     <!-- 通过实体找资源 -->
     <select id="queryResource" resultType="resource">
-        select id, resource_name, download, collection, `period`, grade, subject, url, view_url, entity, updateTime, resource_type, browse, rate from t_resource where
+        select id, resource_name, download, collection, `period`, grade, subject, url, view_url, entity, updateTime, resource_type, browse, rate, file_type from t_resource where
         <trim suffixOverrides="and">
             <if test="entity!=null">entity like concat('%',#{entity},'%') and </if>
             <if test="type!=0">resource_type =#{type} and </if>
@@ -84,11 +54,11 @@
     </update>
     <!-- 查热门资源 -->
     <select id="queryHot" resultType="resource">
-        SELECT id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime FROM t_resource ORDER BY browse DESC LIMIT 10
+        SELECT id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type FROM t_resource ORDER BY browse DESC LIMIT 10
     </select>
     <!-- 查最新资源 -->
     <select id="queryTime" resultType="resource">
-        select id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime from t_resource order by updateTime desc limit 10
+        select id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type from t_resource order by updateTime desc limit 10
     </select>
 
     <!-- 查文档url -->
