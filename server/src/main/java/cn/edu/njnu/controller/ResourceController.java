@@ -29,13 +29,6 @@ public class ResourceController {
     }
 
     @CrossOrigin
-    @GetMapping("/v1.0/public/conditionalQueryResource")
-    public Result conditionalQueryResource(@RequestParam Map<String, Object> conditionalMap){
-        System.out.println(conditionalMap);
-        return resourceService.conditionalQueryResource(conditionalMap);
-    }
-
-    @CrossOrigin
     @GetMapping("/v1.0/public/queryRelated")
     public Result queryRelated(@RequestParam Map<String, Object> resourceIDMap){
         System.out.println(resourceIDMap);
@@ -58,12 +51,6 @@ public class ResourceController {
     @GetMapping("/v1.0/public/recommendResource")
     public Result recommendResource(@RequestParam Map<String, Object> IDMap){
         return resourceService.recommendResource(IDMap);
-    }
-
-    @CrossOrigin
-    @GetMapping("/v1.0/public/condition")
-    public Result condition(){
-        return resourceService.selectCondition();
     }
 
     @CrossOrigin

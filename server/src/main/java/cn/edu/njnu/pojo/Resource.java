@@ -17,9 +17,7 @@ public class Resource {
     String cid;
     int page;
 
-    String related_10;
     String keywords;
-    String entity;
     ArrayList<String> entityList;
     String updateTime;
     int download;
@@ -34,6 +32,36 @@ public class Resource {
     Integer tableResourceID;
 
     double rate;
+    String fileType;
+
+    public Resource() {
+    }
+
+    public Resource(int id, String resourceName, String remark, String url, String viewUrl, String aid, String bvid, String cid, int page, String keywords, ArrayList<String> entityList, String updateTime, int download, int collection, int browse, int resourceType, String period, String grade, int subject, int table, Integer tableResourceID, double rate, String fileType) {
+        this.id = id;
+        this.resourceName = resourceName;
+        this.remark = remark;
+        this.url = url;
+        this.viewUrl = viewUrl;
+        this.aid = aid;
+        this.bvid = bvid;
+        this.cid = cid;
+        this.page = page;
+        this.keywords = keywords;
+        this.entityList = entityList;
+        this.updateTime = updateTime;
+        this.download = download;
+        this.collection = collection;
+        this.browse = browse;
+        this.resourceType = resourceType;
+        this.period = period;
+        this.grade = grade;
+        this.subject = subject;
+        this.table = table;
+        this.tableResourceID = tableResourceID;
+        this.rate = rate;
+        this.fileType = fileType;
+    }
 
     public int getId() {
         return id;
@@ -107,28 +135,12 @@ public class Resource {
         this.page = page;
     }
 
-    public String getRelated_10() {
-        return related_10;
-    }
-
-    public void setRelated_10(String related_10) {
-        this.related_10 = related_10;
-    }
-
     public String getKeywords() {
         return keywords;
     }
 
     public void setKeywords(String keywords) {
         this.keywords = keywords;
-    }
-
-    public String getEntity() {
-        return entity;
-    }
-
-    public void setEntity(String entity) {
-        this.entity = entity;
     }
 
     public ArrayList<String> getEntityList() {
@@ -227,6 +239,14 @@ public class Resource {
         this.rate = rate;
     }
 
+    public String getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
+    }
+
     @Override
     public String toString() {
         return "Resource{" +
@@ -239,9 +259,7 @@ public class Resource {
                 ", bvid='" + bvid + '\'' +
                 ", cid='" + cid + '\'' +
                 ", page=" + page +
-                ", related_10='" + related_10 + '\'' +
                 ", keywords='" + keywords + '\'' +
-                ", entity='" + entity + '\'' +
                 ", entityList=" + entityList +
                 ", updateTime='" + updateTime + '\'' +
                 ", download=" + download +
@@ -254,36 +272,7 @@ public class Resource {
                 ", table=" + table +
                 ", tableResourceID=" + tableResourceID +
                 ", rate=" + rate +
+                ", fileType='" + fileType + '\'' +
                 '}';
-    }
-
-    public Resource() {
-    }
-
-    public Resource(int id, String resourceName, String remark, String url, String viewUrl, String aid, String bvid, String cid, int page, String related_10, String keywords, String entity, ArrayList<String> entityList, String updateTime, int download, int collection, int browse, int resourceType, String period, String grade, int subject, int table, Integer tableResourceID, double rate) {
-        this.id = id;
-        this.resourceName = resourceName;
-        this.remark = remark;
-        this.url = url;
-        this.viewUrl = viewUrl;
-        this.aid = aid;
-        this.bvid = bvid;
-        this.cid = cid;
-        this.page = page;
-        this.related_10 = related_10;
-        this.keywords = keywords;
-        this.entity = entity;
-        this.entityList = entityList;
-        this.updateTime = updateTime;
-        this.download = download;
-        this.collection = collection;
-        this.browse = browse;
-        this.resourceType = resourceType;
-        this.period = period;
-        this.grade = grade;
-        this.subject = subject;
-        this.table = table;
-        this.tableResourceID = tableResourceID;
-        this.rate = rate;
     }
 }

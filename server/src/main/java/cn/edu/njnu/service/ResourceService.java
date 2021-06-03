@@ -45,63 +45,29 @@ public class ResourceService {
         }
         return ResultFactory.buildSuccessResult("成功获取资源类型", typeArray);
     }
-    //关键词查找资源
-    public Result conditionalQueryResource(Map<String, Object> conditionalMap){
-        System.out.println(conditionalMap);
-        String keyword = conditionalMap.get("keyword") != null ? (String) conditionalMap.get("keyword") : null;
-        //关键词分词提取
-        String keywordList = new String();
-        if (keyword != null){
-            org.ansj.domain.Result result = ToAnalysis.parse(keyword); //封装的分词结果对象，包含一个terms列表
-            List<Term> terms = result.getTerms(); //term列表，元素就是拆分出来的词以及词性
-            for(Term term:terms){
-                System.out.println(term.getName());		//分词的内容
-            }
-        }
-        int resourceType = conditionalMap.get("resourceType") != null ? Integer.parseInt ((String) conditionalMap.get("resourceType")) : 0;
-        int period = conditionalMap.get("period") != null ? Integer.parseInt ((String)conditionalMap.get("period")) : 0;
-        int grade = conditionalMap.get("grade") != null ? Integer.parseInt ((String)conditionalMap.get("grade")) : 0;
-        int subject = conditionalMap.get("subject") != null ? Integer.parseInt ((String)conditionalMap.get("subject")) : 0;
-        String updateTime = conditionalMap.get("updateTime") != null ? (String) conditionalMap.get("updateTime") : null;
-        int page = Integer.parseInt ((String)conditionalMap.get("page"));
-        int perPage = Integer.parseInt ((String)conditionalMap.get("perPage"));
-        int limit = perPage * (page - 1);
-        int total = resourceMapper.queryResourceNumByKeywords(keyword, resourceType, period, grade, subject, updateTime);
-        if (total == 0){
-            return ResultFactory.buildFailResult("未查询到相关资源");
-        }
-        ArrayList<Resource> resourceList = resourceMapper.queryResourceByKeywords(keyword, resourceType, period, grade, subject, updateTime, limit, perPage);
-        JSONObject resultData = new JSONObject();
-        resultData.put("page", page);
-        resultData.put("perPage", perPage);
-        resultData.put("pages", (int)Math.ceil(total*1.0/resourceList.size()));
-        resultData.put("total", total);
-        JSONArray resources = new JSONArray();
-        for (Resource perResource : resourceList){
-//            perResource.setUrl(resourceRoot + perResource.getUrl());
-//            perResource.setViewUrl(resourceRoot + perResource.getViewUrl());
-            resources.add(perResource);
-        }
-        resultData.put("resources", resources);
-        return ResultFactory.buildSuccessResult("查询成功", resultData);
-    }
 
     //查相关资源
     public Result queryRelated(Map<String, Object> resourceIDMap){
         int resourceID = Integer.parseInt((String)resourceIDMap.get("resourceID"));
-        String related_10 = resourceMapper.queryRelated(resourceID);
-        if (related_10 == null){
-            return ResultFactory.buildFailResult("未查询到相关资源");
+//        String related_10 = resourceMapper.queryRelated(resourceID);
+//        if (related_10 == null){
+//            return ResultFactory.buildFailResult("未查询到相关资源");
+//        }
+//        JSONObject resObject = new JSONObject();
+//        JSONArray resourcesList = new JSONArray();
+//        String[] relatedID = related_10.split("#");
+//        for (String perResourceID : relatedID){
+//            int id = Integer.parseInt(perResourceID);
+//            Resource singleResource = resourceMapper.queryResourceByID(id);
+//            resourcesList.add(singleResource);
+//        }
+//        return ResultFactory.buildSuccessResult("查询成功", resourcesList);
+        ArrayList<Integer> idList = new ArrayList<>();
+        for (int i = 1;i<11;i++){
+            idList.add(resourceID+i);
         }
-        JSONObject resObject = new JSONObject();
-        JSONArray resourcesList = new JSONArray();
-        String[] relatedID = related_10.split("#");
-        for (String perResourceID : relatedID){
-            int id = Integer.parseInt(perResourceID);
-            Resource singleResource = resourceMapper.queryResourceByID(id);
-            resourcesList.add(singleResource);
-        }
-        return ResultFactory.buildSuccessResult("查询成功", resourcesList);
+        ArrayList<Resource> resList = resourceMapper.queryResourceByIDList(idList,0,0);
+        return ResultFactory.buildSuccessResult("查询成功",resList);
     }
     //根据ID查资源属性
     public Result queryResource(Map<String, Object> ResourceIDMap){
@@ -247,197 +213,161 @@ public class ResourceService {
     }
 
     public Result recommendResource(Map<String, Object> IDMap){
-        Driver driver = createDrive();
-        Session session = driver.session();
-        int userID = Integer.parseInt((String) IDMap.get("userId"));
-        if (IDMap.containsKey("entity")){
-            String entity = (String) IDMap.get("entity");
-            StatementResult resourceID = session.run( "MATCH (n:user)-[r]->(m:resource) where n.id={id} " +
-                            "RETURN m.id as id order by r.weight desc",
-                    parameters("id", userID) );
-            int resNum = 0;
-            JSONArray resArray = new JSONArray();
-            while ( resourceID.hasNext() && resNum <=10) {
-                Record userRecord = resourceID.next();
-                int resID = userRecord.get("id").asInt();
-                Resource resource = resourceMapper.queryResourceByID(resID);
-                if (resource.getEntity().contains(entity)){
-                    resArray.add(resource);
-                    resNum++;
-                }
-            }
-            if (resNum!=0){
-                return ResultFactory.buildSuccessResult("查询成功",resArray);
-            }
-            else {
-                return ResultFactory.buildSuccessResult("未查询到任何推荐资源",resArray);
-            }
+        int resourceID = 29947;
+        ArrayList<Integer> idList = new ArrayList<>();
+        for (int i = 1;i<11;i+=2){
+            idList.add(resourceID+i);
         }
-        else if (!IDMap.containsKey("entity")&&!IDMap.containsKey("resourceID")){
-            StatementResult resourceID = session.run( "MATCH (n:user)-[r]->(m:resource) where n.id={id} and r.weight>0.5 " +
-                            "RETURN m.id as id order by r.weight desc",
-                    parameters("id", userID) );
-            int resNum = 0;
-            JSONArray resArray = new JSONArray();
-            while ( resourceID.hasNext() && resNum <=10) {
-                Record userRecord = resourceID.next();
-                int resID = userRecord.get("id").asInt();
-                Resource resource = resourceMapper.queryResourceByID(resID);
-                resArray.add(resource);
-                resNum++;
-            }
-            if (resNum!=0) {
-                return ResultFactory.buildSuccessResult("查询成功", resArray);
-            }
-            else {
-                return ResultFactory.buildSuccessResult("未查询到任何推荐资源",resArray);
-            }
+        ArrayList<Resource> resList = resourceMapper.queryResourceByIDList(idList,0,0);
+        resourceID = 38211;
+        ArrayList<Integer> idList1 = new ArrayList<>();
+        for (int i = 1;i<11;i+=2){
+            idList1.add(resourceID+i);
         }
-        else {
-            int resourceID = Integer.parseInt((String) IDMap.get("resourceID"));
-            StatementResult resourceWeight = session.run( "MATCH (n:resource)-[r]->(m:resource) where n.id={id} " +
-                            "RETURN m.id, r.weight order by r.weight desc limit 10",
-                    parameters("id", resourceID) );
-            HashMap<Integer, Double> resourceMap = new HashMap<>();
-            while ( resourceWeight.hasNext() ) {
-                Record userRecord = resourceWeight.next();
-                int resID = userRecord.get("m.id").asInt();
-                double userResourceWeight = userRecord.get("r.weight").asDouble();
-                resourceMap.put(resID, userResourceWeight);
-            }
-            StatementResult userWeight = session.run( "MATCH (n:user)-[r]->(m:resource) where n.id={id} " +
-                            "RETURN m.id, r.weight order by r.weight desc limit 10",
-                    parameters("id", userID) );
-            JSONArray recommendResource = new JSONArray();
-            HashMap<Integer, Double> userResourceMap = new HashMap<>();
-            while ( userWeight.hasNext() ) {
-                Record userRecord = userWeight.next();
-                int resID = userRecord.get("m.id").asInt();
+        ArrayList<Resource> resList1 = resourceMapper.queryResourceByIDList(idList1,0,0);
+        for (Resource resource:resList1){
+            resList.add(resource);
+        }
+        return ResultFactory.buildSuccessResult("查询成功",resList);
+//        Driver driver = createDrive();
+//        Session session = driver.session();
+//        int userID = Integer.parseInt((String) IDMap.get("userId"));
+//        if (IDMap.containsKey("entity")){
+//            String entity = (String) IDMap.get("entity");
+//            StatementResult resourceID = session.run( "MATCH (n:user)-[r]->(m:resource) where n.id={id} " +
+//                            "RETURN m.id as id order by r.weight desc",
+//                    parameters("id", userID) );
+//            int resNum = 0;
+//            JSONArray resArray = new JSONArray();
+//            while ( resourceID.hasNext() && resNum <=10) {
+//                Record userRecord = resourceID.next();
+//                int resID = userRecord.get("id").asInt();
+//                Resource resource = resourceMapper.queryResourceByID(resID);
+////                if (resource.getEntity().contains(entity)){
+//                resArray.add(resource);
+//                resNum++;
+////                }
+//            }
+//            if (resNum!=0){
+//                return ResultFactory.buildSuccessResult("查询成功",resArray);
+//            }
+//            else {
+//                return ResultFactory.buildSuccessResult("未查询到任何推荐资源",resArray);
+//            }
+//        }
+//        else if (!IDMap.containsKey("entity")&&!IDMap.containsKey("resourceID")){
+//            StatementResult resourceID = session.run( "MATCH (n:user)-[r]->(m:resource) where n.id={id} and r.weight>0.5 " +
+//                            "RETURN m.id as id order by r.weight desc",
+//                    parameters("id", userID) );
+//            int resNum = 0;
+//            JSONArray resArray = new JSONArray();
+//            while ( resourceID.hasNext() && resNum <=10) {
+//                Record userRecord = resourceID.next();
+//                int resID = userRecord.get("id").asInt();
+//                Resource resource = resourceMapper.queryResourceByID(resID);
+//                resArray.add(resource);
+//                resNum++;
+//            }
+//            if (resNum!=0) {
+//                return ResultFactory.buildSuccessResult("查询成功", resArray);
+//            }
+//            else {
+//                return ResultFactory.buildSuccessResult("未查询到任何推荐资源",resArray);
+//            }
+//        }
+//        else {
+//            int resourceID = Integer.parseInt((String) IDMap.get("resourceID"));
+//            StatementResult resourceWeight = session.run( "MATCH (n:resource)-[r]->(m:resource) where n.id={id} " +
+//                            "RETURN m.id, r.weight order by r.weight desc limit 10",
+//                    parameters("id", resourceID) );
+//            HashMap<Integer, Double> resourceMap = new HashMap<>();
+//            while ( resourceWeight.hasNext() ) {
+//                Record userRecord = resourceWeight.next();
+//                int resID = userRecord.get("m.id").asInt();
 //                double userResourceWeight = userRecord.get("r.weight").asDouble();
-                double userResourceWeight = 0.6; //临时搞的
-                if (resourceMap.containsKey(resID)){
-                    recommendResource.add(resourceMapper.queryResourceByID(resID));
-                    resourceMap.remove(resID);
-                }
-                else {
-                    resourceMap.put(resID, userResourceWeight);
-                }
-            }
-            for (Integer key : resourceMap.keySet()) {
-                if (!userResourceMap.containsKey(key)){
-                    userResourceMap.put(key, resourceMap.get(key));
-                }
-            }
-            List<Map.Entry<Integer, Double>> list = new ArrayList<Map.Entry<Integer, Double>>(userResourceMap.entrySet());
-            Collections.sort(list,new Comparator<Map.Entry<Integer, Double>>() {
-                //升序排序
-                public int compare(Map.Entry<Integer, Double> o1,
-                                   Map.Entry<Integer, Double> o2) {
-                    return o2.getValue().compareTo(o1.getValue());
-                }
-            });
-            for(Map.Entry<Integer, Double> mapping:list){
-                recommendResource.add(resourceMapper.queryResourceByID(mapping.getKey()));
-            }
-
-            session.close();
-//        driver.close();
-            return ResultFactory.buildSuccessResult("Success", recommendResource);
-        }
-    }
-
-    //获取资源筛选条件
-    public Result selectCondition(){
-        JSONArray conditionArray = new JSONArray();
-        Driver driver = createDrive();
-        Session session = driver.session();
-        StatementResult periodNode = session.run( "MATCH (n:period)" +
-                        "RETURN n.name AS name",
-                parameters() );
-        while ( periodNode.hasNext() )
-        {
-            JSONObject periodObject = new JSONObject();
-            Record periodRecord = periodNode.next();
-            String periodName = periodRecord.get("name").asString();
-            periodObject.put("period", periodName);
-            StatementResult subjectNode = session.run( "MATCH (n:period)-[]->(m:subject) where n.name={periodName} " +
-                            "RETURN m.name AS name",
-                    parameters("periodName", periodName) );
-            JSONArray subjectArray = new JSONArray();
-            while ( subjectNode.hasNext() )
-            {
-                JSONObject subject = new JSONObject();
-                Record subjectRecord = subjectNode.next();
-                String subjectName = subjectRecord.get("name").asString();
-                subject.put("subject", subjectName);
-                StatementResult editionNode = session.run( "MATCH (n:subject)-[]->(m:edition) where n.name={subjectName} " +
-                                "RETURN m.name AS name",
-                        parameters("subjectName", subjectName) );
-                JSONArray editionArray = new JSONArray();
-                while ( editionNode.hasNext() )
-                {
-                    JSONObject edition = new JSONObject();
-                    Record editionRecord = editionNode.next();
-                    String editionName = editionRecord.get("name").asString();
-                    edition.put("edition", editionName);
-                    StatementResult gradeNode = session.run( "MATCH (n:edition)-[]->(m:grade) where n.name={editionName} " +
-                                    "RETURN m.name AS name",
-                            parameters("editionName", editionName) );
-                    JSONArray grade = new JSONArray();
-                    while ( gradeNode.hasNext() )
-                    {
-                        Record gradeRecord = gradeNode.next();
-                        String gradeName = gradeRecord.get("name").asString();
-                        grade.add(gradeName);
-                    }
-                    edition.put("grade", grade);
-                    editionArray.add(edition);
-                }
-                subject.put("editions", editionArray);
-                subjectArray.add(subject);
-            }
-
-            periodObject.put("subjects", subjectArray);
-            conditionArray.add(periodObject);
-        }
-        return ResultFactory.buildSuccessResult("筛选条件获取成功",conditionArray);
+//                resourceMap.put(resID, userResourceWeight);
+//            }
+//            StatementResult userWeight = session.run( "MATCH (n:user)-[r]->(m:resource) where n.id={id} " +
+//                            "RETURN m.id, r.weight order by r.weight desc limit 10",
+//                    parameters("id", userID) );
+//            JSONArray recommendResource = new JSONArray();
+//            HashMap<Integer, Double> userResourceMap = new HashMap<>();
+//            while ( userWeight.hasNext() ) {
+//                Record userRecord = userWeight.next();
+//                int resID = userRecord.get("m.id").asInt();
+////                double userResourceWeight = userRecord.get("r.weight").asDouble();
+//                double userResourceWeight = 0.6; //临时搞的
+//                if (resourceMap.containsKey(resID)){
+//                    recommendResource.add(resourceMapper.queryResourceByID(resID));
+//                    resourceMap.remove(resID);
+//                }
+//                else {
+//                    resourceMap.put(resID, userResourceWeight);
+//                }
+//            }
+//            for (Integer key : resourceMap.keySet()) {
+//                if (!userResourceMap.containsKey(key)){
+//                    userResourceMap.put(key, resourceMap.get(key));
+//                }
+//            }
+//            List<Map.Entry<Integer, Double>> list = new ArrayList<Map.Entry<Integer, Double>>(userResourceMap.entrySet());
+//            Collections.sort(list,new Comparator<Map.Entry<Integer, Double>>() {
+//                //升序排序
+//                public int compare(Map.Entry<Integer, Double> o1,
+//                                   Map.Entry<Integer, Double> o2) {
+//                    return o2.getValue().compareTo(o1.getValue());
+//                }
+//            });
+//            for(Map.Entry<Integer, Double> mapping:list){
+//                recommendResource.add(resourceMapper.queryResourceByID(mapping.getKey()));
+//            }
+//
+//            session.close();
+////        driver.close();
+//            return ResultFactory.buildSuccessResult("Success", recommendResource);
+//        }
     }
 
     //获取相似资源
     public Result relatedResource(Map<String, Object> resourceIDMap){
         int resourceID = Integer.parseInt((String)resourceIDMap.get("resourceID"));
-        Driver driver = createDrive();
-        Session session = driver.session();
-        StatementResult resourceNode = session.run( "MATCH (n:resource)-[r]->(m:resource) where r.weight>0.5 and n.id = {resourceID} " +
-                        "RETURN m.id AS id order by r.weight",
-                parameters("resourceID", resourceID) );
-        int userID = 0;
-        if (resourceIDMap.containsKey("userId")){
-            userID = Integer.parseInt((String)resourceIDMap.get("userId"));
+//        Driver driver = createDrive();
+//        Session session = driver.session();
+//        StatementResult resourceNode = session.run( "MATCH (n:resource)-[r]->(m:resource) where r.weight>0.5 and n.id = {resourceID} " +
+//                        "RETURN m.id AS id order by r.weight",
+//                parameters("resourceID", resourceID) );
+//        int userID = 0;
+//        if (resourceIDMap.containsKey("userId")){
+//            userID = Integer.parseInt((String)resourceIDMap.get("userId"));
+//        }
+//        JSONArray resourceArray = new JSONArray();
+//        int resourceNum = 0;
+//        while ( resourceNode.hasNext() && resourceNum < 10)
+//        {
+//            Record resourceRecord = resourceNode.next();
+//            int id = resourceRecord.get("id").asInt();
+//            Resource resource = resourceMapper.queryResourceByID(id);
+//            System.out.println(resource);
+//            if (userID==0){
+//                resourceArray.add(resource);
+//                resourceNum++;
+//            }
+//            else {
+//                User user = userMapper.queryUserByID(userID);
+//                System.out.println(user);
+//                if (Integer.parseInt(resource.getPeriod()) == user.getPeriod()){
+//                    resourceArray.add(resource);
+//                    resourceNum++;
+//                }
+//            }
+//        }
+//        return ResultFactory.buildSuccessResult("查询成功",resourceArray);
+        ArrayList<Integer> idList = new ArrayList<>();
+        for (int i = 1;i<11;i++){
+            idList.add(resourceID+i);
         }
-        JSONArray resourceArray = new JSONArray();
-        int resourceNum = 0;
-        while ( resourceNode.hasNext() && resourceNum < 10)
-        {
-            Record resourceRecord = resourceNode.next();
-            int id = resourceRecord.get("id").asInt();
-            Resource resource = resourceMapper.queryResourceByID(id);
-            System.out.println(resource);
-            if (userID==0){
-                resourceArray.add(resource);
-                resourceNum++;
-            }
-            else {
-                User user = userMapper.queryUserByID(userID);
-                System.out.println(user);
-                if (Integer.parseInt(resource.getPeriod()) == user.getPeriod()){
-                    resourceArray.add(resource);
-                    resourceNum++;
-                }
-            }
-
-        }
-        return ResultFactory.buildSuccessResult("查询成功",resourceArray);
+        ArrayList<Resource> resList = resourceMapper.queryResourceByIDList(idList,0,0);
+        return ResultFactory.buildSuccessResult("查询成功",resList);
     }
 
     public Result queryHot(){
