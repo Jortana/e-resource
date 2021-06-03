@@ -1,6 +1,6 @@
 <template>
 <div class="resource-name" @click="viewResource(resource['id'])">
-  <div class="inline-resource-name">{{ resource['resourceName'] }}</div>
+  <div :class="isHidden ? 'inline-resource-name' : ''">{{ resource['resourceName'] }}</div>
   <!-- 隐藏的a元素，用来在新窗口打开资源页面 -->
   <a class="resource-target" ref="resourceTarget" href="" target="_blank" v-show="false"></a>
 </div>
@@ -10,7 +10,11 @@
 export default {
   name: 'ResourceLink',
   props: {
-    resource: Object
+    resource: Object,
+    isHidden: {
+      type: Boolean,
+      default: false
+    }
   },
   methods: {
     viewResource (resourceID) {

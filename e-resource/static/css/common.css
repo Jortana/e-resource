@@ -14,13 +14,23 @@
   width: 100%;
 }
 
-/* 主要界面需要向右移，和logo右侧对齐 */
+.lg-container {
+  margin: 0 auto;
+  width: 1200px;
+}
+
 .main-container {
-  margin-left: 176px;
+  margin-left: 0;
+  /*width: 80%;*/
   margin-top: 1rem;
   /*空出nav-menu的位置*/
   height: calc(100vh - 100px);
 }
+
+/*!* 主要界面需要向右移，和logo右侧对齐 *!*/
+/*.main-container {*/
+/*  margin-left: 176px;*/
+/*}*/
 
 /*!* main container 下面的div *!*/
 /*.out-first-screen {*/

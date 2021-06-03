@@ -21,7 +21,7 @@
                 v-for="entity in resource['entityList']"
                 :key = entity
               >
-                <el-button size="mini">
+                <el-button size="mini" @click="searchEntity(entity)">
                   {{ entity }}
                 </el-button>
               </div>
@@ -55,12 +55,25 @@
 <script>
 import ResourceLink from '@/components/ResourceLink'
 import DownloadButton from '@/components/DownloadButton'
+import merge from 'webpack-merge'
 
 export default {
   name: 'ResourceListWithInfo',
   components: { ResourceLink, DownloadButton },
   props: {
     resources: Array
+  },
+  methods: {
+    searchEntity (entity) {
+      this.$router.push({
+        query: merge(this.$route.query, {
+          'q': entity,
+          'type': 0,
+          'page': 1,
+          'sort': 0
+        })
+      })
+    }
   }
 }
 </script>

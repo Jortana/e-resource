@@ -11,7 +11,7 @@
       trigger="hover"
       :visible-arrow="false"
       transition="el-zoom-in-top"
-      close-delay="100"
+      :close-delay="100"
       width="150">
       <div class="operation-container">
         <div class="operation-btn flex">编辑</div>

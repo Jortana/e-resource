@@ -11,7 +11,7 @@
         <use v-else-if="resource['fileType'] === 'video'" xlink:href="#e-resource-icon-video"></use>
         <use v-else xlink:href="#e-resource-icon-unknown"></use>
       </svg>
-      <resource-link class="resource-name" :resource="resource" :browseTime="browseTime"></resource-link>
+      <resource-link class="resource-name" :resource="resource" :browseTime="browseTime" :isHidden="isHidden"></resource-link>
       <span v-if="browseTime === true" class="flex browse-time">{{ resource['browse'] }}</span>
     </div>
   </div>
@@ -26,7 +26,11 @@ export default {
   },
   props: {
     resourceList: Array,
-    browseTime: Boolean
+    browseTime: Boolean,
+    isHidden: {
+      type: Boolean,
+      default: false
+    }
   }
 }
 </script>

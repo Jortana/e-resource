@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="lg-container">
     <nav-menu :searchInfo.sync="searchInfo"></nav-menu>
     <div class="main-container resource-container">
       <div class="resources">
@@ -46,7 +46,7 @@
                   </el-tab-pane>
                 </el-tabs>
                 <div class="sort">
-                  <el-radio-group v-model="sort" size="mini" @change="changeSort">
+                  <el-radio-group v-model="searchInfo.sort" size="mini" @change="changeSort">
                     <el-radio-button label="0">综合</el-radio-button>
                     <el-radio-button label="1">最热</el-radio-button>
                     <el-radio-button label="2">最新</el-radio-button>
@@ -74,7 +74,7 @@
           </div>
         </div>
         <!-- 知识图谱 -->
-        <div class="graph flex-1">
+        <div class="graph">
             <k-g-chart :entities="entities.entities" ref="chart"></k-g-chart>
         </div>
       </div>
@@ -118,8 +118,11 @@ export default {
   watch: {
     query: {
       handler (newQuery, oldQuery) {
+        console.log('sort', this.searchInfo.sort)
+        console.log(this.$route.query.sort)
         this.resetResource()
         this.searchInfo.type = newQuery.type === undefined ? 0 : newQuery.type
+        this.searchInfo.sort = newQuery.sort === undefined ? 0 : newQuery.sort
         this.searchInfo.content = newQuery.q === undefined ? 0 : newQuery.q
         this.pageInfo.page = newQuery.page === undefined ? 1 : newQuery.page
         this.goSearch()
@@ -143,7 +146,8 @@ export default {
     return {
       searchInfo: {
         type: this.$route.query.type === undefined ? 0 : this.$route.query.type,
-        content: this.$route.query.q
+        content: this.$route.query.q,
+        sort: this.$route.query.sort === undefined ? 0 : this.$route.query.sort
       },
       pageInfo: {
         page: this.$route.query.page === undefined ? 1 : this.$route.query.page,
@@ -183,7 +187,6 @@ export default {
       cardInfo: {},
       goal: [],
       key: [],
-      sort: this.$route.query.sort === undefined ? 0 : this.$route.query.sort,
       activeEntity: ''
     }
   },
@@ -193,6 +196,7 @@ export default {
       this.$router.push({
         query: merge(this.$route.query, {
           'type': this.searchInfo.type,
+          'sort': 0,
           'page': 1
         })
       })
@@ -202,7 +206,7 @@ export default {
       searchEntity({
         keyword: this.searchInfo.content,
         type: this.searchInfo.type,
-        sort: this.sort,
+        sort: this.searchInfo.sort,
         page: this.pageInfo.page,
         perPage: this.pageInfo.perPage
       }).then(response => {
@@ -245,7 +249,6 @@ export default {
       })
     },
     changeSort (sort) {
-      console.log(sort)
       this.$router.push({
         query: merge(this.$route.query, {
           'type': this.searchInfo.type,
@@ -371,10 +374,12 @@ export default {
 .pages {
   display: flex;
   justify-content: center;
+  padding-bottom: 2rem;
 }
 
 .graph {
   padding-left: 2rem;
+  width: 400px;
   height: 500px;
   min-height: 500px;
 }

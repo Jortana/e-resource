@@ -2,7 +2,7 @@
 <div class="lg-container">
   <nav-menu></nav-menu>
   <div class="main-container flex">
-    <div class="resource-info flex-1">
+    <div class="resource-info left-side">
       <div class="flex">
         <div class="basic-info flex-1">
           <h2 @click="addToCart(resource.id)">{{ resource['resourceName'] }}</h2>
@@ -48,7 +48,7 @@
       </div>
       <!-- ---------- -->
     </div>
-    <div class="flex-1 right-side">
+    <div class="right-side">
       <div class="graph">
         <k-g-chart :entities="entities.entities" ref="chart"></k-g-chart>
       </div>
@@ -193,12 +193,13 @@ export default {
 </script>
 
 <style scoped>
-.main-container {
-  /*border-bottom: 1px solid #dcdfe6;*/
+.left-side {
+  padding-right: 2rem;
 }
 
 .right-side {
   margin-left: 1rem;
+  width: 350px;
 }
 
 .operation {
@@ -210,7 +211,8 @@ export default {
 }
 
 .graph {
-  height: 100%;
+  height: 500px;
+  /*height: 100%;*/
 }
 
 .resource-info {
@@ -248,20 +250,16 @@ export default {
 }
 
 .rate {
+  border-top: 1px solid #e4e7ed;
+  padding-top: 1rem;
   margin-top: 1rem;
 }
 
 .comment-container {
-  margin-top: 1rem;
+  /*margin-top: 1rem;*/
   padding-top: 1rem;
-  border-top: 1px solid #e4e7ed;
   padding-bottom: 5rem;
 }
-
-/*.recommend-container {*/
-/*  margin-left: -.5px;*/
-/*  border-left: 1px solid #dcdfe6;*/
-/*}*/
 
 /*@media only screen and (max-width : 768px) {*/
 /*  .main-container {*/

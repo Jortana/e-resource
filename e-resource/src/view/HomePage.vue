@@ -9,19 +9,19 @@
         <div class="card flex-1">
           <h2>热门资源</h2>
           <div class="list-container">
-            <resource-list :resourceList="hotResources" :browseTime="true"></resource-list>
+            <resource-list :resourceList="hotResources" :browseTime="true" :isHidden="true"></resource-list>
           </div>
         </div>
         <div class="card flex-1">
           <h2>最新资源</h2>
           <div class="list-container">
-            <resource-list :resourceList="newResources" :browseTime="true"></resource-list>
+            <resource-list :resourceList="newResources" :browseTime="true" :isHidden="true"></resource-list>
           </div>
         </div>
         <div class="card flex-1" v-if="isLogin === true">
           <h2>推荐资源</h2>
           <div class="list-container">
-            <resource-list :resourceList="recommendResources" :browseTime="true"></resource-list>
+            <resource-list :resourceList="recommendResources" :browseTime="true" :isHidden="true"></resource-list>
           </div>
         </div>
       </div>
