@@ -28,11 +28,21 @@
       <div class="viewer">
         <resource-viewer :url="String(resource['viewUrl'])" :bInfo="{ aid: resource['aid'], bvid: resource['bvid'], cid: resource['cid'], page: 1 }"></resource-viewer>
       </div>
+      <!-- 评分 -->
+      <div class="rate">
+        <el-rate
+          v-model="resource['rate']"
+          disabled
+          show-score
+          :colors="colors"
+          score-template="{value}">
+        </el-rate>
+      </div>
       <div>
         <comment class="comment-container" :id="resource.id"></comment>
       </div>
       <!-- 相关资源 -->
-      <div class="related-resource flex-1" v-if="relatedResources.length !== 0">
+      <div v-show="false" class="related-resource flex-1" v-if="relatedResources.length !== 0">
         <h2>相关资源</h2>
         <resource-list :resourceList="relatedResources"></resource-list>
       </div>
@@ -135,7 +145,8 @@ export default {
         entities: []
       },
       relatedResources: [],
-      recommendResources: []
+      recommendResources: [],
+      colors: ['#99A9BF', '#F7BA2A', '#FF9900']
     }
   },
   methods: {
@@ -204,7 +215,7 @@ export default {
 
 .resource-info {
   position: relative;
-  border-right: 1px solid #dcdfe6;
+  /*border-right: 1px solid #dcdfe6;*/
 }
 
 .resource-info >>> h2 {
@@ -236,10 +247,15 @@ export default {
   border-top: 1px solid #dcdfe6;
 }
 
+.rate {
+  margin-top: 1rem;
+}
+
 .comment-container {
   margin-top: 1rem;
   padding-top: 1rem;
   border-top: 1px solid #e4e7ed;
+  padding-bottom: 5rem;
 }
 
 /*.recommend-container {*/

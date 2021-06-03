@@ -16,7 +16,7 @@ public class CommentController {
     }
 
     @CrossOrigin
-    @GetMapping("/v1.0/public/queryComment")
+    @GetMapping("/v1.0/public/comment")
     public Result queryComment(@RequestParam Map<String, Object> resourceIDMap){
         return commentService.queryComment(resourceIDMap);
     }

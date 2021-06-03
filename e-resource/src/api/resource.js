@@ -51,3 +51,12 @@ export const download = (resourceID) => {
   window.location.href = `http://127.0.0.1:9000/e-resource/api${baseURL}/public/download?resourceID=${resourceID}`
   // return http.download(`${baseURL}/public/download?resourceID=${resourceID}`)
 }
+
+/**
+ * 根据资源 ID 获取评论
+ * @param {Number} resourceID- 资源 ID
+ * @returns {AxiosPromise}
+ */
+export const getComment = (resourceID) => {
+  return http.get(`${baseURL}/public/comment?resourceID=${resourceID}`)
+}
