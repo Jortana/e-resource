@@ -8,7 +8,7 @@ public class Comment {
     String date;
     double rate;
     String avatar;
-    String userName;
+    String username;
 
     public Comment() {
     }
@@ -22,18 +22,18 @@ public class Comment {
                 ", date='" + date + '\'' +
                 ", rate=" + rate +
                 ", avatar='" + avatar + '\'' +
-                ", userName='" + userName + '\'' +
+                ", username='" + username + '\'' +
                 '}';
     }
 
-    public Comment(int userID, int resourceID, String content, String date, double rate, String avatar, String userName) {
+    public Comment(int userID, int resourceID, String content, String date, double rate, String avatar, String username) {
         this.userID = userID;
         this.resourceID = resourceID;
         this.content = content;
         this.date = date;
         this.rate = rate;
         this.avatar = avatar;
-        this.userName = userName;
+        this.username = username;
     }
 
     public int getUserID() {
@@ -84,11 +84,11 @@ public class Comment {
         this.avatar = avatar;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUsername(String username) {
+        this.username = username;
     }
 }
