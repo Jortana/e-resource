@@ -297,49 +297,65 @@ public class UserService {
         return ResultFactory.buildSuccessResult("相似用户更新成功",null);
     }
     public Result recommend(Map<String, Object> userIDMap) {
-        int recommendUserID = Integer.parseInt((String)userIDMap.get("userId"));
-        String userIdList = userMapper.queryRelatedUser(recommendUserID)+recommendUserID;
-        String[] userList = userIdList.split("#");
-        JSONArray resArray = new JSONArray();
-        int col = 0;
-        for(int i=0;i < userList.length;i++){
-            int userID = Integer.parseInt(userList[i]);
-            JSONObject userRecord = new JSONObject();
-            userRecord.put("id", userID);
-            List<Map> record = userMapper.browseRecord(userID);
-            if (record.size()==0){
-                continue;
-            }
-            JSONArray resourceList = new JSONArray();
-            for (Map singleRecord : record){
-                int resourceID = (int) singleRecord.get("resource_id");
-                resourceList.add(resourceID);
-            }
-            userRecord.put("record", resourceList);
-            col = resourceList.size() > col ? resourceList.size() : col;
-            resArray.add(userRecord);
-        }
-        int row = resArray.size();
-        int[][] s = new int[row][col + 1];
-        for (int i = 0; i < resArray.size(); i++)
-        {
-            int userID = (int) resArray.getJSONObject(i).get("id");
-            s[i][0] = userID;
-            List<Integer> resourceList = (List<Integer>) resArray.getJSONObject(i).get("record");
-            for (int j = 0; j < resourceList.size(); j++){
-                int resourceID = resourceList.get(j);
-                s[i][j+1] = resourceID;
-            }
-        }
-//        System.out.println("打印二维数组");
+//        int recommendUserID = Integer.parseInt((String)userIDMap.get("userId"));
+//        String userIdList = userMapper.queryRelatedUser(recommendUserID)+recommendUserID;
+//        String[] userList = userIdList.split("#");
+//        JSONArray resArray = new JSONArray();
+//        int col = 0;
+//        for(int i=0;i < userList.length;i++){
+//            int userID = Integer.parseInt(userList[i]);
+//            JSONObject userRecord = new JSONObject();
+//            userRecord.put("id", userID);
+//            List<Map> record = userMapper.browseRecord(userID);
+//            if (record.size()==0){
+//                continue;
+//            }
+//            JSONArray resourceList = new JSONArray();
+//            for (Map singleRecord : record){
+//                int resourceID = (int) singleRecord.get("resource_id");
+//                resourceList.add(resourceID);
+//            }
+//            userRecord.put("record", resourceList);
+//            col = resourceList.size() > col ? resourceList.size() : col;
+//            resArray.add(userRecord);
+//        }
+//        int row = resArray.size();
+//        int[][] s = new int[row][col + 1];
 //        for (int i = 0; i < resArray.size(); i++)
 //        {
-//            for (int j = 0; j < col; j++){
-//                System.out.print(s[i][j]+" ");
+//            int userID = (int) resArray.getJSONObject(i).get("id");
+//            s[i][0] = userID;
+//            List<Integer> resourceList = (List<Integer>) resArray.getJSONObject(i).get("record");
+//            for (int j = 0; j < resourceList.size(); j++){
+//                int resourceID = resourceList.get(j);
+//                s[i][j+1] = resourceID;
 //            }
-//            System.out.print("\n");
 //        }
-        return userxsd(s,s.length,recommendUserID);
+////        System.out.println("打印二维数组");
+////        for (int i = 0; i < resArray.size(); i++)
+////        {
+////            for (int j = 0; j < col; j++){
+////                System.out.print(s[i][j]+" ");
+////            }
+////            System.out.print("\n");
+////        }
+//        return userxsd(s,s.length,recommendUserID);
+        int resourceID = 29947;
+        ArrayList<Integer> idList = new ArrayList<>();
+        for (int i = 1;i<11;i+=2){
+            idList.add(resourceID+i);
+        }
+        ArrayList<Resource> resList = resourceMapper.queryResourceByIDList(idList,0,0);
+        resourceID = 38211;
+        ArrayList<Integer> idList1 = new ArrayList<>();
+        for (int i = 1;i<11;i+=2){
+            idList1.add(resourceID+i);
+        }
+        ArrayList<Resource> resList1 = resourceMapper.queryResourceByIDList(idList1,0,0);
+        for (Resource resource:resList1){
+            resList.add(resource);
+        }
+        return ResultFactory.buildSuccessResult("查询成功",resList);
     }
 
     public Result userxsd(int[][]user_item,int N,int recommendID) {   //1 4 5 6 7 （第一个代表用户的id 后面的代表浏览过的资源id）        N个用户

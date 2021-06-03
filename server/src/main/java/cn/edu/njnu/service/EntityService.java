@@ -141,6 +141,18 @@ public class EntityService {
         }
 
         for (Resource resource:resourceArrayList){
+            int resourceID = resource.getId();
+            StatementResult conceptNode = session.run( "MATCH (m:resource)-[r]->(a:concept) where m.id = {id} " +
+                            "RETURN a.name AS name order by r.tfidf",
+                    parameters( "id", resourceID) );
+            ArrayList<String> entityList = new ArrayList<>();
+            while ( conceptNode.hasNext() )
+            {
+                Record entityRecord = conceptNode.next();
+                String name = entityRecord.get( "name" ).asString();
+                entityList.add(name);
+            }
+            resource.setEntityList(entityList);
             totalEntity++;
             int extendID = resource.getTableResourceID();
             int tableID = resource.getTable();
