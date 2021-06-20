@@ -201,11 +201,14 @@ public class EntityService {
 //            singleGK.put("keyPoint", perGK.get("t_key"));
 //            resArray.add(singleGK);
 //        }
-        JSONObject singleGK = new JSONObject();
-        singleGK.put("objectives", "基本经济制度的内容，公有制经济的含义及地位，非公有制经济的作用");
-        singleGK.put("resourceID", 1);
-        singleGK.put("keyPoint", "基本经济制度确立过程，基本经济制度发挥的作用");
-        resArray.add(singleGK);
+        for (int i = 0;i<3;i++){
+            JSONObject singleGK = new JSONObject();
+            String id = Integer.toString(i+1);
+            singleGK.put("objectives", id + ":基本经济制度的内容，公有制经济的含义及地位，非公有制经济的作用");
+            singleGK.put("keyPoint", id + ":基本经济制度确立过程，基本经济制度发挥的作用");
+            singleGK.put("resourceID", i+1);
+            resArray.add(singleGK);
+        }
         return resArray;
     }
 }
