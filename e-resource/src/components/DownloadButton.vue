@@ -1,7 +1,5 @@
 <template>
-  <el-button class="full-width" type="primary" size="medium" icon="el-icon-download" @click="download()">
-    下载
-  </el-button>
+  <el-button type="primary" icon="el-icon-download" circle @click="download()"></el-button>
 </template>
 
 <script>

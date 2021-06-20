@@ -36,14 +36,7 @@
               <download-button :resourceID="resource['id']"></download-button>
             </div>
             <div class="full-width">
-              <el-button class="full-width" size="medium" icon="el-icon-document-add">
-                加入资源包
-              </el-button>
-            </div>
-            <div class="full-width">
-              <el-button class="full-width" size="medium" icon="el-icon-star-off">
-                收藏
-              </el-button>
+              <el-button icon="el-icon-document-add" circle></el-button>
             </div>
           </div>
         </div>
@@ -80,7 +73,7 @@ export default {
 
 <style scoped>
 .resource-info {
-  height: 190px;
+  /*height: 190px;*/
   display: flex;
   border-bottom: 1px solid #dcdfe6;
   padding-top: 1rem;
@@ -93,7 +86,7 @@ export default {
 }
 
 .thumbnail-container {
-  height: 100%;
+  /*height: 100%;*/
   align-items: center;
   justify-content: center;
 }
@@ -106,6 +99,7 @@ export default {
 .info {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   position: relative;
   margin-left: 1rem;
 }
@@ -125,8 +119,8 @@ export default {
 .extra {
   display: flex;
   margin-top: .8rem;
-  position: absolute;
-  bottom: 0;
+  /*position: absolute;*/
+  /*bottom: 0;*/
   min-width: 220px;
 }
 
@@ -155,7 +149,7 @@ export default {
 }
 
 .resource-name {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: bold;
   cursor: pointer;
 }

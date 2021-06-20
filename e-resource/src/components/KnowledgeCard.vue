@@ -6,11 +6,27 @@
     <div slot="header" class="clearfix">
       <span class="card-title">{{ entityName }}</span>
     </div>
-    <div
-      v-for="(value, name, index) in info"
-      :key="index">
-      <div class="properties" v-if="index < 5">
-        <span class="bold">{{ name }}：</span>{{ value }}
+    <div class="flex">
+      <div class="flex-1">
+        <div
+          v-for="(value, name, index) in info"
+          v-if="index % 2 === 0"
+          :key="index">
+          <div class="properties">
+            <span class="bold">{{ name }}：</span>{{ value }}
+          </div>
+        </div>
+      </div>
+      <div class="flex-1">
+        <div
+          class="flex-1"
+          v-for="(value, name, index) in info"
+          v-if="index % 2 !== 0"
+          :key="index">
+          <div class="properties">
+            <span class="bold">{{ name }}：</span>{{ value }}
+          </div>
+        </div>
       </div>
     </div>
     <el-link class="more" @click="gotoKnowledge">查看完整信息</el-link>
@@ -32,6 +48,7 @@ export default {
         this.entityName = info.name
         delete info.name
         this.info = info
+        console.log(this.info)
       },
       immediate: true
     }
@@ -58,7 +75,7 @@ export default {
 }
 
 .properties {
-  font-size: .9rem;
+  font-size: 1rem;
   margin-bottom: .3rem;
 }
 

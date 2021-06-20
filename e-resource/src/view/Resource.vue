@@ -199,7 +199,7 @@ export default {
 
 .right-side {
   margin-left: 1rem;
-  width: 350px;
+  width: 400px;
 }
 
 .operation {

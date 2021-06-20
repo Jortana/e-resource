@@ -10,11 +10,14 @@
           <div class="resource">
             <div>
               <!-- 这里的v-for的数组实际上是只有一个元素的，后端问题，之前的想法和现在不一样，我发现这个问题的时候已经写了很多了，改起来太麻烦了，懒得改了 -->
-              <div
-              >
+              <div>
                 <!-- 教学目标和教学重难点 -->
+                <div class="flex" style="justify-content: space-between;">
+                <goal-and-key-card :list="goal" :title="'学习目标'" style="width: calc(50% - 10px); height: 180px" />
+                <goal-and-key-card :list="key" :title="'学习重难点'" style="width: calc(50% - 10px); height: 180px" />
+                </div>
                 <div v-if="goal.length > 0">
-                  <div class="subtitle">教学目标</div>
+                  <div class="subtitle">学习目标</div>
                   <div
                     v-for="(goal, index) in goal"
                     :key="index"
@@ -25,7 +28,7 @@
                   </div>
                 </div>
                 <div v-if="key.length > 0">
-                  <div class="subtitle">教学重难点</div>
+                  <div class="subtitle">学习重难点</div>
                   <div
                     v-for="(key, index) in key"
                     :key="'key' + index"
@@ -53,7 +56,6 @@
                   </el-radio-group>
                 </div>
                 <!-- -------------------------------------------------------------------------------- -->
-<!--                {{ resources.resources.resources }}-->
                 <resource-list-with-info v-if="resources.resources.length > 0" :resources="resources.resources"></resource-list-with-info>
                 <div v-else>{{ noResourceHint }}</div>
               </div>
@@ -88,6 +90,7 @@ import KnowledgeCard from '@/components/KnowledgeCard'
 import ResourceLink from '@/components/ResourceLink'
 import DownloadButton from '@/components/DownloadButton'
 import ResourceListWithInfo from '@/components/ResourceListWithInfo'
+import GoalAndKeyCard from '@/components/GoalAndKeyCard'
 import { record } from '@/api/record'
 // import { recommendByUserEntity } from '@/api/recommend'
 // import { download } from '@/api/resource'
@@ -102,7 +105,8 @@ export default {
     KnowledgeCard,
     ResourceLink,
     DownloadButton,
-    ResourceListWithInfo
+    ResourceListWithInfo,
+    GoalAndKeyCard
   },
   mounted () {
     this.goSearch()
@@ -118,8 +122,6 @@ export default {
   watch: {
     query: {
       handler (newQuery, oldQuery) {
-        console.log('sort', this.searchInfo.sort)
-        console.log(this.$route.query.sort)
         this.resetResource()
         this.searchInfo.type = newQuery.type === undefined ? 0 : newQuery.type
         this.searchInfo.sort = newQuery.sort === undefined ? 0 : newQuery.sort
@@ -142,7 +144,6 @@ export default {
     }
   },
   data () {
-    console.log(this.$route.query)
     return {
       searchInfo: {
         type: this.$route.query.type === undefined ? 0 : this.$route.query.type,
@@ -210,16 +211,15 @@ export default {
         page: this.pageInfo.page,
         perPage: this.pageInfo.perPage
       }).then(response => {
-        console.log(response.data)
         this.resetResource()
         if (response.data.code === 200) {
-          console.log(response.data.data)
           let resource = response.data.data.resources[0]
           this.resources.total = response.data.data.total
           this.resources.pages = response.data.data.pages
           // 提取出教学目标和重难点以数组的形式存储
           let goal = []
           let key = []
+          console.log(resource)
           resource['goalAndKey'].forEach(goalAndKey => {
             if (goalAndKey['objectives'] !== null) {
               goal.push({
@@ -241,7 +241,6 @@ export default {
             this.cardInfo = resource.properties
           }
           this.resources.resources = resource.resources
-          console.log(this.resources)
         }
         if (this.resources.resources.length === 0) {
           this.noResourceHint = '未查询到相关资源'
@@ -274,10 +273,8 @@ export default {
     },
     getRelatedEntity (keyword) {
       this.resetEntity()
-      console.log(keyword)
       relatedEntity(keyword)
         .then(response => {
-          console.log(response)
           if (response.data.code === 200) {
             this.entities.entities = response.data.data
           }
