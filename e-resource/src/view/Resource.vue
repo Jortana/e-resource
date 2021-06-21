@@ -13,15 +13,13 @@
             <download-button :resourceID="Number(resourceID)"></download-button>
           </div>
           <div class="operation-button">
-            <el-button class="full-width" size="medium" icon="el-icon-document-add">
-              加入资源包
-            </el-button>
+            <add-to-package-button></add-to-package-button>
           </div>
-          <div class="operation-button">
-            <el-button class="full-width" size="medium" icon="el-icon-star-off">
-              收藏
-            </el-button>
-          </div>
+<!--          <div class="operation-button">-->
+<!--            <el-button class="full-width" size="medium" icon="el-icon-star-off">-->
+<!--              收藏-->
+<!--            </el-button>-->
+<!--          </div>-->
         </div>
       </div>
       <!-- 资源展示组件 -->
@@ -69,7 +67,8 @@ import NavMenu from '@/components/NavMenu'
 import KGChart from '@/components/Chart/KGChart'
 import ResourceViewer from '@/components/ViewResource/ResourceViewer'
 import ResourceLink from '@/components/ResourceLink'
-import DownloadButton from '@/components/DownloadButton'
+import DownloadButton from '@/components/Buttons/DownloadButton'
+import AddToPackageButton from '@/components/Buttons/AddToPackageButton'
 import ResourceList from '@/components/ResourceList'
 import Comment from '@/components/Comment'
 import {related, resourceInfo} from '@/api/resource'
@@ -87,7 +86,8 @@ export default {
     ResourceLink,
     DownloadButton,
     ResourceList,
-    Comment
+    Comment,
+    AddToPackageButton
   },
   props: {
   },

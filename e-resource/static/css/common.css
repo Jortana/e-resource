@@ -27,6 +27,10 @@
   height: calc(100vh - 100px);
 }
 
+.none {
+  display: none;
+}
+
 /*!* 主要界面需要向右移，和logo右侧对齐 *!*/
 /*.main-container {*/
 /*  margin-left: 176px;*/

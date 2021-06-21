@@ -3,23 +3,33 @@
     <el-card class="card" shadow="never">
       <div class="card-content">
         <div class="title bold">{{title}}</div>
-        <div v-if="contents[curIndex]" class="content">
+        <div
+          v-if="contents[curIndex]"
+          class="content"
+          @mouseover="changeBtnShow(true)"
+          @mouseleave="changeBtnShow(false)"
+        >
           {{contents[curIndex].content}}
+          <!-- 添加到备课的按钮 -->
+          <add-to-package-button class="x-mini-btn" :ref="'btn'" :default-visible="false"></add-to-package-button>
         </div>
-<!--        {{list}}-->
       </div>
       <div class="operations">
-        <el-button icon="el-icon-arrow-left" circle size="mini"></el-button>
+        <el-button icon="el-icon-arrow-left" circle size="mini" @click="changePage(-1)" :disabled="curIndex <= 0"></el-button>
         <el-link :underline="false">查看全部</el-link>
-        <el-button icon="el-icon-arrow-right" circle size="mini"></el-button>
+        <el-button icon="el-icon-arrow-right" circle size="mini" @click="changePage(1)" :disabled="curIndex >= contents.length - 1"></el-button>
       </div>
     </el-card>
   </div>
 </template>
 
 <script>
+import AddToPackageButton from '@/components/Buttons/AddToPackageButton'
 export default {
   name: 'GoalAndKeyCard',
+  components: {
+    AddToPackageButton
+  },
   props: {
     list: Array,
     title: String
@@ -27,6 +37,7 @@ export default {
   watch: {
     list: {
       handler () {
+        this.curIndex = 0
         this.contents = [...this.list]
       },
       immediate: true
@@ -36,6 +47,17 @@ export default {
     return {
       contents: [],
       curIndex: 0
+    }
+  },
+  methods: {
+    // 切换条数
+    changePage (change) {
+      this.curIndex += change
+    },
+    // 控制添加到备课的按钮是否显示
+    changeBtnShow (show) {
+      const ref = 'btn'
+      this.$refs[ref].changeVisible(show)
     }
   }
 }
@@ -77,4 +99,13 @@ export default {
   color: #909399;
 }
 
+.operations .el-link:hover {
+  color: #b0b3bc;
+}
+
+.x-mini-btn {
+  padding: 3px;
+  font-size: .5rem;
+  margin-left: 5px;
+}
 </style>

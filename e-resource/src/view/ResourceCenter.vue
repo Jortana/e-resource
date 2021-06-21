@@ -12,31 +12,19 @@
               <!-- 这里的v-for的数组实际上是只有一个元素的，后端问题，之前的想法和现在不一样，我发现这个问题的时候已经写了很多了，改起来太麻烦了，懒得改了 -->
               <div>
                 <!-- 教学目标和教学重难点 -->
-                <div class="flex" style="justify-content: space-between;">
-                <goal-and-key-card :list="goal" :title="'学习目标'" style="width: calc(50% - 10px); height: 180px" />
-                <goal-and-key-card :list="key" :title="'学习重难点'" style="width: calc(50% - 10px); height: 180px" />
-                </div>
-                <div v-if="goal.length > 0">
-                  <div class="subtitle">学习目标</div>
-                  <div
-                    v-for="(goal, index) in goal"
-                    :key="index"
-                    v-if="index < 5"
-                    :class="goal.content.length > 43 ? 'content-link overflow-content' : 'content-link'"
-                    @click="viewResource(goal.resourceID)">
-                    {{ goal.content }}
-                  </div>
-                </div>
-                <div v-if="key.length > 0">
-                  <div class="subtitle">学习重难点</div>
-                  <div
-                    v-for="(key, index) in key"
-                    :key="'key' + index"
-                    v-if="index < 5"
-                    :class="key.content.length > 43 ? 'content-link overflow-content' : 'content-link'"
-                    @click="viewResource(key.resourceID)">
-                    {{ key.content }}
-                  </div>
+                <div class="flex goal-and-key-container">
+                  <goal-and-key-card
+                    class="goal-and-key-card"
+                    v-if="goal.length > 0"
+                    :list="goal"
+                    :title="'学习目标'"
+                  />
+                  <goal-and-key-card
+                    class="goal-and-key-card"
+                    v-if="key.length > 0"
+                    :list="key"
+                    :title="'学习重难点'"
+                  />
                 </div>
                 <!-- ----------------- -->
                 <!-- ------------------------------ 筛选 ---------------------------------------- -->
@@ -77,7 +65,7 @@
         </div>
         <!-- 知识图谱 -->
         <div class="graph">
-            <k-g-chart :entities="entities.entities" ref="chart"></k-g-chart>
+          <k-g-chart :entities="entities.entities" ref="chart"></k-g-chart>
         </div>
       </div>
     </div>
@@ -88,7 +76,7 @@
 import NavMenu from '@/components/NavMenu'
 import KnowledgeCard from '@/components/KnowledgeCard'
 import ResourceLink from '@/components/ResourceLink'
-import DownloadButton from '@/components/DownloadButton'
+import DownloadButton from '@/components/Buttons/DownloadButton'
 import ResourceListWithInfo from '@/components/ResourceListWithInfo'
 import GoalAndKeyCard from '@/components/GoalAndKeyCard'
 import { record } from '@/api/record'
@@ -219,7 +207,6 @@ export default {
           // 提取出教学目标和重难点以数组的形式存储
           let goal = []
           let key = []
-          console.log(resource)
           resource['goalAndKey'].forEach(goalAndKey => {
             if (goalAndKey['objectives'] !== null) {
               goal.push({
@@ -375,13 +362,29 @@ export default {
 }
 
 .graph {
-  padding-left: 2rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  margin-top: 1rem;
+  margin-left: 1rem;
+  border: 1px solid #EBEEF5;
+  border-radius: 4px;
   width: 400px;
-  height: 500px;
-  min-height: 500px;
+  height: 420px;
+  min-height: 400px;
 }
 
 .graph button {
   margin-top: 10px;
+}
+
+/*教学目标和教学重难点卡片*/
+.goal-and-key-container {
+  margin-bottom: 1rem;
+  justify-content: space-between;
+}
+
+.goal-and-key-card {
+  width: calc(50% - 10px);
+  height: 180px
 }
 </style>

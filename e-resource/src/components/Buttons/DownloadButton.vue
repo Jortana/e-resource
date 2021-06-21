@@ -1,5 +1,5 @@
 <template>
-  <el-button type="primary" icon="el-icon-download" circle @click="download()"></el-button>
+  <el-button type="primary" :size="size" icon="el-icon-download" circle @click="download()"></el-button>
 </template>
 
 <script>
@@ -8,7 +8,8 @@ import { download } from '@/api/resource'
 export default {
   name: 'DownloadButton',
   props: {
-    resourceID: Number
+    resourceID: Number,
+    size: String
   },
   methods: {
     download () {

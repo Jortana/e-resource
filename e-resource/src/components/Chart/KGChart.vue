@@ -51,7 +51,6 @@ export default {
      * 节点点击事件
      */
     nodeClick (node) {
-      console.log(node.data)
       if (node.data.name === this.$route.query.q) {
         return
       }
@@ -106,7 +105,6 @@ export default {
      * 设置echarts配置项
      */
     initCharts () {
-      console.log('init chart')
       if (!this.chart) {
         this.chart = echarts.init(document.getElementById('chart'))
         this.chart.on('click', (event) => {

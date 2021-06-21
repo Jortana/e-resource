@@ -31,12 +31,12 @@
               <div class="extra-info"><i class="el-icon-download"></i> {{ resource['download'] }} 下载</div>
             </div>
           </div>
-          <div class="operation">
+          <div class="operations">
             <div class="full-width">
-              <download-button :resourceID="resource['id']"></download-button>
+              <download-button :resourceID="resource['id']" :size="'medium'"></download-button>
             </div>
             <div class="full-width">
-              <el-button icon="el-icon-document-add" circle></el-button>
+              <add-to-package-button :size="'medium'"></add-to-package-button>
             </div>
           </div>
         </div>
@@ -47,12 +47,13 @@
 
 <script>
 import ResourceLink from '@/components/ResourceLink'
-import DownloadButton from '@/components/DownloadButton'
+import DownloadButton from '@/components/Buttons/DownloadButton'
+import AddToPackageButton from '@/components/Buttons/AddToPackageButton'
 import merge from 'webpack-merge'
 
 export default {
   name: 'ResourceListWithInfo',
-  components: { ResourceLink, DownloadButton },
+  components: { ResourceLink, DownloadButton, AddToPackageButton },
   props: {
     resources: Array
   },
@@ -131,7 +132,7 @@ export default {
   margin-right: 1rem;
 }
 
-.operation {
+.operations {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -140,8 +141,8 @@ export default {
   align-items: center;
 }
 
-.operation button {
-  margin-bottom: 10px;
+.operations button {
+  margin-bottom: 12px;
 }
 
 .file-name {

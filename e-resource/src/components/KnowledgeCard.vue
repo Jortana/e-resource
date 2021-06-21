@@ -12,8 +12,10 @@
           v-for="(value, name, index) in info"
           v-if="index % 2 === 0"
           :key="index">
-          <div class="properties">
+          <div class="properties flex" @mouseover="changeBtnShow(index, true)" @mouseleave="changeBtnShow(index, false)">
             <span class="bold">{{ name }}：</span>{{ value }}
+            <!-- 添加到备课的按钮 -->
+            <add-to-package-button class="x-mini-btn" :ref="'btn' + index" :default-visible="false"></add-to-package-button>
           </div>
         </div>
       </div>
@@ -23,8 +25,10 @@
           v-for="(value, name, index) in info"
           v-if="index % 2 !== 0"
           :key="index">
-          <div class="properties">
+          <div class="properties flex">
             <span class="bold">{{ name }}：</span>{{ value }}
+            <!-- 添加到备课的按钮 -->
+            <add-to-package-button class="x-mini-btn" :ref="'btn' + index" :default-visible="false"></add-to-package-button>
           </div>
         </div>
       </div>
@@ -37,8 +41,12 @@
 </template>
 
 <script>
+import AddToPackageButton from '@/components/Buttons/AddToPackageButton'
 export default {
   name: 'KnowledgeCard',
+  components: {
+    AddToPackageButton
+  },
   props: {
     entityInfo: Object
   },
@@ -48,7 +56,6 @@ export default {
         this.entityName = info.name
         delete info.name
         this.info = info
-        console.log(this.info)
       },
       immediate: true
     }
@@ -64,6 +71,10 @@ export default {
       let target = this.$refs.knowledgeTarget
       target.setAttribute('href', `${window.location.origin}/knowledge/${this.entityName}`)
       target.click()
+    },
+    changeBtnShow (index, show) {
+      const ref = 'btn' + index
+      this.$refs[ref][0].changeVisible(show)
     }
   }
 }
@@ -81,5 +92,11 @@ export default {
 
 .more {
   margin-top: 1rem;
+}
+
+.x-mini-btn {
+  padding: 3px;
+  font-size: .5rem;
+  margin-left: 5px;
 }
 </style>
