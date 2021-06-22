@@ -26,6 +26,37 @@
         </div>
       </div>
     </main>
+    <!-- 导航目录 -->
+    <div class="menu-container">
+      <div class="white-container">
+        <!-- 每一个目录 -->
+        <div
+          class="flex"
+          v-for="(menuObj, index) in menus"
+          :key="index"
+        >
+          <div class="menu-condition">{{ menuObj.condition }}</div>
+          <div>
+            <div
+              class="menu-row"
+              v-for="(classification, index) in menuObj['classification']"
+              :key="index"
+            >
+              <div class="menu-name">【{{classification['periodName']}}】</div>
+              <div class="links-container">
+              <!-- 每一个可选项 -->
+                <div
+                  v-for="menu in classification['subject']"
+                  :key="menu['periodID']"
+                >
+                  <el-link class="link" :underline="false">{{menu['subjectName']}}</el-link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -33,8 +64,9 @@
 import Search from '@/components/Search'
 import NavMenu from '@/components/NavMenu'
 import ResourceList from '@/components/ResourceList'
-import {authentication} from '@/api/auth'
-import {hotResource, newResource, userRecommendResource} from '@/api/recommend'
+import { authentication } from '@/api/auth'
+import { menus } from '@/api/menu'
+import { hotResource, newResource, userRecommendResource } from '@/api/recommend'
 
 export default {
   name: 'HomePage',
@@ -45,7 +77,8 @@ export default {
       isLogin: false,
       hotResources: [],
       newResources: [],
-      recommendResources: []
+      recommendResources: [],
+      menus: []
     }
   },
   created () {
@@ -56,6 +89,9 @@ export default {
         }
         this.getRecommendResource()
       })
+  },
+  mounted () {
+    this.getMenus()
   },
   watch: {
   },
@@ -90,6 +126,15 @@ export default {
             this.recommendResources = response.data.data
           })
       }
+    },
+    getMenus () {
+      menus()
+        .then(response => {
+          const { data: { code, data } } = response
+          if (code === 200) {
+            this.menus = data
+          }
+        })
     }
   }
 }
@@ -97,17 +142,19 @@ export default {
 
 <style scoped>
 .main {
-  background-image: url('~@/assets/background.jpg');
-  background-size:cover;
-  height: 100vh;
-  background-repeat:no-repeat;
+  /*background-image: url('~@/assets/background.jpg');*/
+  background: linear-gradient(180deg, rgb(98, 207, 204) 30%, rgb(219, 229, 198) 70%);
+  /*background-size:cover;*/
+  min-height: 100vh;
+  padding-bottom: 5rem;
+  /*background-repeat:no-repeat;*/
 }
 
 main {
-  height: calc(100vh - 70px);
+  height: calc(100vh - 50px);
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-evenly;
   align-items: center;
 }
 
@@ -115,7 +162,7 @@ main {
   width: 50vw;
   height: 3rem;
   max-width: 580px;
-  transform: translateY(20%);
+  /*transform: translateY(20%);*/
 }
 
 .main-search >>> .el-input__prefix,
@@ -133,11 +180,11 @@ main {
   );
   border-radius: 1rem;
   backdrop-filter: blur(2rem);
-  transform: translateY(15%);
+  /*transform: translateY(15%);*/
 }
 
 .wide {
-  width: 1100px;
+  width: 1200px;
 }
 
 .thin {
@@ -170,5 +217,66 @@ main {
 
 .list-container >>> .resource-name {
   color: #606266;
+}
+
+/*导航栏*/
+.menu-container {
+  /*display: flex;*/
+  /*justify-content: center;*/
+  width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: linear-gradient(
+    to right bottom,
+    rgba(255, 255, 255, 0.7),
+    rgba(255, 255, 255, 0.3)
+  );
+  border-radius: 1rem;
+  backdrop-filter: blur(2rem);
+}
+
+.menu-condition {
+  font-size: 1.2rem;
+  width: 50px;
+}
+
+.menu-name {
+  color: #409EFF;
+  width: 70px;
+}
+
+.menu-condition,
+.menu-name {
+  margin-right: 1rem;
+}
+
+/*每一个可选项外面的壳*/
+.links-container {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.white-container {
+  padding: 1.5rem 1.2rem;
+  background: linear-gradient(
+    to left top,
+    rgba(255, 255, 255, 1),
+    rgba(255, 255, 255, 0.8)
+  );
+  border-radius: .6rem;
+  box-shadow: 6px 6px 20px rgba(122, 122, 122, 0.1);
+  overflow: hidden;
+}
+
+.menu-row {
+  display: flex;
+  margin-bottom: .5rem;
+}
+
+.link {
+  font-size: 1rem;
+  margin-right: .7rem;
+  margin-bottom: .5rem;
 }
 </style>

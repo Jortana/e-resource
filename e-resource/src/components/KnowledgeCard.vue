@@ -25,7 +25,7 @@
           v-for="(value, name, index) in info"
           v-if="index % 2 !== 0"
           :key="index">
-          <div class="properties flex">
+          <div class="properties flex" @mouseover="changeBtnShow(index, true)" @mouseleave="changeBtnShow(index, false)">
             <span class="bold">{{ name }}：</span>{{ value }}
             <!-- 添加到备课的按钮 -->
             <add-to-package-button class="x-mini-btn" :ref="'btn' + index" :default-visible="false"></add-to-package-button>
