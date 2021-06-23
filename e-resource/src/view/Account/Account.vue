@@ -1,8 +1,8 @@
 <template>
-<div>
-  <nav-menu></nav-menu>
-  <router-view></router-view>
-</div>
+  <div>
+    <nav-menu></nav-menu>
+    <router-view></router-view>
+  </div>
 </template>
 
 <script>
@@ -15,6 +15,4 @@ export default {
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

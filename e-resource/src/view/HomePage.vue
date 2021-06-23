@@ -3,25 +3,44 @@
     <nav-menu class="menu"></nav-menu>
     <main>
       <div @keyup.enter="search">
-        <search class="search" :searchContent.sync="searchContent" @search="search"></search>
+        <search
+          :searchContent.sync="searchContent"
+          class="search"
+          @search="search"
+        ></search>
       </div>
-      <div class="recommend-container flex" :class="isLogin === true ? 'wide' : 'thin'">
+      <div
+        :class="isLogin === true ? 'wide' : 'thin'"
+        class="recommend-container flex"
+      >
         <div class="card flex-1">
           <h2>热门资源</h2>
           <div class="list-container">
-            <resource-list :resourceList="hotResources" :browseTime="true" :isHidden="true"></resource-list>
+            <resource-list
+              :resourceList="hotResources"
+              :browseTime="true"
+              :isHidden="true"
+            ></resource-list>
           </div>
         </div>
         <div class="card flex-1">
           <h2>最新资源</h2>
           <div class="list-container">
-            <resource-list :resourceList="newResources" :browseTime="true" :isHidden="true"></resource-list>
+            <resource-list
+              :resourceList="newResources"
+              :browseTime="true"
+              :isHidden="true"
+            ></resource-list>
           </div>
         </div>
-        <div class="card flex-1" v-if="isLogin === true">
+        <div v-if="isLogin === true" class="card flex-1">
           <h2>推荐资源</h2>
           <div class="list-container">
-            <resource-list :resourceList="recommendResources" :browseTime="true" :isHidden="true"></resource-list>
+            <resource-list
+              :resourceList="recommendResources"
+              :browseTime="true"
+              :isHidden="true"
+            ></resource-list>
           </div>
         </div>
       </div>
@@ -30,26 +49,26 @@
     <div class="menu-container">
       <div class="white-container">
         <!-- 每一个目录 -->
-        <div
-          class="flex"
-          v-for="(menuObj, index) in menus"
-          :key="index"
-        >
+        <div v-for="(menuObj, index) in menus" :key="index" class="flex">
           <div class="menu-condition">{{ menuObj.condition }}</div>
           <div>
             <div
-              class="menu-row"
               v-for="(classification, index) in menuObj['classification']"
               :key="index"
+              class="menu-row"
             >
-              <div class="menu-name">【{{classification['periodName']}}】</div>
+              <div class="menu-name">
+                【{{ classification['periodName'] }}】
+              </div>
               <div class="links-container">
-              <!-- 每一个可选项 -->
+                <!-- 每一个可选项 -->
                 <div
                   v-for="menu in classification['subject']"
                   :key="menu['periodID']"
                 >
-                  <el-link class="link" :underline="false">{{menu['subjectName']}}</el-link>
+                  <el-link :underline="false" class="link">
+                    {{ menu['subjectName'] }}
+                  </el-link>
                 </div>
               </div>
             </div>
@@ -66,12 +85,16 @@ import NavMenu from '@/components/NavMenu'
 import ResourceList from '@/components/ResourceList'
 import { authentication } from '@/api/auth'
 import { menus } from '@/api/menu'
-import { hotResource, newResource, userRecommendResource } from '@/api/recommend'
+import {
+  hotResource,
+  newResource,
+  userRecommendResource
+} from '@/api/recommend'
 
 export default {
   name: 'HomePage',
   components: { NavMenu, Search, ResourceList },
-  data () {
+  data() {
     return {
       searchContent: '',
       isLogin: false,
@@ -81,23 +104,21 @@ export default {
       menus: []
     }
   },
-  created () {
-    authentication()
-      .then(response => {
-        if (response.data.code === 200) {
-          this.isLogin = true
-        }
-        this.getRecommendResource()
-      })
+  watch: {},
+  created() {
+    authentication().then((response) => {
+      if (response.data.code === 200) {
+        this.isLogin = true
+      }
+      this.getRecommendResource()
+    })
   },
-  mounted () {
+  mounted() {
     this.getMenus()
   },
-  watch: {
-  },
   methods: {
-    search () {
-      let content = this.searchContent
+    search() {
+      const content = this.searchContent
       if (content !== '') {
         this.$router.push({
           path: '/search',
@@ -107,34 +128,32 @@ export default {
         })
       }
     },
-    getRecommendResource () {
-      hotResource()
-        .then(response => {
-          if (response.data.code === 200) {
-            this.hotResources = response.data.data
-          }
-        })
-      newResource()
-        .then(response => {
-          if (response.data.code === 200) {
-            this.newResources = response.data.data
-          }
-        })
+    getRecommendResource() {
+      hotResource().then((response) => {
+        if (response.data.code === 200) {
+          this.hotResources = response.data.data
+        }
+      })
+      newResource().then((response) => {
+        if (response.data.code === 200) {
+          this.newResources = response.data.data
+        }
+      })
       if (this.isLogin === true) {
-        userRecommendResource()
-          .then(response => {
-            this.recommendResources = response.data.data
-          })
+        userRecommendResource().then((response) => {
+          this.recommendResources = response.data.data
+        })
       }
     },
-    getMenus () {
-      menus()
-        .then(response => {
-          const { data: { code, data } } = response
-          if (code === 200) {
-            this.menus = data
-          }
-        })
+    getMenus() {
+      menus().then((response) => {
+        const {
+          data: { code, data }
+        } = response
+        if (code === 200) {
+          this.menus = data
+        }
+      })
     }
   }
 }
@@ -143,7 +162,11 @@ export default {
 <style scoped>
 .main {
   /*background-image: url('~@/assets/background.jpg');*/
-  background: linear-gradient(180deg, rgb(98, 207, 204) 30%, rgb(219, 229, 198) 70%);
+  background: linear-gradient(
+    180deg,
+    rgb(98, 207, 204) 30%,
+    rgb(219, 229, 198) 70%
+  );
   /*background-size:cover;*/
   min-height: 100vh;
   padding-bottom: 5rem;
@@ -199,7 +222,7 @@ main {
     rgba(255, 255, 255, 1),
     rgba(255, 255, 255, 0.8)
   );
-  border-radius: .6rem;
+  border-radius: 0.6rem;
   box-shadow: 6px 6px 20px rgba(122, 122, 122, 0.1);
   overflow: hidden;
   /*text-overflow: ellipsis;*/
@@ -241,7 +264,7 @@ main {
 }
 
 .menu-name {
-  color: #409EFF;
+  color: #409eff;
   width: 70px;
 }
 
@@ -264,19 +287,19 @@ main {
     rgba(255, 255, 255, 1),
     rgba(255, 255, 255, 0.8)
   );
-  border-radius: .6rem;
+  border-radius: 0.6rem;
   box-shadow: 6px 6px 20px rgba(122, 122, 122, 0.1);
   overflow: hidden;
 }
 
 .menu-row {
   display: flex;
-  margin-bottom: .5rem;
+  margin-bottom: 0.5rem;
 }
 
 .link {
   font-size: 1rem;
-  margin-right: .7rem;
-  margin-bottom: .5rem;
+  margin-right: 0.7rem;
+  margin-bottom: 0.5rem;
 }
 </style>

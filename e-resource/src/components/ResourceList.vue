@@ -1,9 +1,9 @@
 <template>
   <div class="resource-container">
     <div
-      class="flex"
       v-for="resource in resourceList"
-      :key="resource.id">
+      :key="resource.id"
+      class="flex">
       <svg class="type-icon" aria-hidden="true">
         <use v-if="resource['fileType'] === 'doc' || resource['fileType'] === 'docx'" xlink:href="#e-resource-icon-word"></use>
         <use v-else-if="resource['fileType'] === 'ppt' || resource['fileType'] === 'pptx'" xlink:href="#e-resource-icon-ppt"></use>
@@ -11,7 +11,7 @@
         <use v-else-if="resource['fileType'] === 'video'" xlink:href="#e-resource-icon-video"></use>
         <use v-else xlink:href="#e-resource-icon-unknown"></use>
       </svg>
-      <resource-link class="resource-name" :resource="resource" :browseTime="browseTime" :isHidden="isHidden"></resource-link>
+      <resource-link :resource="resource" :browseTime="browseTime" :isHidden="isHidden" class="resource-name"></resource-link>
       <span v-if="browseTime === true" class="flex browse-time">{{ resource['browse'] }}</span>
     </div>
   </div>

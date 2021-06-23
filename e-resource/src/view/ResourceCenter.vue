@@ -5,7 +5,11 @@
       <div class="resources">
         <div class="flex-1">
           <!-- 知识卡片 -->
-          <knowledge-card class="knowledge-card" :entityInfo="cardInfo" v-if="JSON.stringify(cardInfo) !== '{}'"></knowledge-card>
+          <knowledge-card
+            v-if="JSON.stringify(cardInfo) !== '{}'"
+            :entityInfo="cardInfo"
+            class="knowledge-card"
+          ></knowledge-card>
           <!-- 找到的实体和资源信息 -->
           <div class="resource">
             <div>
@@ -14,16 +18,16 @@
                 <!-- 教学目标和教学重难点 -->
                 <div class="flex goal-and-key-container">
                   <goal-and-key-card
-                    class="goal-and-key-card"
                     v-if="goal.length > 0"
                     :list="goal"
                     :title="'学习目标'"
+                    class="goal-and-key-card"
                   />
                   <goal-and-key-card
-                    class="goal-and-key-card"
                     v-if="key.length > 0"
                     :list="key"
                     :title="'学习重难点'"
+                    class="goal-and-key-card"
                   />
                 </div>
                 <!-- ----------------- -->
@@ -33,39 +37,58 @@
                     v-for="type in resourceTypes"
                     :key="type.code"
                     :label="type.label"
-                    :name="String(type.code)">
-                  </el-tab-pane>
+                    :name="String(type.code)"
+                  ></el-tab-pane>
                 </el-tabs>
                 <div class="sort">
-                  <el-radio-group v-model="searchInfo.sort" size="mini" @change="changeSort">
+                  <el-radio-group
+                    v-model="searchInfo.sort"
+                    size="mini"
+                    @change="changeSort"
+                  >
                     <el-radio-button label="0">综合</el-radio-button>
                     <el-radio-button label="1">最热</el-radio-button>
                     <el-radio-button label="2">最新</el-radio-button>
                   </el-radio-group>
                 </div>
                 <!-- -------------------------------------------------------------------------------- -->
-                <resource-list-with-info v-if="resources.resources.length > 0" :resources="resources.resources"></resource-list-with-info>
+                <resource-list-with-info
+                  v-if="resources.resources.length > 0"
+                  :resources="resources.resources"
+                ></resource-list-with-info>
                 <div v-else>{{ noResourceHint }}</div>
               </div>
             </div>
             <!-- 隐藏的a元素，用来在新窗口打开资源页面 -->
             <!-- 这个本来应该和资源名称一起封装在ResourceLink里了，但是教学重难点还需要使用，懒得封装了，也包括下面的ViewResource method -->
-            <a class="resource-target" ref="resourceTarget" href="" target="_blank" v-show="false"></a>
+            <a
+              v-show="false"
+              ref="resourceTarget"
+              class="resource-target"
+              href=""
+              target="_blank"
+            ></a>
             <!-- 触发下载测试 -->
-            <a ref="download" href="" target="_blank" download v-show="false"></a>
+            <a
+              v-show="false"
+              ref="download"
+              href=""
+              target="_blank"
+              download
+            ></a>
           </div>
-          <div class="pages" v-if="resources.total > 10">
+          <div v-if="resources.total > 10" class="pages">
             <el-pagination
-              layout="prev, pager, next"
               :total="resources.total"
               :current-page="Number(query.page)"
-              @current-change="changePage">
-            </el-pagination>
+              layout="prev, pager, next"
+              @current-change="changePage"
+            ></el-pagination>
           </div>
         </div>
         <!-- 知识图谱 -->
         <div class="graph">
-          <k-g-chart :entities="entities.entities" ref="chart"></k-g-chart>
+          <k-g-chart ref="chart" :entities="entities.entities"></k-g-chart>
         </div>
       </div>
     </div>
@@ -96,20 +119,73 @@ export default {
     ResourceListWithInfo,
     GoalAndKeyCard
   },
-  mounted () {
-    this.goSearch()
+  data() {
+    return {
+      searchInfo: {
+        type: this.$route.query.type === undefined ? 0 : this.$route.query.type,
+        content: this.$route.query.q,
+        sort: this.$route.query.sort === undefined ? 0 : this.$route.query.sort
+      },
+      pageInfo: {
+        page: this.$route.query.page === undefined ? 1 : this.$route.query.page,
+        perPage: 10
+      },
+      resourceTypes: [
+        {
+          label: '全部',
+          code: 0
+        },
+        {
+          label: '视频',
+          code: 1
+        },
+        {
+          label: '试题',
+          code: 2
+        },
+        {
+          label: '试卷',
+          code: 3
+        },
+        {
+          label: '课件',
+          code: 4
+        },
+        {
+          label: '文献资料',
+          code: 5
+        },
+        {
+          label: '教学案例',
+          code: 6
+        }
+      ],
+      resources: {
+        resources: {},
+        total: 0,
+        pages: 0
+      },
+      noResourceHint: '',
+      entities: {
+        entities: []
+      },
+      cardInfo: {},
+      goal: [],
+      key: [],
+      activeEntity: ''
+    }
   },
   computed: {
-    query () {
+    query() {
       return this.$route.query
     },
-    graphEntity () {
+    graphEntity() {
       return this.entities.entities
     }
   },
   watch: {
     query: {
-      handler (newQuery, oldQuery) {
+      handler(newQuery, oldQuery) {
         this.resetResource()
         this.searchInfo.type = newQuery.type === undefined ? 0 : newQuery.type
         this.searchInfo.sort = newQuery.sort === undefined ? 0 : newQuery.sort
@@ -126,71 +202,26 @@ export default {
       immediate: true
     },
     graphEntity: {
-      handler () {
+      handler() {
         // this.$refs.chart.initCharts()
       }
     }
   },
-  data () {
-    return {
-      searchInfo: {
-        type: this.$route.query.type === undefined ? 0 : this.$route.query.type,
-        content: this.$route.query.q,
-        sort: this.$route.query.sort === undefined ? 0 : this.$route.query.sort
-      },
-      pageInfo: {
-        page: this.$route.query.page === undefined ? 1 : this.$route.query.page,
-        perPage: 10
-      },
-      resourceTypes: [{
-        label: '全部',
-        code: 0
-      }, {
-        label: '视频',
-        code: 1
-      }, {
-        label: '试题',
-        code: 2
-      }, {
-        label: '试卷',
-        code: 3
-      }, {
-        label: '课件',
-        code: 4
-      }, {
-        label: '文献资料',
-        code: 5
-      }, {
-        label: '教学案例',
-        code: 6
-      }],
-      resources: {
-        resources: {},
-        total: 0,
-        pages: 0
-      },
-      noResourceHint: '',
-      entities: {
-        entities: []
-      },
-      cardInfo: {},
-      goal: [],
-      key: [],
-      activeEntity: ''
-    }
+  mounted() {
+    this.goSearch()
   },
   methods: {
-    changeType (tab) {
+    changeType(tab) {
       this.searchInfo.type = tab.name
       this.$router.push({
         query: merge(this.$route.query, {
-          'type': this.searchInfo.type,
-          'sort': 0,
-          'page': 1
+          type: this.searchInfo.type,
+          sort: 0,
+          page: 1
         })
       })
     },
-    goSearch () {
+    goSearch() {
       this.noResourceHint = ''
       searchEntity({
         keyword: this.searchInfo.content,
@@ -198,16 +229,16 @@ export default {
         sort: this.searchInfo.sort,
         page: this.pageInfo.page,
         perPage: this.pageInfo.perPage
-      }).then(response => {
+      }).then((response) => {
         this.resetResource()
         if (response.data.code === 200) {
-          let resource = response.data.data.resources[0]
+          const resource = response.data.data.resources[0]
           this.resources.total = response.data.data.total
           this.resources.pages = response.data.data.pages
           // 提取出教学目标和重难点以数组的形式存储
-          let goal = []
-          let key = []
-          resource['goalAndKey'].forEach(goalAndKey => {
+          const goal = []
+          const key = []
+          resource['goalAndKey'].forEach((goalAndKey) => {
             if (goalAndKey['objectives'] !== null) {
               goal.push({
                 content: goalAndKey['objectives'],
@@ -234,52 +265,54 @@ export default {
         }
       })
     },
-    changeSort (sort) {
+    changeSort(sort) {
       this.$router.push({
         query: merge(this.$route.query, {
-          'type': this.searchInfo.type,
-          'page': 1,
-          'sort': sort
+          type: this.searchInfo.type,
+          page: 1,
+          sort: sort
         })
       })
     },
-    resetResource () {
+    resetResource() {
       this.resources.resources = []
       this.resources.total = 0
       this.resources.pages = 0
     },
-    resetGoalAndKey () {
+    resetGoalAndKey() {
       this.goal = []
       this.key = []
     },
-    resetCardInfo () {
+    resetCardInfo() {
       this.cardInfo = {}
     },
-    resetEntity () {
+    resetEntity() {
       this.entities.entities = []
     },
-    getRelatedEntity (keyword) {
+    getRelatedEntity(keyword) {
       this.resetEntity()
-      relatedEntity(keyword)
-        .then(response => {
-          if (response.data.code === 200) {
-            this.entities.entities = response.data.data
-          }
-        })
+      relatedEntity(keyword).then((response) => {
+        if (response.data.code === 200) {
+          this.entities.entities = response.data.data
+        }
+      })
     },
-    changePage (curPage) {
+    changePage(curPage) {
       this.$router.push({
         query: merge(this.$route.query, {
-          'page': curPage
+          page: curPage
         })
       })
     },
-    viewResource (resourceID) {
-      let target = this.$refs.resourceTarget
+    viewResource(resourceID) {
+      const target = this.$refs.resourceTarget
       record({
         resourceID: resourceID
       })
-      target.setAttribute('href', `${window.location.origin}/resource/${resourceID}`)
+      target.setAttribute(
+        'href',
+        `${window.location.origin}/resource/${resourceID}`
+      )
       target.click()
     }
   }
@@ -288,8 +321,8 @@ export default {
 
 <style scoped>
 .sort {
-  margin-top: -.5rem;
-  margin-bottom: .5rem;
+  margin-top: -0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .resources {
@@ -309,7 +342,7 @@ export default {
 
 .resource .subtitle {
   color: #606266;
-  margin-top: .5rem;
+  margin-top: 0.5rem;
 }
 
 .content-link {
@@ -318,7 +351,7 @@ export default {
   cursor: pointer;
   text-align: justify;
   width: 100%;
-  font-size: .8rem;
+  font-size: 0.8rem;
   line-height: 1.2rem;
   height: 1.2rem;
   color: #909399;
@@ -327,12 +360,12 @@ export default {
 .content-link:hover {
   color: #53a8ff;
   text-decoration: underline;
-  text-underline-offset: .2rem;
+  text-underline-offset: 0.2rem;
 }
 
 /*省略号*/
 .overflow-content::after {
-  content: "...";
+  content: '...';
   position: absolute;
   bottom: 0;
   right: 0;
@@ -366,7 +399,7 @@ export default {
   padding-right: 1rem;
   margin-top: 1rem;
   margin-left: 1rem;
-  border: 1px solid #EBEEF5;
+  border: 1px solid #ebeef5;
   border-radius: 4px;
   width: 400px;
   height: 420px;
@@ -385,6 +418,6 @@ export default {
 
 .goal-and-key-card {
   width: calc(50% - 10px);
-  height: 180px
+  height: 180px;
 }
 </style>

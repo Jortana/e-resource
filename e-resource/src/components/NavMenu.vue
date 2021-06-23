@@ -1,24 +1,24 @@
 <template>
-<div class="menu">
-  <div class="left">
-    <logo></logo>
-    <div class="search-container" v-if="$route.fullPath !== '/'" @keyup.enter="search">
-      <search class="search" :searchContent.sync="searchInfo.content" @search="search"></search>
+  <div class="menu">
+    <div class="left">
+      <logo></logo>
+      <div v-if="$route.fullPath !== '/'" class="search-container" @keyup.enter="search">
+        <search :searchContent.sync="searchInfo.content" class="search" @search="search"></search>
+      </div>
     </div>
-  </div>
-  <div class="user-info" v-if="this.$store.state.user">
-    <div class="resource-package">
-      <el-popover
-        placement="bottom"
-        trigger="click">
-        <div>资源包是空的</div>
-        <el-button slot="reference">我的资源包</el-button>
-      </el-popover>
+    <div v-if="this.$store.state.user" class="user-info">
+      <div class="resource-package">
+        <el-popover
+          placement="bottom"
+          trigger="click">
+          <div>资源包是空的</div>
+          <el-button slot="reference">我的资源包</el-button>
+        </el-popover>
+      </div>
+      <avatar class="avatar"></avatar>
     </div>
-    <avatar class="avatar"></avatar>
+    <el-button v-else class="avatar login-btn" @click="gotoLogin">登 录</el-button>
   </div>
-  <el-button v-else class="avatar login-btn" @click="gotoLogin">登 录</el-button>
-</div>
 </template>
 
 <script>
@@ -27,38 +27,38 @@ import Logo from '@/components/NavMenu/Logo'
 import Avatar from '@/components/NavMenu/Avatar'
 export default {
   name: 'NavMenu',
+  components: {
+    Search,
+    Logo,
+    Avatar
+  },
   props: {
     searchInfo: {
       type: Object,
-      default () {
+      default() {
         return {
           content: ''
         }
       }
     }
   },
-  components: {
-    Search,
-    Logo,
-    Avatar
-  },
-  computed: {
-    searchContent () {
-      return this.searchInfo.content
-    }
-  },
-  data () {
+  data() {
     return {
     }
   },
+  computed: {
+    searchContent() {
+      return this.searchInfo.content
+    }
+  },
   methods: {
-    gotoLogin () {
+    gotoLogin() {
       this.$router.push({
         path: '/login',
         query: { redirect: this.$route.fullPath }
       })
     },
-    search () {
+    search() {
       if (this.searchInfo.content === '') {
         return
       }

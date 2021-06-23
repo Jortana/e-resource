@@ -1,5 +1,5 @@
 <template>
-  <div class="resource-list" v-if="resources.length > 0">
+  <div v-if="resources.length > 0" class="resource-list">
     <div
       v-for="resource in resources"
       :key="resource.id"
@@ -16,10 +16,10 @@
               <span v-if="resource['url'] == null"></span>
               <span v-else>{{ `${resource['resourceName']}.${resource['url'].split('.').slice(-1)}` }}</span>
             </div>
-            <div class="entity-list" v-if="resource['entityList'] !== null">
+            <div v-if="resource['entityList'] !== null" class="entity-list">
               <div
                 v-for="entity in resource['entityList']"
-                :key = entity
+                :key = "entity"
               >
                 <el-button size="mini" @click="searchEntity(entity)">
                   {{ entity }}
@@ -58,7 +58,7 @@ export default {
     resources: Array
   },
   methods: {
-    searchEntity (entity) {
+    searchEntity(entity) {
       this.$router.push({
         query: merge(this.$route.query, {
           'q': entity,

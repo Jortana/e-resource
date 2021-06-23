@@ -1,5 +1,11 @@
 <template>
-  <el-button type="primary" :size="size" icon="el-icon-download" circle @click="download()"></el-button>
+  <el-button
+    :size="size"
+    type="primary"
+    icon="el-icon-download"
+    circle
+    @click="download()"
+  ></el-button>
 </template>
 
 <script>
@@ -12,13 +18,11 @@ export default {
     size: String
   },
   methods: {
-    download () {
+    download() {
       download(this.resourceID)
     }
   }
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

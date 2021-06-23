@@ -3,45 +3,59 @@
   <div class="comment-container">
     <h2>评论</h2>
     <div class="edit-comment-container comments flex">
-      <el-avatar class="avatar" :size="50" icon="el-icon-user-solid" :src="$store.state.user.avatar"></el-avatar>
+      <el-avatar
+        :size="50"
+        :src="$store.state.user.avatar"
+        class="avatar"
+        icon="el-icon-user-solid"
+      ></el-avatar>
       <div class="edit-comment-info-container flex-1">
         <el-rate
-          class="rate info"
           v-model="editComment['rate']"
-          show-score
           :colors="colors"
-          score-template="{value}">
-        </el-rate>
+          class="rate info"
+          show-score
+          score-template="{value}"
+        ></el-rate>
         <div class="flex">
           <el-input
-            class="textarea"
-            type="textarea"
             :disabled="!isLogin"
             :rows="3"
             :placeholder="isLogin ? '请输入内容' : '请登录后发表评论'"
-            v-model="editComment.content">
-          </el-input>
-          <el-button class="commit-btn" type="primary"><div>发表</div><div>评论</div></el-button>
+            v-model="editComment.content"
+            class="textarea"
+            type="textarea"
+          ></el-input>
+          <el-button class="commit-btn" type="primary">
+            <div>发表</div>
+            <div>评论</div>
+          </el-button>
         </div>
       </div>
     </div>
     <div class="comments">
       <div
-        class="comment flex"
         v-for="(comment, index) in comments"
-        :key="index">
-        <el-avatar class="avatar" :size="50" icon="el-icon-user-solid" :src="comment.avatar"></el-avatar>
+        :key="index"
+        class="comment flex"
+      >
+        <el-avatar
+          :size="50"
+          :src="comment.avatar"
+          class="avatar"
+          icon="el-icon-user-solid"
+        ></el-avatar>
         <div class="comment-info-container flex-1">
           <div class="username">{{ comment['username'] }}</div>
-<!--          <div class="username">NOBUG</div>-->
+          <!--          <div class="username">NOBUG</div>-->
           <el-rate
-            class="rate info"
             v-model="comment['rate']"
+            :colors="colors"
+            class="rate info"
             disabled
             show-score
-            :colors="colors"
-            score-template="{value}">
-          </el-rate>
+            score-template="{value}"
+          ></el-rate>
           <div class="content info">{{ comment['content'] }}</div>
           <div class="date info">{{ comment['date'] }}</div>
         </div>
@@ -61,15 +75,7 @@ export default {
   props: {
     id: Number
   },
-  watch: {
-    id: {
-      handler () {
-        this.authentication()
-        this.getComment()
-      }
-    }
-  },
-  data () {
+  data() {
     return {
       comments: [],
       colors: ['#99A9BF', '#F7BA2A', '#FF9900'],
@@ -80,26 +86,32 @@ export default {
       isLogin: false
     }
   },
+  watch: {
+    id: {
+      handler() {
+        this.authentication()
+        this.getComment()
+      }
+    }
+  },
   methods: {
-    authentication () {
-      authentication()
-        .then(response => {
-          if (response.data.code === 200) {
-            this.isLogin = true
-          }
-        })
+    authentication() {
+      authentication().then((response) => {
+        if (response.data.code === 200) {
+          this.isLogin = true
+        }
+      })
     },
-    getComment () {
-      getComment(this.id)
-        .then(response => {
-          if (response.data.code === 200) {
-            console.log(response.data.data)
-            response.data.data.forEach(comment => {
-              comment['avatar'] = fileBaseURL + comment['avatar']
-            })
-            this.comments = response.data.data
-          }
-        })
+    getComment() {
+      getComment(this.id).then((response) => {
+        if (response.data.code === 200) {
+          console.log(response.data.data)
+          response.data.data.forEach((comment) => {
+            comment['avatar'] = fileBaseURL + comment['avatar']
+          })
+          this.comments = response.data.data
+        }
+      })
     }
   }
 }
@@ -115,19 +127,19 @@ export default {
 }
 
 .edit-comment-info-container .rate {
-  margin-bottom: .5rem;
+  margin-bottom: 0.5rem;
 }
 
 .commit-btn {
-  margin-left: .8rem;
+  margin-left: 0.8rem;
 }
 
 .commit-btn div {
-  letter-spacing: .1rem;
+  letter-spacing: 0.1rem;
 }
 
 .commit-btn div:first-child {
-  margin-bottom: .3rem;
+  margin-bottom: 0.3rem;
 }
 
 .comments {
@@ -137,7 +149,7 @@ export default {
 .comment {
   padding-top: 1.5rem;
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid #EBEEF5;
+  border-bottom: 1px solid #ebeef5;
 }
 
 .comment-info-container .info {
@@ -158,11 +170,12 @@ export default {
 
 .comment-info-container .date {
   margin-top: 1rem;
-  font-size: .8rem;
+  font-size: 0.8rem;
   color: #909399;
 }
 
 .textarea >>> textarea {
-  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif !important;
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', '微软雅黑', Arial, sans-serif !important;
 }
 </style>

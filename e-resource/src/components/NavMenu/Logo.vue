@@ -9,7 +9,7 @@
 export default {
   name: 'Logo',
   methods: {
-    goHome () {
+    goHome() {
       this.$router.push({
         path: '/'
       })

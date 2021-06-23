@@ -1,82 +1,112 @@
 <template>
-<div class="main-container">
-  <h2>个人中心</h2>
-  <div class="user-info">
-    <div class="show-basic-infos">
-      <div class="avatar"><el-avatar :size="100" :src="userinfo.avatar"></el-avatar></div>
-      <div class="basic-info">
-        <h2>
-          {{ userinfo.username }}
-        </h2>
-        <div class="email">
-          {{ userinfo.user_email }}
+  <div class="main-container">
+    <h2>个人中心</h2>
+    <div class="user-info">
+      <div class="show-basic-infos">
+        <div class="avatar">
+          <el-avatar :size="100" :src="userinfo.avatar"></el-avatar>
+        </div>
+        <div class="basic-info">
+          <h2>
+            {{ userinfo.username }}
+          </h2>
+          <div class="email">
+            {{ userinfo.user_email }}
+          </div>
         </div>
       </div>
-    </div>
-    <div class="infos-container">
-      <h2>账户</h2>
-      <div class="infos flex-1">
-        <div class="info">
-          <h3>用户名</h3>
-          <div class="info-content" v-if="isEdit.basic === false">{{ userinfo.username }}</div>
-          <el-input class="info-content" v-else v-model="editInfo.username"></el-input>
+      <div class="infos-container">
+        <h2>账户</h2>
+        <div class="infos flex-1">
+          <div class="info">
+            <h3>用户名</h3>
+            <div v-if="isEdit.basic === false" class="info-content">
+              {{ userinfo.username }}
+            </div>
+            <el-input
+              v-else
+              v-model="editInfo.username"
+              class="info-content"
+            ></el-input>
+          </div>
+        </div>
+        <div class="infos flex-1">
+          <div class="info">
+            <h3>密码</h3>
+            <el-button class="change-password-btn" type="text">
+              更改密码
+            </el-button>
+          </div>
+        </div>
+        <div class="edit">
+          <el-button
+            v-if="isEdit.basic === false"
+            type="primary"
+            size="medium"
+            plain
+          >
+            编辑
+          </el-button>
+          <el-button v-else type="primary" size="medium">完成</el-button>
         </div>
       </div>
-      <div class="infos flex-1">
-        <div class="info">
-          <h3>密码</h3>
-          <el-button class="change-password-btn" type="text">更改密码</el-button>
+      <div class="infos-container">
+        <h2>学籍</h2>
+        <div class="infos flex-1">
+          <div class="info">
+            <h3>省</h3>
+            <div class="info-content">江苏省</div>
+          </div>
+          <div class="info">
+            <h3>市</h3>
+            <div class="info-content">南京市</div>
+          </div>
+          <div class="info">
+            <h3>区</h3>
+            <div class="info-content">鼓楼区</div>
+          </div>
         </div>
-      </div>
-      <div class="edit">
-        <el-button type="primary" size="medium" plain v-if="isEdit.basic === false">编辑</el-button>
-        <el-button type="primary" size="medium" v-else>完成</el-button>
-      </div>
-    </div>
-    <div class="infos-container">
-      <h2>学籍</h2>
-      <div class="infos flex-1">
-        <div class="info">
-          <h3>省</h3>
-          <div class="info-content">江苏省</div>
+        <div class="infos flex-1">
+          <div class="info">
+            <h3>学校</h3>
+            <div v-if="isEdit.region === false" class="info-content">
+              {{ userinfo.school }}
+            </div>
+            <el-input
+              v-else
+              v-model="editInfo.username"
+              class="info-content"
+            ></el-input>
+          </div>
+          <div class="info">
+            <h3>学段</h3>
+            <div class="info-content">{{ userinfo.period }}</div>
+          </div>
+          <div class="info">
+            <h3>年级</h3>
+            <div class="info-content">{{ userinfo.grade }}</div>
+          </div>
         </div>
-        <div class="info">
-          <h3>市</h3>
-          <div class="info-content">南京市</div>
+        <div class="edit">
+          <el-button
+            v-if="isEdit.region === false"
+            type="primary"
+            size="medium"
+            plain
+          >
+            编辑
+          </el-button>
+          <el-button v-else type="primary" size="medium">完成</el-button>
         </div>
-        <div class="info">
-          <h3>区</h3>
-          <div class="info-content">鼓楼区</div>
-        </div>
-      </div>
-      <div class="infos flex-1">
-        <div class="info">
-          <h3>学校</h3>
-          <div class="info-content" v-if="isEdit.region === false">{{ userinfo.school }}</div>
-          <el-input class="info-content" v-else v-model="editInfo.username"></el-input>
-        </div>
-        <div class="info">
-          <h3>学段</h3>
-          <div class="info-content">{{ userinfo.period }}</div>
-        </div>
-        <div class="info">
-          <h3>年级</h3>
-          <div class="info-content">{{ userinfo.grade }}</div>
-        </div>
-      </div>
-      <div class="edit">
-        <el-button type="primary" size="medium" plain v-if="isEdit.region === false">编辑</el-button>
-        <el-button type="primary" size="medium" v-else>完成</el-button>
       </div>
     </div>
   </div>
-</div>
 </template>
 
 <script>
 export default {
   name: 'User',
-  data () {
+  data() {
     return {
       isEdit: {
         basic: false,
@@ -95,8 +125,7 @@ export default {
     }
   },
   methods: {
-    getUserInfo () {
-    }
+    getUserInfo() {}
   }
 }
 </script>
@@ -158,7 +187,7 @@ export default {
 }
 
 .infos-container .infos .info .info-content {
-  margin-top: .5rem;
+  margin-top: 0.5rem;
   font-size: 1.2rem;
 }
 

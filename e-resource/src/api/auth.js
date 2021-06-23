@@ -1,6 +1,6 @@
 import http from '@/utils/http'
 
-let baseURL = '/v1.0'
+const baseURL = '/v1.0'
 
 /**
  * 注册

@@ -1,6 +1,6 @@
 import http from '@/utils/http'
 
-let baseURL = '/v1.0'
+const baseURL = '/v1.0'
 
 /**
  * 根据关键词查找对应的知识点
@@ -19,7 +19,7 @@ let baseURL = '/v1.0'
  */
 export const searchEntity = (params) => {
   let data = ''
-  for (let info in params) {
+  for (const info in params) {
     data += info + '=' + params[info] + '&'
   }
   return http.get(`${baseURL}/public/queryEntity?${data}`)

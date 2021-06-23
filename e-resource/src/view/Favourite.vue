@@ -14,8 +14,7 @@
             :key="favFolder.id"
             :curID="curID"
             :favFolder="favFolder"
-          >
-          </fav-folder>
+          ></fav-folder>
         </div>
         <div class="fav-list"></div>
       </div>
@@ -30,7 +29,7 @@ import FavFolder from '@/components/Favourite/FavFolder'
 export default {
   name: 'Favourite',
   components: { NavMenu, FavFolder },
-  data () {
+  data() {
     return {
       favFolders: [],
       resource: [],
@@ -38,27 +37,27 @@ export default {
     }
   },
   computed: {
-    query () {
+    query() {
       return this.$route.query
     }
   },
-  mounted () {
-    this.getFavFolders()
-  },
   watch: {
     query: {
-      handler (newQuery, oldQuery) {
+      handler(newQuery) {
         this.getResources(newQuery.id)
         this.curID = newQuery.id
       },
       immediate: true
     }
   },
+  mounted() {
+    this.getFavFolders()
+  },
   methods: {
-    getResources (favID) {
+    getResources() {
       this.resource = [1, 20, 30]
     },
-    getFavFolders () {
+    getFavFolders() {
       this.favFolders = [
         {
           id: 1,
@@ -79,7 +78,7 @@ export default {
 
 <style scoped>
 .container {
-  background-color: #F4F5F7;
+  background-color: #f4f5f7;
   margin-top: 1rem;
   /*空出nav-menu的位置*/
   height: calc(100vh - 70px);
@@ -88,9 +87,9 @@ export default {
 
 .fav-container {
   margin: 0 auto;
-  border-top-left-radius: .5rem;
-  border-top-right-radius: .5rem;
-  border: 1px solid #DCDFE6;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+  border: 1px solid #dcdfe6;
   width: 60%;
   min-width: 1000px;
   height: 100%;
@@ -100,7 +99,7 @@ export default {
 .folder-list {
   width: 200px;
   /*background-color: #53a8ff;*/
-  border-right: 1px solid #E4E7ED;
+  border-right: 1px solid #e4e7ed;
   /*padding: 1.5rem;*/
 }
 
@@ -120,12 +119,8 @@ export default {
 }
 
 .fav-icon {
-  color: #CCD0D8;
+  color: #ccd0d8;
   font-size: 1.5rem;
-  margin-right: .5rem;
+  margin-right: 0.5rem;
 }
-
-.fav-list {
-}
-
 </style>

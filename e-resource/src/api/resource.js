@@ -1,6 +1,6 @@
 import http from '@/utils/http'
 
-let baseURL = '/v1.0'
+const baseURL = '/v1.0'
 
 /**
  * 根据条件查找资源
@@ -17,7 +17,7 @@ let baseURL = '/v1.0'
  */
 export const resource = (params) => {
   let data = ''
-  for (let info in params) {
+  for (const info in params) {
     data += info + '=' + params[info] + '&'
   }
   // console.log(data)

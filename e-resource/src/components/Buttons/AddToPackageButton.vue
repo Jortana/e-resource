@@ -1,5 +1,11 @@
 <template>
-  <el-button :class="visible ? '' : 'none'" :type="type" :size="size" icon="el-icon-document-add" circle></el-button>
+  <el-button
+    :class="visible ? '' : 'none'"
+    :type="type"
+    :size="size"
+    icon="el-icon-document-add"
+    circle
+  ></el-button>
 </template>
 
 <script>
@@ -14,19 +20,17 @@ export default {
       default: true
     }
   },
-  data () {
+  data() {
     return {
       visible: this.defaultVisible
     }
   },
   methods: {
-    changeVisible (visible) {
+    changeVisible(visible) {
       this.visible = visible
     }
   }
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

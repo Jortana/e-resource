@@ -1,50 +1,52 @@
 <template>
-<div>
-  <nav-menu></nav-menu>
-  <div class="main-container flex">
-    <div class="entity-info flex-1">
-      <h2>{{ entityInfo['entityName'] }}</h2>
-      <div class="flex">
-        <div class="properties flex-1">
-          <div
-            class="flex prop-row"
-            v-for="(value, name, index) in entityInfo.properties"
-            :key="index"
-            v-if="index < Object.keys(entityInfo.properties).length / 2">
-            <div class="flex-1 prop-name">
-              {{ name }}
-            </div>
-            <div class="flex-1">
-              {{ value }}
-            </div>
-<!--            <dl class="inline-flex">-->
-<!--              <dt>{{ name }}</dt>-->
-<!--              <dd>{{ value }}</dd>-->
-<!--            </dl>-->
-          </div>
-        </div>
-        <div class="properties flex-1">
-          <div
-            class="flex prop-row"
-            v-for="(value, name, index) in entityInfo.properties"
-            :key="index"
-            v-if="index >= Object.keys(entityInfo.properties).length / 2">
-            <div class="flex-1 prop-name">
-              {{ name }}
-            </div>
-            <div class="flex-1">
-              {{ value }}
+  <div>
+    <nav-menu></nav-menu>
+    <div class="main-container flex">
+      <div class="entity-info flex-1">
+        <h2>{{ entityInfo['entityName'] }}</h2>
+        <div class="flex">
+          <div class="properties flex-1">
+            <div
+              v-for="(value, name, index) in entityInfo.properties"
+              v-if="index < Object.keys(entityInfo.properties).length / 2"
+              :key="index"
+              class="flex prop-row"
+            >
+              <div class="flex-1 prop-name">
+                {{ name }}
+              </div>
+              <div class="flex-1">
+                {{ value }}
+              </div>
+              <!--            <dl class="inline-flex">-->
+              <!--              <dt>{{ name }}</dt>-->
+              <!--              <dd>{{ value }}</dd>-->
+              <!--            </dl>-->
             </div>
           </div>
+          <div class="properties flex-1">
+            <div
+              v-for="(value, name, index) in entityInfo.properties"
+              v-if="index >= Object.keys(entityInfo.properties).length / 2"
+              :key="index"
+              class="flex prop-row"
+            >
+              <div class="flex-1 prop-name">
+                {{ name }}
+              </div>
+              <div class="flex-1">
+                {{ value }}
+              </div>
+            </div>
+          </div>
         </div>
+        <!--      <h3>相关资源</h3>-->
       </div>
-<!--      <h3>相关资源</h3>-->
-    </div>
-    <div class="graph flex-1">
-      <k-g-chart :entities="relatedEntities" ref="chart"></k-g-chart>
+      <div class="graph flex-1">
+        <k-g-chart ref="chart" :entities="relatedEntities"></k-g-chart>
+      </div>
     </div>
   </div>
-</div>
 </template>
 
 <script>
@@ -59,48 +61,46 @@ export default {
     NavMenu,
     KGChart
   },
+  data() {
+    return {
+      entityInfo: {},
+      relatedEntities: []
+    }
+  },
   computed: {
-    entityName () {
+    entityName() {
       return this.$route.params.entityName
     }
   },
   watch: {
     entityName: {
-      handler (entityName) {
+      handler(entityName) {
         // 获取知识属性
-        properties(entityName)
-          .then(response => {
-            if (response.data.code === 200) {
-              this.entityInfo = response.data.data
-              delete this.entityInfo.properties.name
-              console.log(this.entityInfo)
-            }
-          })
+        properties(entityName).then((response) => {
+          if (response.data.code === 200) {
+            this.entityInfo = response.data.data
+            delete this.entityInfo.properties.name
+            console.log(this.entityInfo)
+          }
+        })
         // 获取相关实体
-        relatedEntity(entityName)
-          .then(response => {
-            if (response.data.code === 200) {
-              response.data.data.forEach(entity => {
-                if (entity.entityName === entityName) {
-                  this.relatedEntities = [entity]
-                }
-              })
-            }
-          })
+        relatedEntity(entityName).then((response) => {
+          if (response.data.code === 200) {
+            response.data.data.forEach((entity) => {
+              if (entity.entityName === entityName) {
+                this.relatedEntities = [entity]
+              }
+            })
+          }
+        })
         // 上传用户记录
         this.record()
       },
       immediate: true
     }
   },
-  data () {
-    return {
-      entityInfo: {},
-      relatedEntities: []
-    }
-  },
   methods: {
-    record () {
+    record() {
       record({
         entityName: String(this.entityName)
       })
@@ -123,9 +123,9 @@ export default {
 }
 
 .prop-row {
-  font-size: .8rem;
+  font-size: 0.8rem;
   line-height: 1rem;
-  margin-bottom: .3rem;
+  margin-bottom: 0.3rem;
 }
 
 .prop-row .prop-name {
