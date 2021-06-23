@@ -13,12 +13,17 @@ export default {
 <style>
 #app {
   /*font-family: 'Avenir', Helvetica, Arial, sans-serif;*/
-  font-family: 'Microsoft YaHei', '微软雅黑', 'Helvetica Neue', Helvetica,
-    'PingFang SC', 'Hiragino Sans GB', Arial, sans-serif;
+  font-family: 'Helvetica Neue', Helvetica, Arial, 'Microsoft Yahei',
+    'Hiragino Sans GB', 'Heiti SC', 'WenQuanYi Micro Hei', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   /*text-align: center;*/
   /*color: #2c3e50;*/
+}
+
+textarea {
+  font-family: 'Helvetica Neue', Helvetica, Arial, 'Microsoft Yahei',
+    'Hiragino Sans GB', 'Heiti SC', 'WenQuanYi Micro Hei', sans-serif;
 }
 
 * {

@@ -143,6 +143,7 @@ module.exports = {
     yoda: [2, 'never'],
     'prefer-const': 2, // 使用let关键字声明的变量，但在初始分配后从未重新分配变量，应改为const声明
     'object-curly-spacing': [2, 'always', { objectsInObjects: false }], // 不允许以对象元素开始和/或以对象元素结尾的对象的大括号内的间距
-    'array-bracket-spacing': [2, 'never'] // 不允许数组括号内的空格
+    'array-bracket-spacing': [2, 'never'], // 不允许数组括号内的空格
+    indent: [2, 2, { SwitchCase: 1 }] // switch的缩进
   }
 }

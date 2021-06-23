@@ -4,7 +4,7 @@
     <div class="main-container flex">
       <div class="resource-info left-side">
         <div class="flex">
-          <div class="basic-info flex-1">
+          <div class="basic-info">
             <h2 @click="addToCart(resource.id)">
               {{ resource['resourceName'] }}
             </h2>
@@ -239,6 +239,10 @@ export default {
 
 .resource-info >>> h2 {
   color: #222226;
+}
+
+.basic-info {
+  margin-right: 1rem;
 }
 
 .resource-name {

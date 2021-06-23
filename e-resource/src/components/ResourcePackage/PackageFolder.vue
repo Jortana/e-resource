@@ -1,12 +1,12 @@
 <template>
   <div
     :class="active ? 'active' : 'no-active'"
-    class="fav-folder flex"
+    class="folder flex"
     @mouseover="hover = true"
     @mouseleave="hover = false"
   >
-    <i class="el-icon-folder-opened fav-icon"></i>
-    <span>{{ favFolder.name }}</span>
+    <i class="el-icon-folder-opened package-icon"></i>
+    <span>{{ folder.name }}</span>
     <el-popover
       :visible-arrow="false"
       :close-delay="100"
@@ -25,10 +25,10 @@
 
 <script>
 export default {
-  name: 'FavFolder',
+  name: 'PackageFolder',
   props: {
-    favFolder: Object,
-    curID: Number
+    folder: Object,
+    curID: String
   },
   data() {
     return {
@@ -37,14 +37,14 @@ export default {
   },
   computed: {
     active() {
-      return this.favFolder.id === this.curID
+      return this.folder.id === this.curID
     }
   }
 }
 </script>
 
 <style scoped>
-.fav-folder {
+.folder {
   position: relative;
 }
 
@@ -58,11 +58,11 @@ export default {
   background-color: #66b1ff;
 }
 
-.active .fav-icon {
+.active .package-icon {
   color: #fff;
 }
 
-.fav-icon {
+.package-icon {
   color: #ccd0d8;
   font-size: 1.5rem;
   margin-right: 0.5rem;
@@ -79,7 +79,7 @@ export default {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) rotate(90deg);
-  font-size: 1rem;
+  font-size: 0.3rem;
   letter-spacing: 1px;
   margin-top: 2px;
 }

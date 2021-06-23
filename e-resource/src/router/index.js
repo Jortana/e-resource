@@ -38,9 +38,9 @@ const routes = [
   },
   // 收藏
   {
-    path: '/favourite',
-    name: 'Favourite',
-    component: () => import('@/view/Favourite')
+    path: '/package',
+    name: 'Package',
+    component: () => import('@/view/Package')
   },
   // 资源页面
   {

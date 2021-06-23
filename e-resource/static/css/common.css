@@ -30,14 +30,3 @@
 .none {
   display: none;
 }
-
-/*!* 主要界面需要向右移，和logo右侧对齐 *!*/
-/*.main-container {*/
-/*  margin-left: 176px;*/
-/*}*/
-
-/*!* main container 下面的div *!*/
-/*.out-first-screen {*/
-/*  margin-left: 176px;*/
-/*  margin-top: 1rem;*/
-/*}*/

@@ -1,102 +1,104 @@
 <template>
-  <div class="main-container">
-    <h2>个人中心</h2>
-    <div class="user-info">
-      <div class="show-basic-infos">
-        <div class="avatar">
-          <el-avatar :size="100" :src="userinfo.avatar"></el-avatar>
-        </div>
-        <div class="basic-info">
-          <h2>
-            {{ userinfo.username }}
-          </h2>
-          <div class="email">
-            {{ userinfo.user_email }}
+  <div class="backgroud">
+    <div class="main-container">
+      <h2>个人中心</h2>
+      <div class="user-info">
+        <div class="show-basic-infos">
+          <div class="avatar">
+            <el-avatar :size="100" :src="userinfo.avatar"></el-avatar>
           </div>
-        </div>
-      </div>
-      <div class="infos-container">
-        <h2>账户</h2>
-        <div class="infos flex-1">
-          <div class="info">
-            <h3>用户名</h3>
-            <div v-if="isEdit.basic === false" class="info-content">
+          <div class="basic-info">
+            <h2>
               {{ userinfo.username }}
+            </h2>
+            <div class="email">
+              {{ userinfo.user_email }}
             </div>
-            <el-input
-              v-else
-              v-model="editInfo.username"
-              class="info-content"
-            ></el-input>
           </div>
         </div>
-        <div class="infos flex-1">
-          <div class="info">
-            <h3>密码</h3>
-            <el-button class="change-password-btn" type="text">
-              更改密码
+        <div class="infos-container">
+          <h2>账户</h2>
+          <div class="infos flex-1">
+            <div class="info">
+              <h3>用户名</h3>
+              <div v-if="isEdit.basic === false" class="info-content">
+                {{ userinfo.username }}
+              </div>
+              <el-input
+                v-else
+                v-model="editInfo.username"
+                class="info-content"
+              ></el-input>
+            </div>
+          </div>
+          <div class="infos flex-1">
+            <div class="info">
+              <h3>密码</h3>
+              <el-button class="change-password-btn" type="text">
+                更改密码
+              </el-button>
+            </div>
+          </div>
+          <div class="edit">
+            <el-button
+              v-if="isEdit.basic === false"
+              type="primary"
+              size="medium"
+              plain
+            >
+              编辑
             </el-button>
+            <el-button v-else type="primary" size="medium">完成</el-button>
           </div>
         </div>
-        <div class="edit">
-          <el-button
-            v-if="isEdit.basic === false"
-            type="primary"
-            size="medium"
-            plain
-          >
-            编辑
-          </el-button>
-          <el-button v-else type="primary" size="medium">完成</el-button>
-        </div>
-      </div>
-      <div class="infos-container">
-        <h2>学籍</h2>
-        <div class="infos flex-1">
-          <div class="info">
-            <h3>省</h3>
-            <div class="info-content">江苏省</div>
-          </div>
-          <div class="info">
-            <h3>市</h3>
-            <div class="info-content">南京市</div>
-          </div>
-          <div class="info">
-            <h3>区</h3>
-            <div class="info-content">鼓楼区</div>
-          </div>
-        </div>
-        <div class="infos flex-1">
-          <div class="info">
-            <h3>学校</h3>
-            <div v-if="isEdit.region === false" class="info-content">
-              {{ userinfo.school }}
+        <div class="infos-container">
+          <h2>学籍</h2>
+          <div class="infos flex-1">
+            <div class="info">
+              <h3>省</h3>
+              <div class="info-content">江苏省</div>
             </div>
-            <el-input
-              v-else
-              v-model="editInfo.username"
-              class="info-content"
-            ></el-input>
+            <div class="info">
+              <h3>市</h3>
+              <div class="info-content">南京市</div>
+            </div>
+            <div class="info">
+              <h3>区</h3>
+              <div class="info-content">鼓楼区</div>
+            </div>
           </div>
-          <div class="info">
-            <h3>学段</h3>
-            <div class="info-content">{{ userinfo.period }}</div>
+          <div class="infos flex-1">
+            <div class="info">
+              <h3>学校</h3>
+              <div v-if="isEdit.region === false" class="info-content">
+                {{ userinfo.school }}
+              </div>
+              <el-input
+                v-else
+                v-model="editInfo.username"
+                class="info-content"
+              ></el-input>
+            </div>
+            <div class="info">
+              <h3>学段</h3>
+              <div class="info-content">{{ userinfo.period }}</div>
+            </div>
+            <div class="info">
+              <h3>年级</h3>
+              <div class="info-content">{{ userinfo.grade }}</div>
+            </div>
           </div>
-          <div class="info">
-            <h3>年级</h3>
-            <div class="info-content">{{ userinfo.grade }}</div>
+          <div class="edit">
+            <el-button
+              v-if="isEdit.region === false"
+              type="primary"
+              size="medium"
+              plain
+            >
+              编辑
+            </el-button>
+            <el-button v-else type="primary" size="medium">完成</el-button>
           </div>
-        </div>
-        <div class="edit">
-          <el-button
-            v-if="isEdit.region === false"
-            type="primary"
-            size="medium"
-            plain
-          >
-            编辑
-          </el-button>
-          <el-button v-else type="primary" size="medium">完成</el-button>
         </div>
       </div>
     </div>
@@ -131,9 +133,29 @@ export default {
 </script>
 
 <style scoped>
+.backgroud {
+  padding-top: 1rem;
+  background-color: #f4f5f7;
+  margin-top: 1rem;
+  /*空出nav-menu的位置*/
+  height: calc(100vh - 70px);
+}
+
 .main-container {
-  /*margin-right: 200px;*/
   max-width: 960px;
+  margin: 0 auto;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+  border: 1px solid #dcdfe6;
+  width: 60%;
+  min-width: 1000px;
+  height: 100%;
+  background-color: #fff;
+  padding: 2rem;
+}
+
+.main-container h2 {
+  font-size: 2rem;
 }
 
 .user-info {
@@ -172,13 +194,13 @@ export default {
 }
 
 .infos-container h2 {
-  font-size: 2.5rem;
+  font-size: 2rem;
   color: #515151;
   font-weight: 400;
 }
 
 .infos-container .infos {
-  margin-left: 4.3rem;
+  margin-left: 5.5rem;
 }
 
 .infos-container .infos .info h3 {
