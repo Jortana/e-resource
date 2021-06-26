@@ -4,9 +4,15 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.edu.njnu.mapper.FavoriteMapper">
     <select id="folder" resultType="map">
-        SELECT folder_id,folder_name,folder_sort FROM t_folder WHERE user_id = #{userID}
+        SELECT `id`, `name`, introduction FROM t_folder WHERE username = #{username}
     </select>
     <select id="collection" resultType="resource">
-        SELECT t_resource.`id`,t_collection.`resource_id`,resource_name,file_type FROM t_collection INNER JOIN t_resource WHERE t_collection.`resource_id` = t_resource.`id` and folder_id = #{folderID}
+        SELECT t_collection.`resource_id`,resource_name,file_type FROM t_collection INNER JOIN t_resource WHERE t_collection.`resource_id` = t_resource.`id` and folder_id = #{folderID}
+    </select>
+    <insert id="createFolder">
+        insert into t_folder set id = #{id}, `name` = #{name}, introduction = #{introduction}, username = #{username}, `date` =#{date}
+    </insert>
+    <select id="queryFolder" resultType="folder">
+        SELECT `id`, `name`, introduction, username, `date` FROM t_folder WHERE `id` = #{id}
     </select>
 </mapper>

@@ -22,6 +22,5 @@ public class AuthenticationController {
             message = "身份认证成功";
             return ResultFactory.buildSuccessResult(message, null);
         }
-
     }
 }
