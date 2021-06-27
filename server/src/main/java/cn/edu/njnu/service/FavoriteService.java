@@ -7,7 +7,6 @@ import cn.edu.njnu.pojo.ResultFactory;
 import cn.edu.njnu.pojo.User;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import jdk.management.resource.ResourceId;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.neo4j.kernel.api.impl.index.storage.layout.FolderLayout;
