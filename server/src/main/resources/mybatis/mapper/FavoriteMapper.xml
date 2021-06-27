@@ -4,15 +4,33 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.edu.njnu.mapper.FavoriteMapper">
     <select id="folder" resultType="map">
-        SELECT `id`, `name`, introduction FROM t_folder WHERE username = #{username}
+        SELECT `id`, `name`, introduction FROM t_folder WHERE username = #{username} order by `date` desc
     </select>
-    <select id="collection" resultType="resource">
-        SELECT t_collection.`resource_id`,resource_name,file_type FROM t_collection INNER JOIN t_resource WHERE t_collection.`resource_id` = t_resource.`id` and folder_id = #{folderID}
+    <select id="collection" resultType="map">
+        SELECT t_resource.`id`, resource_name,file_type FROM t_collection INNER JOIN t_resource WHERE t_collection.`resource_id` = t_resource.`id` and folder_id = #{folderID}
+    </select>
+    <select id="collectionStr" resultType="map">
+        SELECT content FROM t_collection WHERE folder_id = #{folderID} and resource_id is null
     </select>
     <insert id="createFolder">
         insert into t_folder set id = #{id}, `name` = #{name}, introduction = #{introduction}, username = #{username}, `date` =#{date}
     </insert>
     <select id="queryFolder" resultType="folder">
         SELECT `id`, `name`, introduction, username, `date` FROM t_folder WHERE `id` = #{id}
+    </select>
+    <insert id="putInFolder">
+        insert into t_collection set resource_id = #{resourceID}, folder_id = #{folderID}, `date` = #{date}
+    </insert>
+    <select id="queryCollection" resultType="map">
+        SELECT `id`, resource_id, folder_id, `date` FROM t_collection WHERE resource_id = #{resourceID} and folder_id = #{folderID}
+    </select>
+    <insert id="putInFolderStr">
+        insert into t_collection set content = #{content}, folder_id = #{folderID}, `date` = #{date}
+    </insert>
+    <select id="queryCollectionStr" resultType="map">
+        SELECT `id`, content, folder_id, `date` FROM t_collection WHERE content = #{content} and folder_id = #{folderID}
+    </select>
+    <select id="number" resultType="int">
+        select count(id) from t_collection where folder_id = #{folderID}
     </select>
 </mapper>

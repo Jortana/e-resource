@@ -13,7 +13,13 @@ import java.util.Map;
 @Repository
 public interface FavoriteMapper {
     List<Map> folder(String username);
-    ArrayList<Resource> collection(String folderID);
+    ArrayList<Map> collection(String folderID);
+    ArrayList<Map> collectionStr(String folderID);
     boolean createFolder(String id, String name, String introduction, String username, String date);
     Folder queryFolder(String id);
+    boolean putInFolder(int resourceID, String folderID, String date);
+    Map queryCollection(int resourceID, String folderID);
+    boolean putInFolderStr(String content, String folderID, String date);
+    Map queryCollectionStr(String content, String folderID);
+    int number(String folderID);
 }
