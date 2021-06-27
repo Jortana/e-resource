@@ -6,7 +6,7 @@
     @mouseleave="hover = false"
   >
     <i class="el-icon-folder-opened package-icon"></i>
-    <span>{{ folder.name }}</span>
+    <span>{{ folder.folderName }}</span>
     <el-popover
       :visible-arrow="false"
       :close-delay="100"
@@ -37,7 +37,7 @@ export default {
   },
   computed: {
     active() {
-      return this.folder.id === this.curID
+      return this.folder.folderID === this.curID
     }
   }
 }

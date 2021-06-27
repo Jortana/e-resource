@@ -12,8 +12,8 @@
           </div>
           <div
             v-for="folder in packageFolders"
-            :key="folder.id"
-            @click="changeFolder(folder.id)"
+            :key="folder.folderID"
+            @click="changeFolder(folder.folderID)"
           >
             <package-folder :curID="curID" :folder="folder"></package-folder>
           </div>
@@ -21,19 +21,17 @@
           <package-info
             v-if="infoVisible"
             :visible.sync="infoVisible"
+            @updatePackages="getPackageFolders"
           ></package-info>
         </div>
         <!-- 资源包内容展示区域 -->
         <div class="list flex-1">
           <!-- 资源包名、简介等基本信息 -->
-          <div class="basic-info">
-            <div>资源包1</div>
+          <div v-if="curFolderInfo" class="basic-info">
+            <div>{{ curFolderInfo.folderName }}</div>
             <div class="intro">100 个内容</div>
             <div class="intro">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius,
-              cumque error quos natus similique, ut ipsa doloremque perspiciatis
-              nihil necessitatibus esse assumenda aut minima quibusdam expedita
-              libero ipsam fuga? Nostrum.
+              {{ curFolderInfo.introduction }}
             </div>
           </div>
         </div>
@@ -47,6 +45,7 @@ import NavMenu from '@/components/NavMenu'
 import PackageFolder from '@/components/ResourcePackage/PackageFolder'
 import PackageInfo from '@/components/ResourcePackage/PacgakeInfo'
 import merge from 'webpack-merge'
+import { getFolders } from '@/api/package'
 
 export default {
   name: 'Package',
@@ -55,7 +54,8 @@ export default {
     return {
       packageFolders: [],
       packageInfo: '',
-      curID: '',
+      curID: '', // 当前选中的资源包的ID
+      curFolderInfo: null, // 当前选中的资源包的信息
       infoVisible: false // 控制创建和修改资源包信息的对话框是否显示
     }
   },
@@ -72,6 +72,16 @@ export default {
         this.curID = id
       },
       immediate: true
+    },
+    curID: {
+      handler(curID) {
+        const folders = this.packageFolders
+        const curFolderInfo = folders.find((folder) => {
+          return folder.folderID === curID
+        })
+        this.curFolderInfo = curFolderInfo
+      },
+      immediate: true
     }
   },
   mounted() {
@@ -83,19 +93,20 @@ export default {
     },
     getPackageFolders() {
       const { id } = this.query
-      this.packageFolders = [
-        {
-          id: '1',
-          name: '资源包1'
-        },
-        {
-          id: '2',
-          name: '资源包2'
+      // 获取所有资源包
+      getFolders().then((response) => {
+        console.log(response.data)
+        const { code, data: folders, message } = response.data
+        if (code === 200) {
+          this.packageFolders = folders
+          // 设置当前选中的资源包
+          if (id === undefined) {
+            this.curID = folders[0].folderID
+          }
+        } else {
+          this.$message.error(message)
         }
-      ]
-      if (id === undefined) {
-        this.curID = '1'
-      }
+      })
     },
     // 通过路由改变当前所选的文件夹
     changeFolder(id) {
@@ -128,8 +139,9 @@ export default {
   border-top-left-radius: 0.5rem;
   border-top-right-radius: 0.5rem;
   border: 1px solid #dcdfe6;
+  border-bottom: none;
   width: 1000px;
-  height: 100%;
+  min-height: 100%;
   background-color: #fff;
 }
 

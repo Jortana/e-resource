@@ -138,7 +138,7 @@ export default {
   background-color: #f4f5f7;
   margin-top: 1rem;
   /*空出nav-menu的位置*/
-  height: calc(100vh - 70px);
+  min-height: calc(100vh - 70px);
 }
 
 .main-container {

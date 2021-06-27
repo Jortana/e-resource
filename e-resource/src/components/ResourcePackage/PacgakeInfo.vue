@@ -49,6 +49,7 @@
 </template>
 
 <script>
+import { createFolder } from '@/api/package'
 export default {
   name: 'PackageInfo',
   components: {},
@@ -85,7 +86,9 @@ export default {
     validateForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          console.log('valid')
+          // 验证成功，处理信息的格式
+          const { name, intro: introduction } = this.packageInfo
+          this.submit({ name, introduction })
         } else {
           console.log('invalid')
           return false
@@ -93,8 +96,16 @@ export default {
       })
     },
     // 提交创建/修改信息
-    submit() {
-      console.log('submit')
+    submit(folderInfo) {
+      createFolder(folderInfo).then((response) => {
+        const { code } = response.data
+        console.log(response)
+        if (code === 200) {
+          this.$message.success('创建成功')
+          this.$emit('updatePackages')
+          this.close()
+        }
+      })
     }
   }
 }
