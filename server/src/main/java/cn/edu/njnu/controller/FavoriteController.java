@@ -20,9 +20,19 @@ public class FavoriteController {
         return favoriteService.favorite();
     }
 
+    @GetMapping("/v1.0/private/folderResource/{folderID}")
+    public Result folderResource(@PathVariable(name = "folderID") String folderID){
+        return favoriteService.folderResource(folderID);
+    }
+
     @PostMapping("/v1.0/private/createFolder")
     public Result createFolder(@RequestBody Map<String, Object> infoMap){
         System.out.println(infoMap);
         return favoriteService.createFolder(infoMap);
+    }
+
+    @PostMapping("/v1.0/private/putInFolder")
+    public Result putInFolder(@RequestBody Map<String, Object> IDMap){
+        return favoriteService.putInFolder(IDMap);
     }
 }
