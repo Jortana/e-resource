@@ -94,7 +94,6 @@ service.interceptors.response.use(
           duration: 1500
         })
       }
-      error.message('连接服务器失败')
     }
 
     Message({

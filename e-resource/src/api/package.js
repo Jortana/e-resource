@@ -20,3 +20,12 @@ export const createFolder = (packageInfo) => {
 export const getFolders = () => {
   return http.get(`${baseURL}/private/folder`)
 }
+
+/**
+ * 根据资源包 ID 获取其中所包含的资源
+ * @param {String} id
+ * @returns {AxiosPromise}
+ */
+export const getResources = (id) => {
+  return http.get(`${baseURL}/private/folderResource/${id}`)
+}

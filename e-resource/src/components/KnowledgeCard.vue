@@ -121,7 +121,7 @@ export default {
   margin-top: 1rem;
 }
 
-.x-mini-btn {
+.x-mini-btn >>> button {
   padding: 3px;
   font-size: 0.5rem;
   margin-left: 5px;

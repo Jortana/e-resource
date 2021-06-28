@@ -34,6 +34,10 @@
               {{ curFolderInfo.introduction }}
             </div>
           </div>
+          <!-- 资源包中包含资源的展示区域 -->
+          <div>
+            资源
+          </div>
         </div>
       </div>
     </div>
@@ -45,7 +49,7 @@ import NavMenu from '@/components/NavMenu'
 import PackageFolder from '@/components/ResourcePackage/PackageFolder'
 import PackageInfo from '@/components/ResourcePackage/PacgakeInfo'
 import merge from 'webpack-merge'
-import { getFolders } from '@/api/package'
+import { getFolders, getResources } from '@/api/package'
 
 export default {
   name: 'Package',
@@ -68,7 +72,7 @@ export default {
     query: {
       handler(query) {
         const { id } = query
-        this.getPackageInfo(id)
+        this.getPackageResources(id)
         this.curID = id
       },
       immediate: true
@@ -88,14 +92,19 @@ export default {
     this.getPackageFolders()
   },
   methods: {
-    getPackageInfo(id) {
-      console.log(id)
+    // 获取当前 ID 资源包中所包含的资源
+    getPackageResources(id) {
+      getResources(id).then((response) => {
+        const { code, data } = response.data
+        if (code === 200) {
+          console.log(data)
+        }
+      })
     },
+    // 获取所有资源包
     getPackageFolders() {
       const { id } = this.query
-      // 获取所有资源包
       getFolders().then((response) => {
-        console.log(response.data)
         const { code, data: folders, message } = response.data
         if (code === 200) {
           this.packageFolders = folders
