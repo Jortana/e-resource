@@ -22,4 +22,6 @@ public interface FavoriteMapper {
     boolean putInFolderStr(String content, String folderID, String date);
     Map queryCollectionStr(String content, String folderID);
     int number(String folderID);
+    boolean deleteFolder(String folderID);
+    boolean deleteResource(String folderID);
 }

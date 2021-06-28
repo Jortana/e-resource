@@ -7,10 +7,10 @@
         SELECT `id`, `name`, introduction FROM t_folder WHERE username = #{username} order by `date` desc
     </select>
     <select id="collection" resultType="map">
-        SELECT t_resource.`id`, resource_name,file_type FROM t_collection INNER JOIN t_resource WHERE t_collection.`resource_id` = t_resource.`id` and folder_id = #{folderID}
+        SELECT t_resource.`id`, resource_name, file_type, `date`  FROM t_collection INNER JOIN t_resource WHERE t_collection.`resource_id` = t_resource.`id` and folder_id = #{folderID} order by `date` desc
     </select>
     <select id="collectionStr" resultType="map">
-        SELECT content FROM t_collection WHERE folder_id = #{folderID} and resource_id is null
+        SELECT content, `date` FROM t_collection WHERE folder_id = #{folderID} and resource_id is null order by `date` desc
     </select>
     <insert id="createFolder">
         insert into t_folder set id = #{id}, `name` = #{name}, introduction = #{introduction}, username = #{username}, `date` =#{date}
@@ -33,4 +33,11 @@
     <select id="number" resultType="int">
         select count(id) from t_collection where folder_id = #{folderID}
     </select>
+
+    <delete id="deleteFolder">
+        delete from t_folder where id = #{folderID}
+    </delete>
+    <delete id="deleteResource">
+        delete from t_collection where folder_id = #{folderID}
+    </delete>
 </mapper>
