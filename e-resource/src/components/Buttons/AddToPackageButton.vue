@@ -5,7 +5,7 @@
       <i class="el-icon-loading"></i>
       <span>加载中</span>
     </div>
-    <el-scrollbar v-else class="scroller" style="height: 150px;">
+    <el-scrollbar v-else class="scroll" style="height: 150px;">
       <el-checkbox-group v-model="checked">
         <el-checkbox
           v-for="folder in folders"
@@ -74,7 +74,7 @@ export default {
   margin-bottom: 0.5rem;
 }
 
-.scroller >>> .el-scrollbar__wrap {
+.scroll >>> .el-scrollbar__wrap {
   overflow-x: hidden;
 }
 </style>
