@@ -35,4 +35,9 @@ public class FavoriteController {
     public Result putInFolder(@RequestBody Map<String, Object> IDMap){
         return favoriteService.putInFolder(IDMap);
     }
+
+    @DeleteMapping("/v1.0/private/folder/{folderID}")
+    public Result deleteFolder(@PathVariable(name = "folderID") String folderID){
+        return favoriteService.deleteFolder(folderID);
+    }
 }

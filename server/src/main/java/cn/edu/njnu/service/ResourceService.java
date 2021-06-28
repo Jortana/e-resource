@@ -162,6 +162,7 @@ public class ResourceService {
         }
         return ResultFactory.buildSuccessResult("资源相似度更新成功", null);
     }
+
     public static void resxsd(HashMap<Integer, HashMap<String, Integer>> keywords, HashMap<Integer, HashMap<String, Integer>> keywords1) {  //读取与Resid在同一个知识点下面的资源以及与该知识点直接相连的知识下的资源
         Driver driver = createDrive();
         Session session = driver.session();

@@ -15,10 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class FavoriteService {
@@ -85,27 +82,30 @@ public class FavoriteService {
         }
         return ResultFactory.buildFailResult("创建失败");
     }
-
+    //根据收藏夹ID删除收藏夹
+    public Result deleteFolder(String folderID){
+        favoriteMapper.deleteResource(folderID);
+        favoriteMapper.deleteFolder(folderID);
+        return ResultFactory.buildSuccessResult("删除成功", null);
+    }
     //资源加入资源包
     public Result putInFolder(Map<String, Object> IDMap){
         Date date = new Date(System.currentTimeMillis());
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String dateStr = sdf.format(date);
-        String folderID = (String) IDMap.get("folderID");
+        ArrayList<String> folderIDList = (ArrayList<String>) IDMap.get("folderID");
         if (IDMap.containsKey("resourceID")){
             int resourceID = (int) IDMap.get("resourceID");
-            if (favoriteMapper.putInFolder(resourceID, folderID, dateStr)){
-                Map collection = favoriteMapper.queryCollection(resourceID, folderID);
-                return ResultFactory.buildSuccessResult("添加资源成功", collection);
+            for (String folderID:folderIDList){
+                favoriteMapper.putInFolder(resourceID, folderID, dateStr);
             }
         }
         else {
             String content = (String) IDMap.get("content");
-            if (favoriteMapper.putInFolderStr(content, folderID, dateStr)){
-                Map collection = favoriteMapper.queryCollectionStr(content, folderID);
-                return ResultFactory.buildSuccessResult("添加资源成功", collection);
+            for (String folderID:folderIDList){
+                favoriteMapper.putInFolderStr(content, folderID, dateStr);
             }
         }
-        return ResultFactory.buildFailResult("添加资源失败");
+        return ResultFactory.buildSuccessResult("添加成功", null);
     }
 }
