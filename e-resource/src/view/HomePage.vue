@@ -148,7 +148,6 @@ export default {
         if (code === 200) {
           this.menus = data
         }
-        console.log(data)
       })
     }
   }

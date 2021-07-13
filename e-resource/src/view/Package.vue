@@ -19,13 +19,14 @@
               :curID="curID"
               :folder="folder"
               @confirmDelete="confirmDelete"
+              @editFolderInfo="editFolderInfo"
             ></package-folder>
           </div>
           <!-- 确认删除的对话框 -->
           <el-dialog
             :visible.sync="deleteVisible"
             title="确认删除"
-            width="300px"
+            width="350px"
             center
           >
             <span>确认删除吗？</span>
@@ -42,6 +43,8 @@
           <package-info
             v-if="infoVisible"
             :visible.sync="infoVisible"
+            :originInfo="originInfo"
+            @clearInfo="clearInfo"
             @updatePackages="getPackageFolders"
           ></package-info>
         </div>
@@ -82,6 +85,7 @@ export default {
       curID: '', // 当前选中的资源包的 ID
       curFolderInfo: null, // 当前选中的资源包的信息
       infoVisible: false, // 控制创建和修改资源包信息的对话框是否显示
+      originInfo: null, // 待修改的资源包的原始信息
       deleteID: '', // 待删除的文件夹的 ID
       deleteVisible: false // 确认删除的对话框是否显示
     }
@@ -182,6 +186,16 @@ export default {
         }
       })
       this.deleteVisible = false
+    },
+    // 接收修改文件夹的信息
+    editFolderInfo(folderInfo) {
+      // console.log(folderInfo)
+      this.originInfo = folderInfo
+      this.infoVisible = true
+    },
+    // 清除待修改文件夹的信息
+    clearInfo() {
+      this.originInfo = null
     }
   }
 }
@@ -242,12 +256,15 @@ export default {
 }
 
 .basic-info {
-  padding-bottom: 1rem;
   border-bottom: 1px solid #e4e7ed;
 }
 
 .intro {
   color: #909399;
   margin-top: 0.5rem;
+}
+
+.intro:last-child {
+  margin-bottom: 1rem;
 }
 </style>

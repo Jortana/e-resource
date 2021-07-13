@@ -15,7 +15,7 @@
       width="150"
     >
       <div class="operation-container">
-        <div class="operation-btn flex">编辑</div>
+        <div class="operation-btn flex" @click="editFolderInfo">编辑</div>
         <div class="operation-btn flex" @click="confirmDelete">删除</div>
       </div>
       <div v-show="hover" slot="reference" class="operation-dot"></div>
@@ -42,10 +42,15 @@ export default {
     }
   },
   methods: {
-    // 弹出确认删除的对话框
+    // 触发事件，弹出确认删除的对话框
     confirmDelete() {
       const { folderID } = this.folder
       this.$emit('confirmDelete', folderID)
+    },
+    // 触发事件，弹出修改信息的对话框
+    editFolderInfo() {
+      const { folderID, folderName, introduction } = this.folder
+      this.$emit('editFolderInfo', { folderID, folderName, introduction })
     }
   }
 }
