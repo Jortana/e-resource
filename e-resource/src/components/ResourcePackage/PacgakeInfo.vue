@@ -57,14 +57,27 @@ export default {
     visible: {
       type: Boolean,
       default: false
+    },
+    originInfo: {
+      type: Object,
+      default: null
     }
   },
   data() {
+    let packageInfo =
+      this.originInfo !== null
+        ? { ...this.originInfo }
+        : { name: '', intro: '' }
+    // 处理前后端明明不一致
+    if (packageInfo.folderName) {
+      packageInfo = {
+        id: packageInfo.folderID,
+        name: packageInfo.folderName,
+        intro: packageInfo.introduction
+      }
+    }
     return {
-      packageInfo: {
-        name: '',
-        intro: ''
-      },
+      packageInfo: packageInfo,
       rules: {
         name: [
           { required: true, message: '请输入资源包名称', trigger: 'blur' },
@@ -74,13 +87,12 @@ export default {
       }
     }
   },
-  computed: {},
-  watch: {},
-  mounted() {},
   methods: {
     // 要通过事件的方式改变传进来的 visible 的值
     close() {
       this.$emit('update:visible', false)
+      // 关闭时要清空待修改文件夹的信息，否则新建时会有信息残留
+      this.$emit('clearInfo')
     },
     // 验证表单
     validateForm(formName) {
@@ -97,15 +109,20 @@ export default {
     },
     // 提交创建/修改信息
     submit(folderInfo) {
-      createFolder(folderInfo).then((response) => {
-        const { code } = response.data
-        console.log(response)
-        if (code === 200) {
-          this.$message.success('创建成功')
-          this.$emit('updatePackages')
-          this.close()
-        }
-      })
+      // 判断是创建还是修改
+      if (this.originInfo !== null) {
+        // 创建
+        createFolder(folderInfo).then((response) => {
+          const { code } = response.data
+          if (code === 200) {
+            this.$message.success('创建成功')
+            this.$emit('updatePackages')
+            this.close()
+          }
+        })
+      } else {
+        // 修改
+      }
     }
   }
 }

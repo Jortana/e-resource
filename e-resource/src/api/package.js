@@ -29,3 +29,12 @@ export const getFolders = () => {
 export const getResources = (id) => {
   return http.get(`${baseURL}/private/folderResource/${id}`)
 }
+
+/**
+ * 根据资源包 ID 删除资源包
+ * @param {String} id
+ * @returns {AxiosPromise}
+ */
+export const deleteFolder = (id) => {
+  return http.delete(`${baseURL}/private/folder/${id}`)
+}

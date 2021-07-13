@@ -6,45 +6,42 @@
       </div>
       <div class="flex">
         <div class="flex-1">
-          <div
-            v-for="(value, name, index) in info"
-            v-if="index % 2 === 0"
-            :key="index"
-          >
+          <div v-for="(value, name, index) in info" :key="index">
             <div
+              v-if="index % 2 === 0"
               class="properties flex"
               @mouseover="changeBtnShow(index, true)"
               @mouseleave="changeBtnShow(index, false)"
             >
               <span class="bold">{{ name }}：</span>
               {{ value }}
-              <!-- 添加到备课的按钮 -->
+              <!-- 添加到资源包的按钮 -->
               <add-to-package-button
                 :ref="'btn' + index"
                 :default-visible="false"
+                :resourceType="'content'"
+                :content="`${entityName}：${name}：${value}`"
                 class="x-mini-btn"
               ></add-to-package-button>
             </div>
           </div>
         </div>
         <div class="flex-1">
-          <div
-            v-for="(value, name, index) in info"
-            v-if="index % 2 !== 0"
-            :key="index"
-            class="flex-1"
-          >
+          <div v-for="(value, name, index) in info" :key="index" class="flex-1">
             <div
+              v-if="index % 2 !== 0"
               class="properties flex"
               @mouseover="changeBtnShow(index, true)"
               @mouseleave="changeBtnShow(index, false)"
             >
               <span class="bold">{{ name }}：</span>
               {{ value }}
-              <!-- 添加到备课的按钮 -->
+              <!-- 添加到资源包的按钮 -->
               <add-to-package-button
                 :ref="'btn' + index"
                 :default-visible="false"
+                :resourceType="'content'"
+                :content="`${entityName}：${name}：${value}`"
                 class="x-mini-btn"
               ></add-to-package-button>
             </div>

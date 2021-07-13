@@ -119,7 +119,7 @@ export default {
   color: #b0b3bc;
 }
 
-.x-mini-btn {
+.x-mini-btn >>> button {
   padding: 3px;
   font-size: 0.5rem;
   margin-left: 5px;

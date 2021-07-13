@@ -145,5 +145,6 @@ module.exports = {
     'object-curly-spacing': [2, 'always', { objectsInObjects: false }], // 不允许以对象元素开始和/或以对象元素结尾的对象的大括号内的间距
     'array-bracket-spacing': [2, 'never'], // 不允许数组括号内的空格
     indent: [2, 2, { SwitchCase: 1 }] // switch的缩进
+    // 'space-before-function-paren': 'off' // 函数括号前的空格
   }
 }
