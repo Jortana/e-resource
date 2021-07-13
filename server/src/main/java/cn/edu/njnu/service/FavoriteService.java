@@ -4,15 +4,10 @@ import cn.edu.njnu.mapper.FavoriteMapper;
 import cn.edu.njnu.pojo.Folder;
 import cn.edu.njnu.pojo.Result;
 import cn.edu.njnu.pojo.ResultFactory;
-import cn.edu.njnu.pojo.User;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
-import org.neo4j.kernel.api.impl.index.storage.layout.FolderLayout;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -36,7 +31,7 @@ public class FavoriteService {
         for (int i = 0; i < 8; i++) {
             String str = uuid.substring(i * 4, i * 4 + 4);
             int x = Integer.parseInt(str, 16);
-            shortBuffer.append(chars[x % 0x25]);
+            shortBuffer.append(chars[x % 0x24]);
         }
         return shortBuffer.toString();
     }
@@ -64,7 +59,42 @@ public class FavoriteService {
     public Result folderResource(String folderID){
         JSONObject folder = new JSONObject();
         folder.put("resources", favoriteMapper.collection(folderID));
-        folder.put("text", favoriteMapper.collectionStr(folderID));
+        ArrayList<Map> contentMap = favoriteMapper.collectionStr(folderID);
+        ArrayList<String> content = new ArrayList<>();
+        if (contentMap.size()>0){
+            System.out.println(contentMap);
+            for (Map singleContent:contentMap){
+                if (singleContent!=null){
+                    content.add((String) singleContent.get("content"));
+                }
+            }
+        }
+        folder.put("content", content);
+
+        ArrayList<Map> goalMap = favoriteMapper.goal(folderID);
+        ArrayList<String> goal = new ArrayList<>();
+        System.out.println(goalMap);
+        if (goalMap.size()>0){
+            for (Map singleGoal:goalMap){
+                if (singleGoal!=null){
+                    goal.add((String) singleGoal.get("goal"));
+                }
+
+            }
+        }
+        folder.put("goal", goal);
+
+        ArrayList<Map> keyMap = favoriteMapper.key(folderID);
+        ArrayList<String> key = new ArrayList<>();
+        if (goalMap.size()>0){
+            for (Map singleKey:keyMap){
+                if (singleKey!=null){
+                    key.add((String) singleKey.get("key"));
+                }
+
+            }
+        }
+        folder.put("key", key);
         return ResultFactory.buildSuccessResult("获取资源成功", folder);
     }
     //用户创建收藏夹
@@ -73,10 +103,19 @@ public class FavoriteService {
         String username = (String) SecurityUtils.getSubject().getPrincipal();
         String name = (String) infoMap.get("name");
         String introduction = (String) infoMap.get("introduction");
-        Date date = new Date(System.currentTimeMillis());
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String dateStr = sdf.format(date);
-        if (favoriteMapper.createFolder(id, name, introduction, username, dateStr)){
+        int date = (int) System.currentTimeMillis();
+        if (favoriteMapper.createFolder(id, name, introduction, username, date)){
+            Folder folder = favoriteMapper.queryFolder(id);
+            return ResultFactory.buildSuccessResult("创建成功",folder);
+        }
+        return ResultFactory.buildFailResult("创建失败");
+    }
+    //用户修改收藏夹
+    public Result updateFolder(Map<String, Object> infoMap){
+        String id = (String) infoMap.get("folderID");
+        String name = (String) infoMap.get("name");
+        String introduction = (String) infoMap.get("introduction");
+        if (favoriteMapper.updateFolder(id, name, introduction)){
             Folder folder = favoriteMapper.queryFolder(id);
             return ResultFactory.buildSuccessResult("创建成功",folder);
         }
@@ -90,20 +129,43 @@ public class FavoriteService {
     }
     //资源加入资源包
     public Result putInFolder(Map<String, Object> IDMap){
-        Date date = new Date(System.currentTimeMillis());
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String dateStr = sdf.format(date);
-        ArrayList<String> folderIDList = (ArrayList<String>) IDMap.get("folderID");
+        int date = (int) System.currentTimeMillis();
+        ArrayList<String> folderIDList = (ArrayList<String>) IDMap.get("addFolderID");
+        ArrayList<String> delFolderIDList = (ArrayList<String>) IDMap.get("deleteFolderID");
         if (IDMap.containsKey("resourceID")){
             int resourceID = (int) IDMap.get("resourceID");
+            for (String folderID:delFolderIDList){
+                favoriteMapper.delFolderResource(resourceID, folderID);
+            }
             for (String folderID:folderIDList){
-                favoriteMapper.putInFolder(resourceID, folderID, dateStr);
+                favoriteMapper.putInFolder(resourceID, folderID, date);
+            }
+        }
+        else if (IDMap.containsKey("goal")){
+            String goal = (String) IDMap.get("goal");
+            for (String folderID:delFolderIDList){
+                favoriteMapper.delFolderGoal(goal, folderID);
+            }
+            for (String folderID:folderIDList){
+                favoriteMapper.putGoal(goal, folderID, date);
+            }
+        }
+        else if (IDMap.containsKey("key")){
+            String key = (String) IDMap.get("key");
+            for (String folderID:delFolderIDList){
+                favoriteMapper.delFolderKey(key, folderID);
+            }
+            for (String folderID:folderIDList){
+                favoriteMapper.putKey(key, folderID, date);
             }
         }
         else {
             String content = (String) IDMap.get("content");
+            for (String folderID:delFolderIDList){
+                favoriteMapper.delFolderContent(content, folderID);
+            }
             for (String folderID:folderIDList){
-                favoriteMapper.putInFolderStr(content, folderID, dateStr);
+                favoriteMapper.putInFolderStr(content, folderID, date);
             }
         }
         return ResultFactory.buildSuccessResult("添加成功", null);

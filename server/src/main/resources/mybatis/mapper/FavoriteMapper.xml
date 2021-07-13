@@ -12,14 +12,29 @@
     <select id="collectionStr" resultType="map">
         SELECT content, `date` FROM t_collection WHERE folder_id = #{folderID} and resource_id is null order by `date` desc
     </select>
+    <select id="goal" resultType="map">
+        SELECT goal, `date` FROM t_collection WHERE folder_id = #{folderID} and resource_id is null order by `date` desc
+    </select>
+    <select id="key" resultType="map">
+        SELECT `key`, `date` FROM t_collection WHERE folder_id = #{folderID} and resource_id is null order by `date` desc
+    </select>
     <insert id="createFolder">
         insert into t_folder set id = #{id}, `name` = #{name}, introduction = #{introduction}, username = #{username}, `date` =#{date}
     </insert>
+    <update id="updateFolder">
+        update t_folder set `name` = #{name}, introduction = #{introduction} where id = #{id}
+    </update>
     <select id="queryFolder" resultType="folder">
         SELECT `id`, `name`, introduction, username, `date` FROM t_folder WHERE `id` = #{id}
     </select>
     <insert id="putInFolder">
         insert into t_collection set resource_id = #{resourceID}, folder_id = #{folderID}, `date` = #{date}
+    </insert>
+    <insert id="putKey">
+        insert into t_collection set goal = #{goal}, folder_id = #{folderID}, `date` = #{date}
+    </insert>
+    <insert id="putGaol">
+        insert into t_collection set `key` = #{key}, folder_id = #{folderID}, `date` = #{date}
     </insert>
     <select id="queryCollection" resultType="map">
         SELECT `id`, resource_id, folder_id, `date` FROM t_collection WHERE resource_id = #{resourceID} and folder_id = #{folderID}
@@ -39,5 +54,18 @@
     </delete>
     <delete id="deleteResource">
         delete from t_collection where folder_id = #{folderID}
+    </delete>
+    <!-- 删资源 -->
+    <delete id="delFolderResource">
+        delete from t_collection where folder_id = #{folderID} and resource_id = #{resourceID}
+    </delete>
+    <delete id="delFolderContent">
+        delete from t_collection where folder_id = #{folderID} and content = #{content}
+    </delete>
+    <delete id="delFolderGoal">
+        delete from t_collection where folder_id = #{folderID} and goal = #{goal}
+    </delete>
+    <delete id="delFolderKey">
+        delete from t_collection where folder_id = #{folderID} and `key` = #{key}
     </delete>
 </mapper>

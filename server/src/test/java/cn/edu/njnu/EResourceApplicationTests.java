@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.sql.SQLOutput;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,6 +23,10 @@ class EResourceApplicationTests {
 	@Autowired
 	DataSource dataSource;
 
+	@Test
+	void testDate(){
+		System.out.println(System.currentTimeMillis());
+	}
 	@Test
 	void contextLoads() throws SQLException {
 		System.out.println(dataSource.getClass());

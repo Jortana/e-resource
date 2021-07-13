@@ -40,4 +40,9 @@ public class FavoriteController {
     public Result deleteFolder(@PathVariable(name = "folderID") String folderID){
         return favoriteService.deleteFolder(folderID);
     }
+
+    @PutMapping("/v1.0/private/updateFolder")
+    public Result updateFolder(@RequestBody Map<String, Object> infoMap){
+        return favoriteService.updateFolder(infoMap);
+    }
 }
