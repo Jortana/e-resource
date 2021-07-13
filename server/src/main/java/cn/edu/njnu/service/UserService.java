@@ -105,7 +105,7 @@ public class UserService {
     }
 
     private Driver createDrive(){
-        return GraphDatabase.driver( "bolt://223.2.50.241:7687", AuthTokens.basic( "neo4j", "123456" ) );
+        return GraphDatabase.driver( "bolt://222.192.6.62:7687", AuthTokens.basic( "neo4j", "123456" ) );
     }
 
     //推荐算法 UPDATE 2021-4-7

@@ -24,9 +24,9 @@ public class EntityService {
         this.resourceMapper = resourceMapper;
         this.recordMapper = recordMapper;
     }
-    String resourceRoot = "http://223.2.50.241:8082";
+    String resourceRoot = "http://222.192.6.62:8082";
     private Driver createDrive(){
-        return GraphDatabase.driver( "bolt://223.2.50.241:7687", AuthTokens.basic( "neo4j", "123456" ) );
+        return GraphDatabase.driver( "bolt://222.192.6.62:7687", AuthTokens.basic( "neo4j", "123456" ) );
     }
     public JSONArray getRelatedEntity(String entityName, Session session, String mainEntityName){
         StatementResult result = session.run( "MATCH (a:concept) -[k:相关关系]-> (m:concept) where a.name = { name } and m.name<>{mainEntity}" +
@@ -192,21 +192,32 @@ public class EntityService {
     //根据entity查找重难点,从mysql里面查
     public JSONArray goalAndKey(String entityName){
         JSONArray resArray = new JSONArray();
-//        String entity = entityName + '#';
-//        List<Map> goalAndKey = resourceMapper.queryGoalAndKey(entity);
-//        for (Map perGK : goalAndKey){
-//            JSONObject singleGK = new JSONObject();
-//            singleGK.put("objectives", perGK.get("t_goal"));
-//            singleGK.put("resourceID", perGK.get("resource_id"));
-//            singleGK.put("keyPoint", perGK.get("t_key"));
-//            resArray.add(singleGK);
-//        }
-        for (int i = 0;i<3;i++){
+        Driver driver = createDrive();
+        Session session = driver.session();
+        StatementResult goalNode = session.run( "MATCH (m:goal)-[r]->(a:concept) where a.name = {name} " +
+                        "RETURN m.content, m.id",
+                parameters( "name", entityName) );
+        while ( goalNode.hasNext() )
+        {
+            Record goalRecord = goalNode.next();
+            String content = goalRecord.get( "m.content" ).asString();
+            int id = goalRecord.get("m.id").asInt();
             JSONObject singleGK = new JSONObject();
-            String id = Integer.toString(i+1);
-            singleGK.put("objectives", id + ":基本经济制度的内容，公有制经济的含义及地位，非公有制经济的作用");
-            singleGK.put("keyPoint", id + ":基本经济制度确立过程，基本经济制度发挥的作用");
-            singleGK.put("resourceID", i+1);
+            singleGK.put("objectives", content);
+            singleGK.put("resourceID", id);
+            resArray.add(singleGK);
+        }
+        StatementResult keyNode = session.run( "MATCH (m:key)-[r]->(a:concept) where a.name = {name} " +
+                        "RETURN m.content, m.id",
+                parameters( "name", entityName) );
+        while ( keyNode.hasNext() )
+        {
+            Record keyRecord = keyNode.next();
+            String content = keyRecord.get( "m.content" ).asString();
+            int id = keyRecord.get("m.id").asInt();
+            JSONObject singleGK = new JSONObject();
+            singleGK.put("key", content);
+            singleGK.put("resourceID", id);
             resArray.add(singleGK);
         }
         return resArray;

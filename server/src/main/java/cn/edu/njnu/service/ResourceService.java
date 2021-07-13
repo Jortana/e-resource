@@ -23,7 +23,7 @@ public class ResourceService {
 
     private final ResourceMapper resourceMapper;
     private final UserMapper userMapper;
-    String resourceRoot = "http://223.2.50.241:8082";
+    String resourceRoot = "http://222.192.6.62:8082";
     public ResourceService(ResourceMapper resourceMapper, UserMapper userMapper) {
         this.resourceMapper = resourceMapper;
         this.userMapper = userMapper;

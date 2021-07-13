@@ -34,7 +34,7 @@ public class TypeService {
             String periodID = Integer.toString((Integer) period.get("period_id"));
             String periodName = (String) period.get("period_name");
             periodOb.put("ID", Integer.parseInt(periodID));
-            periodOb.put("Name", periodName);
+            periodOb.put("name", periodName);
             JSONArray subjectArray = new JSONArray();
             List<Map> subjectList = typeMapper.subject(periodID);
             for (Map subject:subjectList){
