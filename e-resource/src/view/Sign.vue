@@ -225,7 +225,6 @@ export default {
         username: signIn.username,
         password: signIn.password
       }).then((response) => {
-        console.log(response)
         if (response.data.code === 200) {
           this.$message({
             message: response.data.message,

@@ -16,7 +16,7 @@
     >
       <div class="operation-container">
         <div class="operation-btn flex">编辑</div>
-        <div class="operation-btn flex">删除</div>
+        <div class="operation-btn flex" @click="confirmDelete">删除</div>
       </div>
       <div v-show="hover" slot="reference" class="operation-dot"></div>
     </el-popover>
@@ -32,12 +32,20 @@ export default {
   },
   data() {
     return {
-      hover: false
+      hover: false,
+      confirmVisible: false
     }
   },
   computed: {
     active() {
       return this.folder.folderID === this.curID
+    }
+  },
+  methods: {
+    // 弹出确认删除的对话框
+    confirmDelete() {
+      const { folderID } = this.folder
+      this.$emit('confirmDelete', folderID)
     }
   }
 }

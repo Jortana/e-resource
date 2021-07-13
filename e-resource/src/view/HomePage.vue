@@ -53,21 +53,16 @@
           <div class="menu-condition">{{ menuObj.condition }}</div>
           <div>
             <div
-              v-for="(classification, index) in menuObj['classification']"
-              :key="index"
+              v-for="classification in menuObj['classification']"
+              :key="classification.ID"
               class="menu-row"
             >
-              <div class="menu-name">
-                【{{ classification['periodName'] }}】
-              </div>
+              <div class="menu-name">【{{ classification.Name }}】</div>
               <div class="links-container">
                 <!-- 每一个可选项 -->
-                <div
-                  v-for="menu in classification['subject']"
-                  :key="menu['periodID']"
-                >
+                <div v-for="menu in classification.menu" :key="menu.menuID">
                   <el-link :underline="false" class="link">
-                    {{ menu['subjectName'] }}
+                    {{ menu.menuName }}
                   </el-link>
                 </div>
               </div>
@@ -153,6 +148,7 @@ export default {
         if (code === 200) {
           this.menus = data
         }
+        console.log(data)
       })
     }
   }
@@ -260,7 +256,7 @@ main {
 
 .menu-condition {
   font-size: 1.2rem;
-  width: 50px;
+  width: 100px;
 }
 
 .menu-name {

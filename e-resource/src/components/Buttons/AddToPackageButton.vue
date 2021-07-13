@@ -44,7 +44,11 @@ import { getFolders } from '@/api/package'
 export default {
   name: 'AddToPackageButton',
   props: {
-    resourceID: Number,
+    resourceType: String, // 用于说明添加的资源类型：resource/content/lGoal/lKey等
+    resourceID: String, // 如果添加的是资源，则传递资源 ID
+    content: String, // 如果添加的是文字内容，则传递内容
+    lGoal: Object, // 学习目标
+    lKey: Object, // 学习重难点
     size: String,
     type: String,
     defaultVisible: {
@@ -92,7 +96,19 @@ export default {
       })
     },
     // 将所选资源添加到资源包
-    addToPackage() {}
+    addToPackage() {
+      const { resourceType: type } = this
+      switch (type) {
+        case 'resource':
+          console.log(this.resourceID)
+          break
+        case 'content':
+          console.log(this.content)
+          break
+        default:
+          break
+      }
+    }
   }
 }
 </script>

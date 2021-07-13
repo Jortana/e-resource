@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class DownloadService {
     private final ResourceMapper resourceMapper;
     //在文件操作中，不用/或者\最好，推荐使用File.separator
-    private  final static String rootPath = "http://223.2.50.241:8082";
+    private  final static String rootPath = "http://222.192.6.62:8082";
 
     public DownloadService(ResourceMapper resourceMapper) {
         this.resourceMapper = resourceMapper;

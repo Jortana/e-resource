@@ -24,9 +24,9 @@ public class EntityService {
         this.resourceMapper = resourceMapper;
         this.recordMapper = recordMapper;
     }
-    String resourceRoot = "http://223.2.50.241:8082";
+    String resourceRoot = "http://222.192.6.62:8082";
     private Driver createDrive(){
-        return GraphDatabase.driver( "bolt://223.2.50.241:7687", AuthTokens.basic( "neo4j", "123456" ) );
+        return GraphDatabase.driver( "bolt://222.192.6.62:7687", AuthTokens.basic( "neo4j", "123456" ) );
     }
     public JSONArray getRelatedEntity(String entityName, Session session, String mainEntityName){
         StatementResult result = session.run( "MATCH (a:concept) -[k:相关关系]-> (m:concept) where a.name = { name } and m.name<>{mainEntity}" +

@@ -1,42 +1,51 @@
 <template>
   <div v-if="resources.length > 0" class="resource-list">
-    <div
-      v-for="resource in resources"
-      :key="resource.id"
-    >
+    <div v-for="resource in resources" :key="resource.id">
       <div class="resource-info">
         <div class="thumbnail-container flex">
-          <el-image class="thumbnail">
-          </el-image>
+          <el-image class="thumbnail"></el-image>
         </div>
         <div class="right-side flex">
           <div class="info">
             <resource-link :resource="resource"></resource-link>
             <div class="file-name">
               <span v-if="resource['url'] == null"></span>
-              <span v-else>{{ `${resource['resourceName']}.${resource['url'].split('.').slice(-1)}` }}</span>
+              <span v-else>
+                <span>{{ `${resource['resourceName']}` }}</span>
+                <span>{{ `.${resource['url'].split('.').slice(-1)}` }}</span>
+              </span>
             </div>
             <div v-if="resource['entityList'] !== null" class="entity-list">
-              <div
-                v-for="entity in resource['entityList']"
-                :key = "entity"
-              >
+              <div v-for="entity in resource['entityList']" :key="entity">
                 <el-button size="mini" @click="searchEntity(entity)">
                   {{ entity }}
                 </el-button>
               </div>
             </div>
             <div class="extra">
-              <div class="extra-info"><i class="el-icon-time"></i> {{ resource['updateTime'] }}</div>
-              <div class="extra-info"><i class="el-icon-download"></i> {{ resource['download'] }} 下载</div>
+              <div class="extra-info">
+                <i class="el-icon-time"></i>
+                {{ resource['updateTime'] }}
+              </div>
+              <div class="extra-info">
+                <i class="el-icon-download"></i>
+                {{ resource['download'] }} 下载
+              </div>
             </div>
           </div>
           <div class="operations">
             <div class="full-width">
-              <download-button :resourceID="resource['id']" :size="'medium'"></download-button>
+              <download-button
+                :resourceID="resource['id']"
+                :size="'medium'"
+              ></download-button>
             </div>
             <div class="full-width">
-              <add-to-package-button :size="'medium'"></add-to-package-button>
+              <add-to-package-button
+                :resourceType="'resource'"
+                :resourceID="String(resource.id)"
+                :size="'medium'"
+              ></add-to-package-button>
             </div>
           </div>
         </div>
@@ -61,10 +70,10 @@ export default {
     searchEntity(entity) {
       this.$router.push({
         query: merge(this.$route.query, {
-          'q': entity,
-          'type': 0,
-          'page': 1,
-          'sort': 0
+          q: entity,
+          type: 0,
+          page: 1,
+          sort: 0
         })
       })
     }
@@ -107,7 +116,7 @@ export default {
 
 .entity-list {
   /* 这里的间距要减去按钮设置的间距，但不完全减 */
-  margin-top: calc(.5rem - 5px);
+  margin-top: calc(0.5rem - 5px);
   display: flex;
   flex-wrap: wrap;
 }
@@ -119,7 +128,7 @@ export default {
 
 .extra {
   display: flex;
-  margin-top: .8rem;
+  margin-top: 0.8rem;
   /*position: absolute;*/
   /*bottom: 0;*/
   min-width: 220px;
@@ -127,7 +136,7 @@ export default {
 
 .extra .extra-info {
   color: #909399;
-  font-size: .9rem;
+  font-size: 0.9rem;
   line-height: 1rem;
   margin-right: 1rem;
 }
@@ -136,7 +145,7 @@ export default {
   display: flex;
   flex-direction: column;
   height: 100%;
-  margin-left: .8rem;
+  margin-left: 0.8rem;
   justify-content: center;
   align-items: center;
 }
@@ -157,11 +166,11 @@ export default {
 
 .resource-name:hover {
   text-decoration: underline;
-  text-underline-offset: .1rem;
+  text-underline-offset: 0.1rem;
 }
 
 .name-in-url {
   color: #555555;
-  margin-bottom: .6rem;
+  margin-bottom: 0.6rem;
 }
 </style>

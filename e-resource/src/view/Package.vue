@@ -15,8 +15,29 @@
             :key="folder.folderID"
             @click="changeFolder(folder.folderID)"
           >
-            <package-folder :curID="curID" :folder="folder"></package-folder>
+            <package-folder
+              :curID="curID"
+              :folder="folder"
+              @confirmDelete="confirmDelete"
+            ></package-folder>
           </div>
+          <!-- 确认删除的对话框 -->
+          <el-dialog
+            :visible.sync="deleteVisible"
+            title="确认删除"
+            width="300px"
+            center
+          >
+            <span>确认删除吗？</span>
+            <span slot="footer" class="dialog-footer">
+              <el-button size="medium" @click="deleteVisible = false">
+                取 消
+              </el-button>
+              <el-button size="medium" type="primary" @click="deleteFolder">
+                确 定
+              </el-button>
+            </span>
+          </el-dialog>
           <!-- 创建收藏夹和修改收藏夹信息的对话框 -->
           <package-info
             v-if="infoVisible"
@@ -49,7 +70,7 @@ import NavMenu from '@/components/NavMenu'
 import PackageFolder from '@/components/ResourcePackage/PackageFolder'
 import PackageInfo from '@/components/ResourcePackage/PacgakeInfo'
 import merge from 'webpack-merge'
-import { getFolders, getResources } from '@/api/package'
+import { getFolders, getResources, deleteFolder } from '@/api/package'
 
 export default {
   name: 'Package',
@@ -58,9 +79,11 @@ export default {
     return {
       packageFolders: [],
       packageInfo: '',
-      curID: '', // 当前选中的资源包的ID
+      curID: '', // 当前选中的资源包的 ID
       curFolderInfo: null, // 当前选中的资源包的信息
-      infoVisible: false // 控制创建和修改资源包信息的对话框是否显示
+      infoVisible: false, // 控制创建和修改资源包信息的对话框是否显示
+      deleteID: '', // 待删除的文件夹的 ID
+      deleteVisible: false // 确认删除的对话框是否显示
     }
   },
   computed: {
@@ -112,6 +135,10 @@ export default {
           if (id === undefined) {
             this.curID = folders[0].folderID
           }
+          const curFolderInfo = folders.find((folder) => {
+            return folder.folderID === this.curID
+          })
+          this.curFolderInfo = curFolderInfo
         } else {
           this.$message.error(message)
         }
@@ -129,6 +156,32 @@ export default {
     // 展示创建和修改资源包的对话框
     showInfoDialog() {
       this.infoVisible = true
+    },
+    // 确认删除
+    confirmDelete(id) {
+      // 弹出确认删除的对话框
+      this.deleteVisible = true
+      // 设置待删除的资源包 ID
+      this.deleteID = id
+    },
+    // 删除资源包
+    deleteFolder() {
+      const { deleteID, curID } = this
+      deleteFolder(deleteID).then((response) => {
+        const {
+          data: { code }
+        } = response
+        if (code === 200) {
+          this.$message.success('删除成功')
+          // 删除的资源包是当前选中的
+          if (deleteID === curID) {
+            console.log('aa')
+            this.$router.push('/package')
+          }
+          this.getPackageFolders()
+        }
+      })
+      this.deleteVisible = false
     }
   }
 }
