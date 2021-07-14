@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +14,7 @@ import java.util.Map;
 @Repository
 public interface FavoriteMapper {
     List<Map> folder(String username);
-    ArrayList<Map> collection(String folderID);
+    ArrayList<Resource> collection(String folderID);
     ArrayList<Map> collectionStr(String folderID);
     ArrayList<Map> key(String folderID);
     ArrayList<Map> goal(String folderID);
@@ -34,4 +35,6 @@ public interface FavoriteMapper {
     boolean delFolderContent(String content, String folderID);
     boolean delFolderGoal(String goal, String folderID);
     boolean delFolderKey(String key, String folderID);
+
+    ArrayList<Map> queryCurrent(HashMap<String, Object> condition);
 }
