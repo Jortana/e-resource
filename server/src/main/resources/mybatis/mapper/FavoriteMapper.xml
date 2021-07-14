@@ -10,13 +10,13 @@
         SELECT t_resource.`id`, resource_name, file_type, `date`  FROM t_collection INNER JOIN t_resource WHERE t_collection.`resource_id` = t_resource.`id` and folder_id = #{folderID} order by `date` desc
     </select>
     <select id="collectionStr" resultType="map">
-        SELECT content, `date` FROM t_collection WHERE folder_id = #{folderID} and resource_id is null order by `date` desc
+        SELECT content, `date` FROM t_collection WHERE folder_id = #{folderID} and content is not null order by `date` desc
     </select>
     <select id="goal" resultType="map">
-        SELECT goal, `date` FROM t_collection WHERE folder_id = #{folderID} and resource_id is null order by `date` desc
+        SELECT goal, `date` FROM t_collection WHERE folder_id = #{folderID} and goal is not null order by `date` desc
     </select>
     <select id="key" resultType="map">
-        SELECT `key`, `date` FROM t_collection WHERE folder_id = #{folderID} and resource_id is null order by `date` desc
+        SELECT `key`, `date` FROM t_collection WHERE folder_id = #{folderID} and `key` is not null order by `date` desc
     </select>
     <!-- 根据资源查id -->
     <select id="queryCurrent" resultType="map">
@@ -41,10 +41,10 @@
         insert into t_collection set resource_id = #{resourceID}, folder_id = #{folderID}, `date` = #{date}
     </insert>
     <insert id="putKey">
-        insert into t_collection set goal = #{goal}, folder_id = #{folderID}, `date` = #{date}
-    </insert>
-    <insert id="putGaol">
         insert into t_collection set `key` = #{key}, folder_id = #{folderID}, `date` = #{date}
+    </insert>
+    <insert id="putGoal">
+        insert into t_collection set goal = #{goal}, folder_id = #{folderID}, `date` = #{date}
     </insert>
     <select id="queryCollection" resultType="map">
         SELECT `id`, resource_id, folder_id, `date` FROM t_collection WHERE resource_id = #{resourceID} and folder_id = #{folderID}
@@ -78,4 +78,14 @@
     <delete id="delFolderKey">
         delete from t_collection where folder_id = #{folderID} and `key` = #{key}
     </delete>
+    <!-- 判断是否已添加 -->
+    <select id="yiyou" resultType="map">
+        select t_folder.`id` FROM t_folder INNER JOIN t_collection WHERE t_folder.`id` = t_collection.`folder_id` and username = #{username} and t_folder.`id` = #{folderID} and
+        <trim suffixOverrides="and">
+            <if test="resourceID!=null">resource_id = #{resourceID} and </if>
+            <if test="content!=null">content = #{content} and </if>
+            <if test="goal!=null">goal = #{goal} and </if>
+            <if test="key!=null">key = #{key} and </if>
+        </trim>
+    </select>
 </mapper>

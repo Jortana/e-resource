@@ -22,8 +22,8 @@ public interface FavoriteMapper {
     boolean updateFolder(String id, String name, String introduction);
     Folder queryFolder(String id);
     boolean putInFolder(int resourceID, String folderID, int date);
-    boolean putGoal(String goal, String folderID, int date);
-    boolean putKey(String key, String folderID, int date);
+    boolean putGoal(int goal, String folderID, int date);
+    boolean putKey(int key, String folderID, int date);
     Map queryCollection(int resourceID, String folderID);
     boolean putInFolderStr(String content, String folderID, int date);
     Map queryCollectionStr(String content, String folderID);
@@ -33,8 +33,9 @@ public interface FavoriteMapper {
     //delete
     boolean delFolderResource(int resourceID, String folderID);
     boolean delFolderContent(String content, String folderID);
-    boolean delFolderGoal(String goal, String folderID);
-    boolean delFolderKey(String key, String folderID);
+    boolean delFolderGoal(int goal, String folderID);
+    boolean delFolderKey(int key, String folderID);
 
     ArrayList<Map> queryCurrent(HashMap<String, Object> condition);
+    ArrayList<Map> yiyou(HashMap<String, Object> condition);
 }
