@@ -14,6 +14,18 @@ export const createFolder = (packageInfo) => {
 }
 
 /**
+ * 修改资源包文件夹信息
+ * @param {Object} packageInfo - 资源包文件夹的基本信息
+ * @param {Object} packageInfo.folderID - 资源包 ID
+ * @param {String} packageInfo.name - 资源包名称
+ * @param {String} [packageInfo.introduction] - 资源包简介
+ * @returns {AxiosPromise}
+ */
+export const updateFolder = (packageInfo) => {
+  return http.put(`${baseURL}/private/updateFolder`, packageInfo)
+}
+
+/**
  * 获取当前用户的资源包
  * @returns {AxiosPromise}
  */

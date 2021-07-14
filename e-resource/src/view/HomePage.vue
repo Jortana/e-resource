@@ -57,7 +57,7 @@
               :key="classification.ID"
               class="menu-row"
             >
-              <div class="menu-name">【{{ classification.Name }}】</div>
+              <div class="menu-name">【{{ classification.name }}】</div>
               <div class="links-container">
                 <!-- 每一个可选项 -->
                 <div v-for="menu in classification.menu" :key="menu.menuID">

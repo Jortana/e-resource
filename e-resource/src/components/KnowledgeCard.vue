@@ -48,7 +48,7 @@
           </div>
         </div>
       </div>
-      <el-link class="more" @click="gotoKnowledge">查看完整信息</el-link>
+      <!-- <el-link class="more" @click="gotoKnowledge">查看完整信息</el-link> -->
       <!-- 隐藏的a元素，用来在新窗口打开资源页面 -->
       <a
         v-show="false"
@@ -112,6 +112,7 @@ export default {
 .properties {
   font-size: 1rem;
   margin-bottom: 0.3rem;
+  align-items: center;
 }
 
 .more {

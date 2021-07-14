@@ -137,7 +137,7 @@ export default {
         resourceInfo(resourceID).then((response) => {
           if (response.data.code === 200) {
             this.resource = response.data.data
-            console.log(response.data.data)
+            console.log(this.resource)
             // 先处理一下entityList
             const entityList = response.data.data['entityList']
             let keyword = ''
@@ -157,7 +157,7 @@ export default {
         })
         // 获取相关资源
         related(resourceID).then((response) => {
-          console.log(response)
+          // console.log(response)
           if (response.data.code === 200) {
             this.relatedResources = response.data.data
           }

@@ -59,9 +59,7 @@
             </div>
           </div>
           <!-- 资源包中包含资源的展示区域 -->
-          <div>
-            资源
-          </div>
+          <resources :resourcesObj.sync="resources" />
         </div>
       </div>
     </div>
@@ -72,18 +70,20 @@
 import NavMenu from '@/components/NavMenu'
 import PackageFolder from '@/components/ResourcePackage/PackageFolder'
 import PackageInfo from '@/components/ResourcePackage/PacgakeInfo'
+import Resources from '@/components/ResourcePackage/Resources'
 import merge from 'webpack-merge'
 import { getFolders, getResources, deleteFolder } from '@/api/package'
 
 export default {
   name: 'Package',
-  components: { NavMenu, PackageFolder, PackageInfo },
+  components: { NavMenu, PackageFolder, PackageInfo, Resources },
   data() {
     return {
       packageFolders: [],
       packageInfo: '',
       curID: '', // 当前选中的资源包的 ID
       curFolderInfo: null, // 当前选中的资源包的信息
+      resources: null, // 当前选中的资源包中包含的资源信息
       infoVisible: false, // 控制创建和修改资源包信息的对话框是否显示
       originInfo: null, // 待修改的资源包的原始信息
       deleteID: '', // 待删除的文件夹的 ID
@@ -125,6 +125,7 @@ export default {
         const { code, data } = response.data
         if (code === 200) {
           console.log(data)
+          this.resources = { ...data }
         }
       })
     },

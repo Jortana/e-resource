@@ -108,6 +108,10 @@ public class ResourceService {
         return ResultFactory.buildSuccessResult("查询成功",queryResource);
     }
 
+    private static Driver createDrive(){
+        return GraphDatabase.driver( "bolt://222.192.6.62:7687", AuthTokens.basic( "neo4j", "123456" ) );
+    }
+
     //更新资源相似度
     public Result updateRelatedResource(){
         Driver driver = createDrive();
