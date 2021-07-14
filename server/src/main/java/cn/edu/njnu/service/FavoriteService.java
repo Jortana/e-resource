@@ -65,6 +65,7 @@ public class FavoriteService {
         ArrayList<String> currentFolder = new ArrayList<>();
         if (infoMap.size() == 0){
             resObject.put("currentFolder", currentFolder);
+            return ResultFactory.buildSuccessResult("收藏夹获取成功", resArray);
         }
         else if (infoMap.containsKey("resourceID")){
             int resourceID = Integer.parseInt((String) infoMap.get("resourceID"));
