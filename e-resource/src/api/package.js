@@ -29,8 +29,16 @@ export const updateFolder = (packageInfo) => {
  * 获取当前用户的资源包
  * @returns {AxiosPromise}
  */
-export const getFolders = () => {
-  return http.get(`${baseURL}/private/folder`)
+export const getFolders = (params) => {
+  if (!params) {
+    return http.get(`${baseURL}/private/folder`)
+  }
+  const { resourceID, content } = params || null
+  if (resourceID) {
+    return http.get(`${baseURL}/private/folder/?resourceID=${resourceID}`)
+  } else if (content) {
+    return http.get(`${baseURL}/private/folder/?content=${content}`)
+  }
 }
 
 /**
@@ -40,6 +48,21 @@ export const getFolders = () => {
  */
 export const getResources = (id) => {
   return http.get(`${baseURL}/private/folderResource/${id}`)
+}
+
+/**
+ * 将资源添加到资源包,后四个参数只能写一个
+ * @param {Object} resource
+ * @param {Array} resource.addFolderID - 资源添加资源包的 ID 的数组
+ * @param {Array} resource.deleteFolderID - 资源从资源包删除的资源包的 ID 的数组
+ * @param {String} [resource.resourceID] - 待添加的资源 ID
+ * @param {String} [resource.content] - 待添加的文本资源
+ * @param {String} [resource.goal] - 待添加的学习目标 ID
+ * @param {String} [resource.key] - 待添加的学习重难点 ID
+ * @returns {AxiosPromise}
+ */
+export const addResource = (resource) => {
+  return http.post(`${baseURL}/private/putInFolder`, resource)
 }
 
 /**
