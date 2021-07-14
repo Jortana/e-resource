@@ -15,15 +15,15 @@
       framespacing="0"
       allowfullscreen="true"
     ></iframe>
-    <!--  <div v-else>-->
-    <!--    该资源暂不支持预览，请下载后进行学习-->
-    <!--  </div>-->
+    <div v-else>
+      该资源暂不支持预览
+    </div>
   </div>
 </template>
 
 <script>
 import pdf from 'vue-pdf'
-const baseUrl = 'http://223.2.50.241:8082'
+const baseUrl = 'http://222.192.6.62:8082'
 export default {
   name: 'ResourceViewer',
   components: {

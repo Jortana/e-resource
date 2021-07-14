@@ -418,6 +418,6 @@ export default {
 
 .goal-and-key-card {
   width: calc(50% - 10px);
-  height: 180px;
+  height: 190px;
 }
 </style>

@@ -28,7 +28,8 @@ const http = {
       method: 'put',
       url: url
     }
-    if (params) config.params = params
+    if (params) config.data = params
+    // if (params) config.params = params
     return request(config)
   },
   delete(url, params) {

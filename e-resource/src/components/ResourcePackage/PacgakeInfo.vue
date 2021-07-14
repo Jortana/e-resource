@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import { createFolder } from '@/api/package'
+import { createFolder, updateFolder } from '@/api/package'
 export default {
   name: 'PackageInfo',
   components: {},
@@ -110,7 +110,7 @@ export default {
     // 提交创建/修改信息
     submit(folderInfo) {
       // 判断是创建还是修改
-      if (this.originInfo !== null) {
+      if (this.originInfo === null) {
         // 创建
         createFolder(folderInfo).then((response) => {
           const { code } = response.data
@@ -122,6 +122,15 @@ export default {
         })
       } else {
         // 修改
+        const { id: folderID, name, intro: introduction } = this.packageInfo
+        updateFolder({ folderID, name, introduction }).then((response) => {
+          const { code } = response.data
+          if (code === 200) {
+            this.$message.success('修改成功')
+            this.$emit('updatePackages')
+            this.close()
+          }
+        })
       }
     }
   }
