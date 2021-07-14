@@ -134,6 +134,7 @@ export default {
       const { id } = this.query
       getFolders().then((response) => {
         const { code, data: folders, message } = response.data
+        console.log(response.data)
         if (code === 200) {
           this.packageFolders = folders
           // 设置当前选中的资源包
