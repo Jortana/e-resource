@@ -32,7 +32,7 @@
               <use v-else xlink:href="#e-resource-icon-unknown"></use>
             </svg>
             <div @click="viewResource(resource.id)">
-              {{ resource['resource_name'] }}
+              {{ resource['resourceName'] }}
             </div>
           </li>
         </ul>
@@ -47,13 +47,13 @@
           :key="index"
           class="content"
         >
-          {{ goal }}
+          {{ goal.text }}
         </div>
       </div>
       <div v-if="resources.key" class="section">
         <h4>学习重难点</h4>
         <div v-for="(key, index) in resources.key" :key="index" class="content">
-          {{ key }}
+          {{ key.text }}
         </div>
       </div>
       <div v-if="resources.content" class="section">

@@ -53,7 +53,7 @@
           <!-- 资源包名、简介等基本信息 -->
           <div v-if="curFolderInfo" class="basic-info">
             <div>{{ curFolderInfo.folderName }}</div>
-            <div class="intro">100 个内容</div>
+            <div class="intro">{{ curFolderInfo.resourceNum }} 个内容</div>
             <div class="intro">
               {{ curFolderInfo.introduction }}
             </div>

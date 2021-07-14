@@ -16,6 +16,8 @@
           <add-to-package-button
             :ref="'btn'"
             :default-visible="false"
+            :resourceType="title === '学习目标' ? 'lGoal' : 'lKey'"
+            :resourceID="String(contents[curIndex].resourceID)"
             class="x-mini-btn"
           ></add-to-package-button>
         </div>
