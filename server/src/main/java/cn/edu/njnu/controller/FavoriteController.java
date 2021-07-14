@@ -16,8 +16,8 @@ public class FavoriteController {
     }
 
     @GetMapping("/v1.0/private/folder")
-    public Result favorite(){
-        return favoriteService.favorite();
+    public Result favorite(@RequestParam Map<String, Object> infoMap){
+        return favoriteService.favorite(infoMap);
     }
 
     @GetMapping("/v1.0/private/folderResource/{folderID}")

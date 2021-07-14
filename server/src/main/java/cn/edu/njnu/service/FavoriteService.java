@@ -7,10 +7,13 @@ import cn.edu.njnu.pojo.ResultFactory;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.shiro.SecurityUtils;
+import org.neo4j.driver.v1.*;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import static org.neo4j.driver.v1.Values.parameters;
 
 @Service
 public class FavoriteService {
@@ -18,6 +21,9 @@ public class FavoriteService {
 
     public FavoriteService(FavoriteMapper favoriteMapper) {
         this.favoriteMapper = favoriteMapper;
+    }
+    private Driver createDrive(){
+        return GraphDatabase.driver( "bolt://222.192.6.62:7687", AuthTokens.basic( "neo4j", "123456" ) );
     }
     //生成8位id
     public static  String getUUID()
@@ -37,9 +43,10 @@ public class FavoriteService {
     }
 
     //根据username获取收藏夹
-    public Result favorite(){
+    public Result favorite(Map<String, Object> infoMap){
         String username = (String) SecurityUtils.getSubject().getPrincipal();
-        JSONArray resObject = new JSONArray();
+        JSONObject resObject = new JSONObject();
+        JSONArray resArray = new JSONArray();
         List<Map> folderList = favoriteMapper.folder(username);
         for (Map folder:folderList){
             JSONObject singleFolder = new JSONObject();
@@ -50,13 +57,61 @@ public class FavoriteService {
             singleFolder.put("folderName", folderName);
             singleFolder.put("introduction", introduction);
             singleFolder.put("resourceNum", favoriteMapper.number(folderID));
-            resObject.add(singleFolder);
+            resArray.add(singleFolder);
+        }
+        resObject.put("folders", resArray);
+        HashMap<String, Object> condition = new HashMap<>();
+        condition.put("username", username);
+        ArrayList<String> currentFolder = new ArrayList<>();
+        if (infoMap.size() == 0){
+            resObject.put("currentFolder", currentFolder);
+        }
+        else if (infoMap.containsKey("resourceID")){
+            int resourceID = Integer.parseInt((String) infoMap.get("resourceID"));
+            condition.put("resourceID", resourceID);
+            ArrayList<Map> folderID = favoriteMapper.queryCurrent(condition);
+            for (Map folder:folderID){
+                currentFolder.add((String) folder.get("id"));
+            }
+            resObject.put("currentFolder", currentFolder);
+        }
+        else if (infoMap.containsKey("content")){
+            String content = (String) infoMap.get("content");
+            condition.put("content", content);
+            ArrayList<Map> folderID = favoriteMapper.queryCurrent(condition);
+            for (Map folder:folderID){
+                currentFolder.add((String) folder.get("id"));
+            }
+            resObject.put("currentFolder", currentFolder);
+        }
+        else if (infoMap.containsKey("goal")){
+            int goal = Integer.parseInt((String) infoMap.get("goal"));
+            condition.put("goal", goal);
+            ArrayList<Map> folderID = favoriteMapper.queryCurrent(condition);
+            for (Map folder:folderID){
+                currentFolder.add((String) folder.get("id"));
+            }
+            resObject.put("currentFolder", currentFolder);
+        }
+        else if (infoMap.containsKey("key")){
+            int key = Integer.parseInt((String) infoMap.get("key"));
+            condition.put("key", key);
+            ArrayList<Map> folderID = favoriteMapper.queryCurrent(condition);
+            for (Map folder:folderID){
+                currentFolder.add((String) folder.get("id"));
+            }
+            resObject.put("currentFolder", currentFolder);
+        }
+        else {
+            return ResultFactory.buildFailResult("获取失败");
         }
         return ResultFactory.buildSuccessResult("收藏夹获取成功", resObject);
     }
 
     //根据收藏夹ID获取资源
     public Result folderResource(String folderID){
+        Driver driver = createDrive();
+        Session session = driver.session();
         JSONObject folder = new JSONObject();
         folder.put("resources", favoriteMapper.collection(folderID));
         ArrayList<Map> contentMap = favoriteMapper.collectionStr(folderID);
@@ -72,12 +127,24 @@ public class FavoriteService {
         folder.put("content", content);
 
         ArrayList<Map> goalMap = favoriteMapper.goal(folderID);
-        ArrayList<String> goal = new ArrayList<>();
+        JSONArray goal = new JSONArray();
         System.out.println(goalMap);
         if (goalMap.size()>0){
             for (Map singleGoal:goalMap){
                 if (singleGoal!=null){
-                    goal.add((String) singleGoal.get("goal"));
+                    int id = (int) singleGoal.get("goal");
+                    StatementResult node = session.run( "MATCH (n:GoalAndKey) where n.id = {id} " +
+                                    "RETURN n.goal as goal",
+                            parameters( "id", id) );
+                    while ( node.hasNext() )
+                    {
+                        Record record = node.next();
+                        String text = record.get( "goal" ).asString();
+                        JSONObject goalObject = new JSONObject();
+                        goalObject.put("id", id);
+                        goalObject.put("text", text);
+                        goal.add(goalObject);
+                    }
                 }
 
             }
@@ -85,11 +152,23 @@ public class FavoriteService {
         folder.put("goal", goal);
 
         ArrayList<Map> keyMap = favoriteMapper.key(folderID);
-        ArrayList<String> key = new ArrayList<>();
+        JSONArray key = new JSONArray();
         if (goalMap.size()>0){
             for (Map singleKey:keyMap){
                 if (singleKey!=null){
-                    key.add((String) singleKey.get("key"));
+                    int id = (int) singleKey.get("key");
+                    StatementResult node = session.run( "MATCH (n:GoalAndKey) where n.id = {id} " +
+                                    "RETURN n.key as key",
+                            parameters( "id", id) );
+                    while ( node.hasNext() )
+                    {
+                        Record record = node.next();
+                        String text = record.get( "key" ).asString();
+                        JSONObject keyObject = new JSONObject();
+                        keyObject.put("id", id);
+                        keyObject.put("text", text);
+                        key.add(keyObject);
+                    }
                 }
 
             }

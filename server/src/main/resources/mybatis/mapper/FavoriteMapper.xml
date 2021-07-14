@@ -6,7 +6,7 @@
     <select id="folder" resultType="map">
         SELECT `id`, `name`, introduction FROM t_folder WHERE username = #{username} order by `date` desc
     </select>
-    <select id="collection" resultType="map">
+    <select id="collection" resultType="resource">
         SELECT t_resource.`id`, resource_name, file_type, `date`  FROM t_collection INNER JOIN t_resource WHERE t_collection.`resource_id` = t_resource.`id` and folder_id = #{folderID} order by `date` desc
     </select>
     <select id="collectionStr" resultType="map">
@@ -17,6 +17,16 @@
     </select>
     <select id="key" resultType="map">
         SELECT `key`, `date` FROM t_collection WHERE folder_id = #{folderID} and resource_id is null order by `date` desc
+    </select>
+    <!-- 根据资源查id -->
+    <select id="queryCurrent" resultType="map">
+        select t_folder.`id` FROM t_folder INNER JOIN t_collection WHERE t_folder.`id` = t_collection.`folder_id` and username = #{username} and
+        <trim suffixOverrides="and">
+            <if test="resourceID!=null">resource_id = #{resourceID} and </if>
+            <if test="content!=null">content = #{content} and </if>
+            <if test="goal!=null">goal = #{goal} and </if>
+            <if test="key!=null">key = #{key} and </if>
+        </trim>
     </select>
     <insert id="createFolder">
         insert into t_folder set id = #{id}, `name` = #{name}, introduction = #{introduction}, username = #{username}, `date` =#{date}

@@ -194,29 +194,18 @@ public class EntityService {
         JSONArray resArray = new JSONArray();
         Driver driver = createDrive();
         Session session = driver.session();
-        StatementResult goalNode = session.run( "MATCH (m:goal)-[r]->(a:concept) where a.name = {name} " +
-                        "RETURN m.content, m.id",
+        StatementResult goalNode = session.run( "MATCH (m:GoalAndKey)-[r]->(a:concept) where a.name = {name} " +
+                        "RETURN m.key, m.goal, m.id",
                 parameters( "name", entityName) );
         while ( goalNode.hasNext() )
         {
             Record goalRecord = goalNode.next();
-            String content = goalRecord.get( "m.content" ).asString();
+            String objectives = goalRecord.get( "m.goal" ).asString();
+            String key = goalRecord.get( "m.key" ).asString();
             int id = goalRecord.get("m.id").asInt();
             JSONObject singleGK = new JSONObject();
-            singleGK.put("objectives", content);
-            singleGK.put("resourceID", id);
-            resArray.add(singleGK);
-        }
-        StatementResult keyNode = session.run( "MATCH (m:key)-[r]->(a:concept) where a.name = {name} " +
-                        "RETURN m.content, m.id",
-                parameters( "name", entityName) );
-        while ( keyNode.hasNext() )
-        {
-            Record keyRecord = keyNode.next();
-            String content = keyRecord.get( "m.content" ).asString();
-            int id = keyRecord.get("m.id").asInt();
-            JSONObject singleGK = new JSONObject();
-            singleGK.put("key", content);
+            singleGK.put("objectives", objectives);
+            singleGK.put("key", key);
             singleGK.put("resourceID", id);
             resArray.add(singleGK);
         }
