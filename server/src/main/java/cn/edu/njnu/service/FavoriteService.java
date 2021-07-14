@@ -129,8 +129,9 @@ public class FavoriteService {
 
         ArrayList<Map> goalMap = favoriteMapper.goal(folderID);
         JSONArray goal = new JSONArray();
-        System.out.println(goalMap);
+
         if (goalMap.size()>0){
+            System.out.println(goalMap);
             for (Map singleGoal:goalMap){
                 if (singleGoal!=null){
                     int id = (int) singleGoal.get("goal");
@@ -154,7 +155,7 @@ public class FavoriteService {
 
         ArrayList<Map> keyMap = favoriteMapper.key(folderID);
         JSONArray key = new JSONArray();
-        if (goalMap.size()>0){
+        if (keyMap.size()>0){
             for (Map singleKey:keyMap){
                 if (singleKey!=null){
                     int id = (int) singleKey.get("key");
@@ -212,31 +213,55 @@ public class FavoriteService {
         int date = (int) System.currentTimeMillis();
         ArrayList<String> folderIDList = (ArrayList<String>) IDMap.get("addFolderID");
         ArrayList<String> delFolderIDList = (ArrayList<String>) IDMap.get("deleteFolderID");
+        String username = (String) SecurityUtils.getSubject().getPrincipal();
+        int flag = 0; //判断是否添加成功
         if (IDMap.containsKey("resourceID")){
             int resourceID = (int) IDMap.get("resourceID");
             for (String folderID:delFolderIDList){
                 favoriteMapper.delFolderResource(resourceID, folderID);
             }
             for (String folderID:folderIDList){
-                favoriteMapper.putInFolder(resourceID, folderID, date);
+                HashMap<String, Object> condition = new HashMap<>();
+                condition.put("username", username);
+                condition.put("folderID", folderID);
+                condition.put("resourceID", resourceID);
+                if (favoriteMapper.yiyou(condition).size() == 0){
+                    flag = 1;
+                    favoriteMapper.putInFolder(resourceID, folderID, date);
+                }
             }
         }
         else if (IDMap.containsKey("goal")){
-            String goal = (String) IDMap.get("goal");
+            int goal = (int) IDMap.get("goal");
             for (String folderID:delFolderIDList){
                 favoriteMapper.delFolderGoal(goal, folderID);
             }
             for (String folderID:folderIDList){
-                favoriteMapper.putGoal(goal, folderID, date);
+                HashMap<String, Object> condition = new HashMap<>();
+                condition.put("username", username);
+                condition.put("folderID", folderID);
+                condition.put("goal", goal);
+                System.out.println(favoriteMapper.yiyou(condition));
+                if (favoriteMapper.yiyou(condition).size() == 0){
+                    flag = 1;
+                    favoriteMapper.putGoal(goal, folderID, date);
+                }
             }
         }
         else if (IDMap.containsKey("key")){
-            String key = (String) IDMap.get("key");
+            int key = (int) IDMap.get("key");
             for (String folderID:delFolderIDList){
                 favoriteMapper.delFolderKey(key, folderID);
             }
             for (String folderID:folderIDList){
-                favoriteMapper.putKey(key, folderID, date);
+                HashMap<String, Object> condition = new HashMap<>();
+                condition.put("username", username);
+                condition.put("folderID", folderID);
+                condition.put("key", key);
+                if (favoriteMapper.yiyou(condition).size() == 0){
+                    flag = 1;
+                    favoriteMapper.putKey(key, folderID, date);
+                }
             }
         }
         else {
@@ -245,9 +270,21 @@ public class FavoriteService {
                 favoriteMapper.delFolderContent(content, folderID);
             }
             for (String folderID:folderIDList){
-                favoriteMapper.putInFolderStr(content, folderID, date);
+                HashMap<String, Object> condition = new HashMap<>();
+                condition.put("username", username);
+                condition.put("folderID", folderID);
+                condition.put("content", content);
+                if (favoriteMapper.yiyou(condition).size() == 0){
+                    flag = 1;
+                    favoriteMapper.putInFolderStr(content, folderID, date);
+                }
             }
         }
-        return ResultFactory.buildSuccessResult("添加成功", null);
+        if (flag == 1){
+            return ResultFactory.buildSuccessResult("添加成功", null);
+        }
+        else {
+            return ResultFactory.buildFailResult("添加失败");
+        }
     }
 }
