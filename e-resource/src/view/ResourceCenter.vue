@@ -247,7 +247,7 @@ export default {
             }
             if (goalAndKey['keyPoint'] !== null) {
               key.push({
-                content: goalAndKey['keyPoint'],
+                content: goalAndKey['objectives'],
                 resourceID: goalAndKey['resourceID']
               })
             }
