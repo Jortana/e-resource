@@ -30,4 +30,6 @@ public interface ResourceMapper {
 
     Map queryDocument(int id);
     Map queryBvideo(int id);
+
+    String queryUrl(int resourceID);
 }
