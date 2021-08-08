@@ -14,7 +14,11 @@
       <i
         v-show="mouseOver"
         slot="reference"
-        :class="btnMouseOver ? 'el-icon-error danger' : 'el-icon-error'"
+        :class="
+          btnMouseOver
+            ? 'el-icon-error danger content-btn'
+            : 'el-icon-error content-btn'
+        "
         @mouseenter="btnMouseOver = true"
         @mouseleave="btnMouseOver = false"
       ></i>
@@ -23,22 +27,55 @@
 </template>
 
 <script>
+import { deleteResource } from '@/api/package'
+
 export default {
   name: 'ResourceContent',
   props: {
-    content: String
+    type: String,
+    content: String,
+    id: Number,
+    folderID: String
   },
   data() {
     return {
       mouseOver: false,
       btnMouseOver: false
     }
+  },
+  methods: {
+    deleteResource() {
+      const info = {
+        folderID: this.folderID
+      }
+      switch (this.type) {
+        case 'goal':
+          info.goal = this.id
+          break
+        case 'key':
+          info.key = this.id
+          break
+        case 'content':
+          info.content = this.content
+          break
+        default:
+          break
+      }
+      deleteResource(info).then((response) => {
+        const { code } = response.data
+        if (code === 200) {
+          this.$emit('updateResource')
+        } else {
+          this.$message.error('删除失败，请稍后再试')
+        }
+      })
+    }
   }
 }
 </script>
 
 <style>
-.el-icon-error {
+.content-btn {
   margin-left: 0;
   cursor: pointer;
 }

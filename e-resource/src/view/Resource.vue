@@ -22,7 +22,10 @@
               ></download-button>
             </div>
             <div class="operation-button">
-              <add-to-package-button></add-to-package-button>
+              <add-to-package-button
+                :resourceType="'resource'"
+                :resourceID="String(resourceID)"
+              ></add-to-package-button>
             </div>
             <!--          <div class="operation-button">-->
             <!--            <el-button class="full-width" size="medium" icon="el-icon-star-off">-->
