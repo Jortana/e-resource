@@ -51,15 +51,25 @@
         <!-- 资源包内容展示区域 -->
         <div class="list flex-1">
           <!-- 资源包名、简介等基本信息 -->
-          <div v-if="curFolderInfo" class="basic-info">
-            <div>{{ curFolderInfo.folderName }}</div>
-            <div class="intro">{{ curFolderInfo.resourceNum }} 个内容</div>
-            <div class="intro">
-              {{ curFolderInfo.introduction }}
+          <div v-if="curFolderInfo" class="basic-info flex">
+            <div>
+              <div>{{ curFolderInfo.folderName }}</div>
+              <div class="intro">{{ curFolderInfo.resourceNum }} 个内容</div>
+              <div class="intro">
+                {{ curFolderInfo.introduction }}
+              </div>
             </div>
+            <!-- 下载按钮 -->
+            <el-button class="download-btn" type="primary">
+              下 载
+            </el-button>
           </div>
           <!-- 资源包中包含资源的展示区域 -->
-          <resources :resourcesObj.sync="resources" />
+          <resources
+            :resourcesObj.sync="resources"
+            :folderID="curID"
+            @updateResource="getPackageResources(curID)"
+          />
         </div>
       </div>
     </div>
@@ -128,6 +138,7 @@ export default {
           this.resources = { ...data }
         }
       })
+      this.getPackageFolders()
     },
     // 获取所有资源包
     getPackageFolders() {
@@ -259,6 +270,11 @@ export default {
 
 .basic-info {
   border-bottom: 1px solid #e4e7ed;
+  justify-content: space-between;
+}
+
+.download-btn {
+  margin-bottom: 1rem;
 }
 
 .intro {

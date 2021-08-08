@@ -289,7 +289,7 @@ public class FavoriteService {
     }
     //资源加入资源包
     public Result delSingle(Map<String, Object> IDMap){
-        String folderID = (String) IDMap.get("FolderID");
+        String folderID = (String) IDMap.get("folderID");
         int flag = 0; //判断是否添加成功
         if (IDMap.containsKey("resourceID")){
             int resourceID = (int) IDMap.get("resourceID");

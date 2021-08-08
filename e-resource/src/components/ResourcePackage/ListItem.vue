@@ -1,6 +1,5 @@
 <template>
   <li @mouseover="mouseOver = true" @mouseleave="mouseOver = false">
-    <!-- {{ resource['fileType'] }} -->
     <svg class="type-icon" aria-hidden="true">
       <use
         v-if="resource['fileType'] === 'doc' || resource['fileType'] === 'docx'"
@@ -59,10 +58,13 @@
 </template>
 
 <script>
+import { deleteResource } from '@/api/package'
+
 export default {
   name: 'ListItem',
   props: {
-    resource: Object
+    resource: Object,
+    id: String
   },
   data() {
     return {
@@ -80,7 +82,18 @@ export default {
       target.click()
     },
     deleteResource() {
-      console.log('dedele')
+      const info = {
+        folderID: this.id,
+        resourceID: this.resource.id
+      }
+      deleteResource(info).then((response) => {
+        const { code } = response.data
+        if (code === 200) {
+          this.$emit('updateResource')
+        } else {
+          this.$message.error('删除失败，请稍后再试')
+        }
+      })
     }
   }
 }
@@ -101,7 +114,7 @@ export default {
 }
 
 .el-icon-error {
-  margin-left: 0.5rem;
+  margin-left: 5px;
   color: #c0c4cc;
 }
 

@@ -37,7 +37,7 @@ const http = {
       method: 'delete',
       url: url
     }
-    if (params) config.params = params
+    if (params) config.data = params
     return request(config)
   },
   download(url, params) {

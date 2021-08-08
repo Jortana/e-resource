@@ -73,3 +73,17 @@ export const addResource = (resource) => {
 export const deleteFolder = (id) => {
   return http.delete(`${baseURL}/private/folder/${id}`)
 }
+
+/**
+ * 删除资源包中的某个资源
+ * @param {Object} resourceInfo
+ * @param {Number} resourceInfo.folderID - 待删除资源所在资源包的 ID
+ * @param {String} [resourceInfo.resourceID] - 待删除的资源 ID
+ * @param {String} [resourceInfo.content] - 待删除的文本资源
+ * @param {String} [resourceInfo.goal] - 待删除的学习目标 ID
+ * @param {String} [resourceInfo.key] - 待删除的学习重难点 ID
+ * @returns {AxiosPromise}
+ */
+export const deleteResource = (resourceInfo) => {
+  return http.delete(`${baseURL}/private/delSingle`, resourceInfo)
+}

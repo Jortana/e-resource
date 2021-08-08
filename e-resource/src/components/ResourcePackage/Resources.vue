@@ -9,6 +9,8 @@
             v-for="resource in resources.resources"
             :key="resource.id"
             :resource="resource"
+            :id="folderID"
+            @updateResource="$emit('updateResource')"
           />
         </ul>
       </div>
@@ -22,13 +24,25 @@
           :key="index"
           class="content"
         >
-          <resource-content :content="goal.text" />
+          <resource-content
+            :content="goal.text"
+            :folderID="folderID"
+            :id="goal.id"
+            :type="'goal'"
+            @updateResource="$emit('updateResource')"
+          />
         </div>
       </div>
       <div v-if="resources.key" class="section">
         <h4>学习重难点</h4>
         <div v-for="(key, index) in resources.key" :key="index" class="content">
-          <resource-content :content="key.text" />
+          <resource-content
+            :content="key.text"
+            :folderID="folderID"
+            :id="key.id"
+            :type="'key'"
+            @updateResource="$emit('updateResource')"
+          />
         </div>
       </div>
       <div v-if="resources.content" class="section">
@@ -38,7 +52,12 @@
           :key="index"
           class="content"
         >
-          <resource-content :content="content" />
+          <resource-content
+            :content="content"
+            :folderID="folderID"
+            :type="'content'"
+            @updateResource="$emit('updateResource')"
+          />
         </div>
       </div>
     </section>
@@ -65,7 +84,8 @@ export default {
     resourcesObj: {
       type: Object,
       default: null
-    }
+    },
+    folderID: String
   },
   data() {
     return {
