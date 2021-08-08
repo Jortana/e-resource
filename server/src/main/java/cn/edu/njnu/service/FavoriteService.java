@@ -287,4 +287,35 @@ public class FavoriteService {
             return ResultFactory.buildFailResult("添加失败");
         }
     }
+    //资源加入资源包
+    public Result delSingle(Map<String, Object> IDMap){
+        String folderID = (String) IDMap.get("FolderID");
+        int flag = 0; //判断是否添加成功
+        if (IDMap.containsKey("resourceID")){
+            int resourceID = (int) IDMap.get("resourceID");
+            favoriteMapper.delFolderResource(resourceID, folderID);
+            flag = 1;
+        }
+        else if (IDMap.containsKey("goal")){
+            int goal = (int) IDMap.get("goal");
+            favoriteMapper.delFolderGoal(goal, folderID);
+            flag = 1;
+        }
+        else if (IDMap.containsKey("key")){
+            int key = (int) IDMap.get("key");
+            favoriteMapper.delFolderKey(key, folderID);
+            flag = 1;
+        }
+        else {
+            String content = (String) IDMap.get("content");
+            favoriteMapper.delFolderContent(content, folderID);
+            flag = 1;
+        }
+        if (flag == 1){
+            return ResultFactory.buildSuccessResult("删除成功", null);
+        }
+        else {
+            return ResultFactory.buildFailResult("删除失败");
+        }
+    }
 }

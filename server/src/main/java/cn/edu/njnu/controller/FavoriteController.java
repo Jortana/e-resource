@@ -45,4 +45,9 @@ public class FavoriteController {
     public Result updateFolder(@RequestBody Map<String, Object> infoMap){
         return favoriteService.updateFolder(infoMap);
     }
+
+    @PostMapping("/v1.0/private/delSingle")
+    public Result delSingle(@RequestBody Map<String, Object> IDMap){
+        return favoriteService.delSingle(IDMap);
+    }
 }
