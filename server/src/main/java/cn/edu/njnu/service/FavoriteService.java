@@ -184,7 +184,7 @@ public class FavoriteService {
         String username = (String) SecurityUtils.getSubject().getPrincipal();
         String name = (String) infoMap.get("name");
         String introduction = (String) infoMap.get("introduction");
-        int date = (int) System.currentTimeMillis();
+        long date = System.currentTimeMillis();
         if (favoriteMapper.createFolder(id, name, introduction, username, date)){
             Folder folder = favoriteMapper.queryFolder(id);
             return ResultFactory.buildSuccessResult("创建成功",folder);
@@ -210,7 +210,7 @@ public class FavoriteService {
     }
     //资源加入资源包
     public Result putInFolder(Map<String, Object> IDMap){
-        int date = (int) System.currentTimeMillis();
+        long date = System.currentTimeMillis();
         ArrayList<String> folderIDList = (ArrayList<String>) IDMap.get("addFolderID");
         ArrayList<String> delFolderIDList = (ArrayList<String>) IDMap.get("deleteFolderID");
         String username = (String) SecurityUtils.getSubject().getPrincipal();
@@ -289,27 +289,34 @@ public class FavoriteService {
     }
     //资源加入资源包
     public Result delSingle(Map<String, Object> IDMap){
-        String folderID = (String) IDMap.get("FolderID");
+        System.out.println(IDMap);
+        String folderID = (String) IDMap.get("folderID");
         int flag = 0; //判断是否添加成功
         if (IDMap.containsKey("resourceID")){
             int resourceID = (int) IDMap.get("resourceID");
-            favoriteMapper.delFolderResource(resourceID, folderID);
-            flag = 1;
+            if (favoriteMapper.delFolderResource(resourceID, folderID)){
+                flag = 1;
+            }
         }
         else if (IDMap.containsKey("goal")){
             int goal = (int) IDMap.get("goal");
-            favoriteMapper.delFolderGoal(goal, folderID);
-            flag = 1;
+            System.out.println(goal);
+            System.out.println(folderID);
+            if (favoriteMapper.delFolderGoal(goal, folderID)){
+                flag = 1;
+            }
         }
         else if (IDMap.containsKey("key")){
             int key = (int) IDMap.get("key");
-            favoriteMapper.delFolderKey(key, folderID);
-            flag = 1;
+            if (favoriteMapper.delFolderKey(key, folderID)){
+                flag = 1;
+            }
         }
         else {
             String content = (String) IDMap.get("content");
-            favoriteMapper.delFolderContent(content, folderID);
-            flag = 1;
+            if (favoriteMapper.delFolderContent(content, folderID)){
+                flag = 1;
+            }
         }
         if (flag == 1){
             return ResultFactory.buildSuccessResult("删除成功", null);
