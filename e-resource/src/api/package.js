@@ -87,3 +87,12 @@ export const deleteFolder = (id) => {
 export const deleteResource = (resourceInfo) => {
   return http.delete(`${baseURL}/private/delSingle`, resourceInfo)
 }
+
+/**
+ * 根据资源包 ID 请求生成压缩包并获取压缩包 URL
+ * @param {String} folderID - 资源包 ID
+ * @returns {AxiosPromise}
+ */
+export const queryDownload = (folderID) => {
+  return http.post(`${baseURL}/private/downloadFolder`, { folderID })
+}

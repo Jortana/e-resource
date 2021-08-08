@@ -60,7 +60,11 @@
               </div>
             </div>
             <!-- 下载按钮 -->
-            <el-button class="download-btn" type="primary">
+            <el-button
+              class="download-btn"
+              type="primary"
+              @click="queryDownload"
+            >
               下 载
             </el-button>
           </div>
@@ -82,7 +86,12 @@ import PackageFolder from '@/components/ResourcePackage/PackageFolder'
 import PackageInfo from '@/components/ResourcePackage/PacgakeInfo'
 import Resources from '@/components/ResourcePackage/Resources'
 import merge from 'webpack-merge'
-import { getFolders, getResources, deleteFolder } from '@/api/package'
+import {
+  getFolders,
+  getResources,
+  deleteFolder,
+  queryDownload
+} from '@/api/package'
 
 export default {
   name: 'Package',
@@ -209,6 +218,12 @@ export default {
     // 清除待修改文件夹的信息
     clearInfo() {
       this.originInfo = null
+    },
+    // 请求生成资源包，获取地址
+    queryDownload() {
+      queryDownload(this.curID).then((response) => {
+        console.log(response.data)
+      })
     }
   }
 }
