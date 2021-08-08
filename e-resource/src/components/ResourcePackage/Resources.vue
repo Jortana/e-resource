@@ -5,36 +5,11 @@
       <div v-if="resources.resources" class="section">
         <h4>资源列表</h4>
         <ul>
-          <li v-for="resource in resources.resources" :key="resource.id">
-            <svg class="type-icon" aria-hidden="true">
-              <use
-                v-if="
-                  resource['fileType'] === 'doc' ||
-                    resource['fileType'] === 'docx'
-                "
-                xlink:href="#e-resource-icon-word"
-              ></use>
-              <use
-                v-else-if="
-                  resource['fileType'] === 'ppt' ||
-                    resource['fileType'] === 'pptx'
-                "
-                xlink:href="#e-resource-icon-ppt"
-              ></use>
-              <use
-                v-else-if="resource['fileType'] === 'pdf'"
-                xlink:href="#e-resource-icon-pdf"
-              ></use>
-              <use
-                v-else-if="resource['fileType'] === 'video'"
-                xlink:href="#e-resource-icon-video"
-              ></use>
-              <use v-else xlink:href="#e-resource-icon-unknown"></use>
-            </svg>
-            <div @click="viewResource(resource.id)">
-              {{ resource['resourceName'] }}
-            </div>
-          </li>
+          <list-item
+            v-for="resource in resources.resources"
+            :key="resource.id"
+            :resource="resource"
+          />
         </ul>
       </div>
     </section>
@@ -47,13 +22,13 @@
           :key="index"
           class="content"
         >
-          {{ goal.text }}
+          <resource-content :content="goal.text" />
         </div>
       </div>
       <div v-if="resources.key" class="section">
         <h4>学习重难点</h4>
         <div v-for="(key, index) in resources.key" :key="index" class="content">
-          {{ key.text }}
+          <resource-content :content="key.text" />
         </div>
       </div>
       <div v-if="resources.content" class="section">
@@ -63,7 +38,7 @@
           :key="index"
           class="content"
         >
-          {{ content }}
+          <resource-content :content="content" />
         </div>
       </div>
     </section>
@@ -81,8 +56,11 @@
 </template>
 
 <script>
+import ListItem from '@/components/ResourcePackage/ListItem'
+import ResourceContent from '@/components/ResourcePackage/ResourceContent'
 export default {
   name: 'Resources',
+  components: { ListItem, ResourceContent },
   props: {
     resourcesObj: {
       type: Object,

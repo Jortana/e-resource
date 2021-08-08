@@ -132,7 +132,7 @@ export default {
             focus: 'adjacency',
             force: {
               edgeLength: 50,
-              repulsion: 200
+              repulsion: 180
             },
             label: {
               show: true,
