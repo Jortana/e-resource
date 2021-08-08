@@ -162,7 +162,7 @@ public class DownloadService {
         String folderID = (String) folderIDMap.get("folderID");
         System.out.println(folderID);
         String path = "E:\\TestResource\\download\\" + folderID + "\\";
-//        String path = "D:\\folder\\";
+//        String path = "D:\\" + folderID + "\\";
         File file = new File(path);
         file.mkdirs();
         String fileName = "知识点+学习目标+学习重难点收藏.docx";
@@ -174,14 +174,17 @@ public class DownloadService {
         writeDataDocx(filePath,data,false,12);
         copyAll(folderID, path);
         String zipPath = "E:\\TestResource\\download\\" + folderID + ".zip";
-        FileOutputStream fos1 = new FileOutputStream(new File(zipPath));
-//        FileOutputStream fos1 = new FileOutputStream(new File("D:\\test.zip"));
+//        String zipPath = "D:\\" + folderID + ".zip";
+        System.out.println(zipPath);
+        FileOutputStream fos1 = new FileOutputStream(zipPath);
         toZip(path, fos1, true);
         long end = System.currentTimeMillis();
         System.out.println("打包完成，耗时：" + (end - start) +" ms");
+//        return ResultFactory.buildSuccessResult("success",null);
         File zip = new File(zipPath);
+        String zipURl = "222.192.6.62:8082\\download\\" + folderID + ".zip";
         if (zip.exists()){
-            return ResultFactory.buildSuccessResult("success",zipPath);
+            return ResultFactory.buildSuccessResult("success",zipURl);
         }
         else {
             return ResultFactory.buildFailResult("下载失败");
