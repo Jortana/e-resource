@@ -211,4 +211,98 @@ public class EntityService {
         }
         return resArray;
     }
+    //根据用户浏览记录生成图谱
+    public Result userGraph(int userID){
+        Driver driver = createDrive();
+        Session session = driver.session();
+        HashMap<String, Integer> entityNumMap = new HashMap<>();
+        HashMap<String, Integer> subjectMap = new HashMap<>();
+        ArrayList<Map<String, Object>> recordMap = recordMapper.record(userID);
+        String neo4JMatch = "MATCH (m:resource)-[]->(n:concept) where ";
+        for (Map singleRecord:recordMap){
+            if (singleRecord.containsKey("entity_name")){
+                String entityName = (String) singleRecord.get("entity_name");
+                if (entityNumMap.containsKey(entityName)){
+                    int currentNum = entityNumMap.get(entityName);
+                    entityNumMap.put(entityName, currentNum + 1);
+                }
+                else {
+                    entityNumMap.put(entityName, 1);
+                }
+            }
+
+            if (singleRecord.containsKey("resource_id")){
+                int resourceID = (int)singleRecord.get("resource_id");
+                neo4JMatch += "m.id =" + resourceID + " or ";
+            }
+        }
+        neo4JMatch = neo4JMatch.substring(0, neo4JMatch.length()-4);
+        neo4JMatch += " RETURN n.name as name, n.学科 as subject";
+        StatementResult resEntity = session.run(neo4JMatch);
+        while ( resEntity.hasNext() )
+        {
+            Record nodeRecord = resEntity.next();
+            String entityName = nodeRecord.get( "name" ).asString();
+            String subject = nodeRecord.get( "subject" ).asString();
+            if (!subjectMap.containsKey(subject)){
+                subjectMap.put(subject, 1);
+            }
+            if (entityNumMap.containsKey(entityName)){
+                int currentNum = entityNumMap.get(entityName);
+                entityNumMap.put(entityName, currentNum + 1);
+            }
+            else {
+                entityNumMap.put(entityName, 1);
+            }
+        }
+        //System.out.println(entityNumMap);
+        //System.out.println(subjectMap);
+        String sql =  "MATCH (n:concept) where (";
+        for (String key : entityNumMap.keySet()) {
+            sql += "n.name = \'" + key + "\'" + " or ";
+        }
+        sql = sql.substring(0, sql.length() - 4);
+        JSONArray resArray = new JSONArray();
+        for (String subjectKey : subjectMap.keySet()) {
+            JSONObject subjectObject = new JSONObject();
+            subjectObject.put("subject", subjectKey);
+            String subjectSql = sql + ") and n.学科 = \'" + subjectKey + "\'" + " RETURN n.name as name";
+            StatementResult subjectNode = session.run(subjectSql);
+            JSONArray node = new JSONArray();
+            while ( subjectNode.hasNext() )
+            {
+                JSONObject nodeInfo = new JSONObject();
+                Record subjectNodeRecord = subjectNode.next();
+                String entityName = subjectNodeRecord.get( "name" ).asString();
+                nodeInfo.put("entityName", entityName);
+                ArrayList<String> connectNode = new ArrayList<>();
+                ArrayList<String> disconnect = new ArrayList<>();
+                int disconnectNum = 0;
+                StatementResult relatedNode = session.run("MATCH (n:concept)-[]->(m:concept) where n.name = {nodeName}" +
+                        "RETURN m.name as name",
+                        parameters("nodeName", entityName));
+                while ( relatedNode.hasNext() )
+                {
+                    Record relatedNodeRecord = relatedNode.next();
+                    String relatedEntityName = relatedNodeRecord.get("name").asString();
+                    if (entityNumMap.containsKey(relatedEntityName)){
+                        connectNode.add(relatedEntityName);
+                    }
+                    else {
+                        if (disconnectNum < 4){ //防止disconnect太多了
+                            disconnect.add(relatedEntityName);
+                            disconnectNum++;
+                        }
+                    }
+                }
+
+                nodeInfo.put("connect", connectNode);
+                nodeInfo.put("disconnect", disconnect);
+                node.add(nodeInfo);
+            }
+            subjectObject.put("node", node);
+            resArray.add(subjectObject);
+        }
+        return ResultFactory.buildSuccessResult("success", resArray);
+    }
 }

@@ -26,4 +26,9 @@ public class EntityController {
     public Result queryEntity(@RequestParam Map<String, Object> keywordMap){
         return entityService.queryEntity(keywordMap);
     }
+
+    @GetMapping("/v1.0/private/userGraph/{userID}")
+    public Result userGraph(@PathVariable(name = "userID") int userID){
+        return entityService.userGraph(userID);
+    }
 }

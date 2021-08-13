@@ -11,4 +11,8 @@
     <insert id="addResourceRecord">
         insert into t_browse_record (user_id, browse_date, resource_id) values(#{userID}, #{browseDate}, #{resourceID})
     </insert>
+    <!-- 查询用户浏览记录 -->
+    <select id="record" resultType="map">
+        select resource_id, entity_name from t_browse_record where user_id = #{userID} order by browse_date desc limit 10
+    </select>
 </mapper>
