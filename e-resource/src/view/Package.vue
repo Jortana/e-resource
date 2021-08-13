@@ -67,6 +67,8 @@
             >
               下 载
             </el-button>
+            <!-- 隐藏的a元素，用来在新窗口下载 -->
+            <a v-show="false" ref="downloadTarget" href="" target="_blank"></a>
           </div>
           <!-- 资源包中包含资源的展示区域 -->
           <resources
@@ -222,7 +224,13 @@ export default {
     // 请求生成资源包，获取地址
     queryDownload() {
       queryDownload(this.curID).then((response) => {
-        console.log(response.data)
+        const { code } = response.data
+        if (code === 200) {
+          const { data: url } = response.data
+          const target = this.$refs.downloadTarget
+          target.setAttribute('href', `http://${url}`)
+          target.click()
+        }
       })
     }
   }

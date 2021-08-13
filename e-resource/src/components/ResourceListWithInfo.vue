@@ -3,7 +3,10 @@
     <div v-for="resource in resources" :key="resource.id">
       <div class="resource-info">
         <div class="thumbnail-container flex">
-          <el-image class="thumbnail"></el-image>
+          <el-image
+            :src="'http://222.192.6.62:8082/pic/file.png'"
+            class="thumbnail"
+          ></el-image>
         </div>
         <div class="right-side flex">
           <div class="info">
