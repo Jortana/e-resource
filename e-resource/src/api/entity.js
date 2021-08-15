@@ -1,4 +1,5 @@
 import http from '@/utils/http'
+import store from '@/store'
 
 const baseURL = '/v1.0'
 
@@ -45,4 +46,15 @@ export const relatedEntity = (keyword) => {
  */
 export const properties = (keyword) => {
   return http.get(`${baseURL}/public/getProperties?keyword=${keyword}`)
+}
+
+/**
+ * 根据用户 ID 获取分学科推荐知识点
+ * @returns {AxiosPromise}
+ */
+export const recommend = () => {
+  const userId = store.state.user !== '' ? store.state.user['userId'] : ''
+  if (userId) {
+    return http.get(`${baseURL}/private/userGraph/${userId}`)
+  }
 }

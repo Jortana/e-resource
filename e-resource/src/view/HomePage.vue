@@ -45,6 +45,11 @@
         </div>
       </div>
     </main>
+    <!-- 知识图谱 -->
+    <div v-if="isLogin === true" class="card-container">
+      <k-g-card></k-g-card>
+      <div class="tip"><span>点击节点展开/收起，双击查看详细内容</span></div>
+    </div>
     <!-- 导航目录 -->
     <div class="menu-container">
       <div class="white-container">
@@ -78,6 +83,7 @@
 import Search from '@/components/Search'
 import NavMenu from '@/components/NavMenu'
 import ResourceList from '@/components/ResourceList'
+import KGCard from '@/components/Chart/KGCard'
 import { authentication } from '@/api/auth'
 import { menus } from '@/api/menu'
 import {
@@ -88,7 +94,7 @@ import {
 
 export default {
   name: 'HomePage',
-  components: { NavMenu, Search, ResourceList },
+  components: { NavMenu, Search, ResourceList, KGCard },
   data() {
     return {
       searchContent: '',
@@ -238,6 +244,7 @@ main {
 }
 
 /*导航栏*/
+.card-container,
 .menu-container {
   /*display: flex;*/
   /*justify-content: center;*/
@@ -251,6 +258,11 @@ main {
   );
   border-radius: 1rem;
   backdrop-filter: blur(2rem);
+}
+
+.card-container {
+  padding-bottom: 0.8rem;
+  margin-bottom: 2rem;
 }
 
 .menu-condition {
@@ -296,5 +308,11 @@ main {
   font-size: 1rem;
   margin-right: 0.7rem;
   margin-bottom: 0.5rem;
+}
+
+.tip {
+  font-size: 0.8rem;
+  color: #909399;
+  margin-top: -0.5rem;
 }
 </style>

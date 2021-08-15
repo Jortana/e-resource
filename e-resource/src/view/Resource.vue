@@ -2,7 +2,7 @@
   <div class="lg-container">
     <nav-menu></nav-menu>
     <div class="main-container flex">
-      <div class="resource-info left-side">
+      <div class="resource-info left-side flex-1">
         <div class="flex">
           <div class="basic-info">
             <h2 @click="addToCart(resource.id)">

@@ -186,11 +186,13 @@ export default {
   watch: {
     query: {
       handler(newQuery, oldQuery) {
+        // console.log(this.searchInfo)
         this.resetResource()
         this.searchInfo.type = newQuery.type === undefined ? 0 : newQuery.type
         this.searchInfo.sort = newQuery.sort === undefined ? 0 : newQuery.sort
         this.searchInfo.content = newQuery.q === undefined ? 0 : newQuery.q
         this.pageInfo.page = newQuery.page === undefined ? 1 : newQuery.page
+        // console.log(this.searchInfo)
         this.goSearch()
         if (oldQuery === undefined || newQuery.q !== oldQuery.q) {
           this.resetCardInfo()
@@ -208,7 +210,7 @@ export default {
     }
   },
   mounted() {
-    this.goSearch()
+    // this.goSearch()
   },
   methods: {
     changeType(tab) {
@@ -231,6 +233,7 @@ export default {
         perPage: this.pageInfo.perPage
       }).then((response) => {
         this.resetResource()
+        console.log(response)
         if (response.data.code === 200) {
           const resource = response.data.data.resources[0]
           this.resources.total = response.data.data.total

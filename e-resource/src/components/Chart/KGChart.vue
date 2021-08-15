@@ -62,7 +62,7 @@ export default {
       })
     },
     /**
-     * 格式化数据为echarts需要的格式
+     * 格式化数据为 echarts 需要的格式
      */
     formatData(entities) {
       const nodes = new Set()
