@@ -157,6 +157,7 @@ public class EntityService {
                 entityList.add(name);
             }
             resource.setEntityList(entityList);
+            resource.setCover("/cover/" + resource.getId() + ".png");
             totalEntity++;
             int extendID = resource.getTableResourceID();
             int tableID = resource.getTable();
@@ -218,6 +219,9 @@ public class EntityService {
         HashMap<String, Integer> entityNumMap = new HashMap<>();
         HashMap<String, Integer> subjectMap = new HashMap<>();
         ArrayList<Map<String, Object>> recordMap = recordMapper.record(userID);
+        int flag1 = 0;  //判断是否有搜索单独知识点
+        int flag2 = 0;  //判断是否浏览过资源
+        String neo4jNode = "MATCH (n:concept) where ";
         String neo4JMatch = "MATCH (m:resource)-[]->(n:concept) where ";
         for (Map singleRecord:recordMap){
             if (singleRecord.containsKey("entity_name")){
@@ -229,34 +233,58 @@ public class EntityService {
                 else {
                     entityNumMap.put(entityName, 1);
                 }
+                neo4jNode += "n.name = \'" + entityName + "\'" + " or ";
+                flag1 = 1;
             }
 
             if (singleRecord.containsKey("resource_id")){
                 int resourceID = (int)singleRecord.get("resource_id");
                 neo4JMatch += "m.id =" + resourceID + " or ";
+                flag2 = 1;
             }
         }
-        neo4JMatch = neo4JMatch.substring(0, neo4JMatch.length()-4);
-        neo4JMatch += " RETURN n.name as name, n.学科 as subject";
-        StatementResult resEntity = session.run(neo4JMatch);
-        while ( resEntity.hasNext() )
-        {
-            Record nodeRecord = resEntity.next();
-            String entityName = nodeRecord.get( "name" ).asString();
-            String subject = nodeRecord.get( "subject" ).asString();
-            if (!subjectMap.containsKey(subject)){
-                subjectMap.put(subject, 1);
-            }
-            if (entityNumMap.containsKey(entityName)){
-                int currentNum = entityNumMap.get(entityName);
-                entityNumMap.put(entityName, currentNum + 1);
-            }
-            else {
-                entityNumMap.put(entityName, 1);
+        if (flag1 == 1){
+            neo4jNode = neo4jNode.substring(0, neo4jNode.length()-4);
+            neo4jNode += " RETURN n.name as name, n.学科 as subject";
+            StatementResult resNode = session.run(neo4jNode);
+            while ( resNode.hasNext() )
+            {
+                Record nodeRecord = resNode.next();
+                String entityName = nodeRecord.get( "name" ).asString();
+                String subject = nodeRecord.get( "subject" ).asString();
+                if (!subjectMap.containsKey(subject)){
+                    subjectMap.put(subject, 1);
+                }
+                if (entityNumMap.containsKey(entityName)){
+                    int currentNum = entityNumMap.get(entityName);
+                    entityNumMap.put(entityName, currentNum + 1);
+                }
+                else {
+                    entityNumMap.put(entityName, 1);
+                }
             }
         }
-        //System.out.println(entityNumMap);
-        //System.out.println(subjectMap);
+        if (flag2 == 1){
+            neo4JMatch = neo4JMatch.substring(0, neo4JMatch.length()-4);
+            neo4JMatch += " RETURN n.name as name, n.学科 as subject";
+            StatementResult resEntity = session.run(neo4JMatch);
+            while ( resEntity.hasNext() )
+            {
+                Record nodeRecord = resEntity.next();
+                String entityName = nodeRecord.get( "name" ).asString();
+                String subject = nodeRecord.get( "subject" ).asString();
+                if (!subjectMap.containsKey(subject)){
+                    subjectMap.put(subject, 1);
+                }
+                if (entityNumMap.containsKey(entityName)){
+                    int currentNum = entityNumMap.get(entityName);
+                    entityNumMap.put(entityName, currentNum + 1);
+                }
+                else {
+                    entityNumMap.put(entityName, 1);
+                }
+            }
+        }
         String sql =  "MATCH (n:concept) where (";
         for (String key : entityNumMap.keySet()) {
             sql += "n.name = \'" + key + "\'" + " or ";
@@ -295,7 +323,6 @@ public class EntityService {
                         }
                     }
                 }
-
                 nodeInfo.put("connect", connectNode);
                 nodeInfo.put("disconnect", disconnect);
                 node.add(nodeInfo);
