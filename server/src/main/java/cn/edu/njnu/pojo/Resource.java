@@ -34,38 +34,37 @@ public class Resource {
 
     double rate;
     String fileType;
+    String content;
 
     public Resource() {
     }
 
-    @Override
-    public String toString() {
-        return "Resource{" +
-                "id=" + id +
-                ", resourceName='" + resourceName + '\'' +
-                ", remark='" + remark + '\'' +
-                ", url='" + url + '\'' +
-                ", viewUrl='" + viewUrl + '\'' +
-                ", cover='" + cover + '\'' +
-                ", aid='" + aid + '\'' +
-                ", bvid='" + bvid + '\'' +
-                ", cid='" + cid + '\'' +
-                ", page=" + page +
-                ", keywords='" + keywords + '\'' +
-                ", entityList=" + entityList +
-                ", updateTime='" + updateTime + '\'' +
-                ", download=" + download +
-                ", collection=" + collection +
-                ", browse=" + browse +
-                ", resourceType=" + resourceType +
-                ", period='" + period + '\'' +
-                ", grade='" + grade + '\'' +
-                ", subject=" + subject +
-                ", table=" + table +
-                ", tableResourceID=" + tableResourceID +
-                ", rate=" + rate +
-                ", fileType='" + fileType + '\'' +
-                '}';
+    public Resource(int id, String resourceName, String remark, String url, String viewUrl, String cover, String aid, String bvid, String cid, int page, String keywords, ArrayList<String> entityList, String updateTime, int download, int collection, int browse, int resourceType, String period, String grade, int subject, int table, Integer tableResourceID, double rate, String fileType, String content) {
+        this.id = id;
+        this.resourceName = resourceName;
+        this.remark = remark;
+        this.url = url;
+        this.viewUrl = viewUrl;
+        this.cover = cover;
+        this.aid = aid;
+        this.bvid = bvid;
+        this.cid = cid;
+        this.page = page;
+        this.keywords = keywords;
+        this.entityList = entityList;
+        this.updateTime = updateTime;
+        this.download = download;
+        this.collection = collection;
+        this.browse = browse;
+        this.resourceType = resourceType;
+        this.period = period;
+        this.grade = grade;
+        this.subject = subject;
+        this.table = table;
+        this.tableResourceID = tableResourceID;
+        this.rate = rate;
+        this.fileType = fileType;
+        this.content = content;
     }
 
     public int getId() {
@@ -260,30 +259,42 @@ public class Resource {
         this.fileType = fileType;
     }
 
-    public Resource(int id, String resourceName, String remark, String url, String viewUrl, String cover, String aid, String bvid, String cid, int page, String keywords, ArrayList<String> entityList, String updateTime, int download, int collection, int browse, int resourceType, String period, String grade, int subject, int table, Integer tableResourceID, double rate, String fileType) {
-        this.id = id;
-        this.resourceName = resourceName;
-        this.remark = remark;
-        this.url = url;
-        this.viewUrl = viewUrl;
-        this.cover = cover;
-        this.aid = aid;
-        this.bvid = bvid;
-        this.cid = cid;
-        this.page = page;
-        this.keywords = keywords;
-        this.entityList = entityList;
-        this.updateTime = updateTime;
-        this.download = download;
-        this.collection = collection;
-        this.browse = browse;
-        this.resourceType = resourceType;
-        this.period = period;
-        this.grade = grade;
-        this.subject = subject;
-        this.table = table;
-        this.tableResourceID = tableResourceID;
-        this.rate = rate;
-        this.fileType = fileType;
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    @Override
+    public String toString() {
+        return "Resource{" +
+                "id=" + id +
+                ", resourceName='" + resourceName + '\'' +
+                ", remark='" + remark + '\'' +
+                ", url='" + url + '\'' +
+                ", viewUrl='" + viewUrl + '\'' +
+                ", cover='" + cover + '\'' +
+                ", aid='" + aid + '\'' +
+                ", bvid='" + bvid + '\'' +
+                ", cid='" + cid + '\'' +
+                ", page=" + page +
+                ", keywords='" + keywords + '\'' +
+                ", entityList=" + entityList +
+                ", updateTime='" + updateTime + '\'' +
+                ", download=" + download +
+                ", collection=" + collection +
+                ", browse=" + browse +
+                ", resourceType=" + resourceType +
+                ", period='" + period + '\'' +
+                ", grade='" + grade + '\'' +
+                ", subject=" + subject +
+                ", table=" + table +
+                ", tableResourceID=" + tableResourceID +
+                ", rate=" + rate +
+                ", fileType='" + fileType + '\'' +
+                ", content='" + content + '\'' +
+                '}';
     }
 }
