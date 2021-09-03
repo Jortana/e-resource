@@ -7,12 +7,15 @@ import cn.edu.njnu.pojo.Result;
 import cn.edu.njnu.pojo.ResultFactory;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.ansj.domain.Term;
+import org.ansj.splitWord.analysis.ToAnalysis;
 import org.neo4j.cypherdsl.core.Case;
 import org.neo4j.driver.v1.*;
 import static org.neo4j.driver.v1.Values.parameters;
 
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.AbstractDocument;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -87,7 +90,10 @@ public class EntityService {
         Date date = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String browseDate = formatter.format(date);
+        //获取用户输入的内容
         String keyword = (String) keywordMap.get("keyword");
+        String content = keyword;
+        //向数据库添加用户浏览记录
         if (keywordMap.containsKey("userId")){
             int userId = Integer.parseInt((String) keywordMap.get("userId"));
             recordMapper.addEntityRecord(userId,browseDate,keyword);
@@ -102,50 +108,114 @@ public class EntityService {
         }
         int page = Integer.parseInt( (String) keywordMap.get("page") );
         int perPage = Integer.parseInt( (String) keywordMap.get("perPage") );
+        //根据用户输入与资源名进行匹配
+        ArrayList<Resource> resourceNameList = resourceMapper.queryResourceByContent(content, sort, type);
+        ArrayList<Integer> idList = new ArrayList<>();
+        //获取资源id，避免之后在neo4j中重复查找
+        String quchu = "";
+        for (Resource single:resourceNameList){
+            int id = single.getId();
+            quchu += "and m.id <> " + id + " ";
+            //获取到的资源id加入列表，之后获取详细信息用
+            idList.add(id);
+        }
+        //与neo4j建立连接
         Driver driver = createDrive();
         Session session = driver.session();
-
+        //根据用户输入在neo4j中查找对应节点
         StatementResult result = session.run( "MATCH (a:concept) where a.name = {name} " +
                         "RETURN properties(a) AS props",
                 parameters( "name", keyword) );
-        JSONObject resObject = new JSONObject();
-        JSONArray resArray = new JSONArray();
+
+        Record record = null;
         if (!result.hasNext()){
-            return ResultFactory.buildFailResult("未查询到相关知识点");
+            //精确匹配没有查到则进行模糊查找，结果限制个数为1
+            String keyword1 = ".*" + keyword + ".*";
+            StatementResult result1 = session.run( "MATCH (a:concept) where a.name =~ {name} " +
+                            "RETURN properties(a) AS props limit 1",
+                    parameters( "name", keyword1) );
+            if (result1.hasNext()){
+                record = result1.next();
+            }
+            else { //模糊查找依旧没有查找到，则对用户输入进行分词处理
+                org.ansj.domain.Result ansjResult = ToAnalysis.parse(keyword); //封装的分词结果对象，包含一个terms列表
+                List<Term> terms = ansjResult.getTerms(); //term列表，元素就是拆分出来的词以及词性
+                for(Term term:terms){
+                    String fenci = term.getName();		//分词的内容
+                    if(term.getNatureStr().equals("n")){   //分词的词性，如果是名词，尝试查找节点
+                        StatementResult resultfenci = session.run( "MATCH (a:concept) where a.name = {name} " +
+                                        "RETURN properties(a) AS props",
+                                parameters( "name", fenci) );
+                        if (resultfenci.hasNext()){ //若查找到知识点，跳出查找循环
+                            record = resultfenci.next();
+                            break;
+                        }
+                    }
+                }
+                if (record == null && resourceNameList.isEmpty()){  //分词后也未查到，并且根据资源名也没查到，则返回未查找到的结果
+                    return ResultFactory.buildFailResult("未查询到相关知识点");
+                }
+            }
+        }
+        else { //将查询结果赋值给record
+            record = result.next();
         }
         int totalEntity = 0;
-        Record record = result.next();
-        String entityName = record.get( "props" ).get( "name" ).asString();
-        JSONObject similarEntity = new JSONObject();
-        similarEntity.put("entityName", entityName);
-        similarEntity.put("properties", record.get( "props" ).asMap());
+        //Record record = result.next();
         int skip = (page-1)*perPage;
-        StatementResult resourceNode = session.run( "MATCH (m:resource)-[r]->(a:concept) where a.name = {name} " +
-                        "RETURN m.id AS id order by r.tfidf",
-                parameters( "name", keyword) );
-        ArrayList<Integer> idList = new ArrayList<>();
-        while ( resourceNode.hasNext() )
-        {
-            Record ResourceRecord = resourceNode.next();
-            int resourceID = ResourceRecord.get( "id" ).asInt();
-            idList.add(resourceID);
-        }
         ArrayList<Resource> resourceArrayList = new ArrayList<Resource>();
-        if (sort == 0){
-            for (int resourceID:idList){
-                Resource resource = resourceMapper.queryResourceByID(resourceID);
-                if (resource.getResourceType()==type || type==0){
-                    resourceArrayList.add(resource);
+        JSONObject similarEntity = new JSONObject();
+        if (record!=null){
+            String entityName = record.get( "props" ).get( "name" ).asString();
+            similarEntity.put("goalAndKey", goalAndKey(entityName));
+            similarEntity.put("entityName", entityName);
+            keyword = entityName;
+            similarEntity.put("properties", record.get( "props" ).asMap());
+            //如果keyword跟一开始用户的keyword不同，则再对资源名进行一次匹配
+            if (!keyword.equals(content)){
+                ArrayList<Resource> resourceNameList2 = resourceMapper.queryResourceByContent(keyword, sort, type);
+                for (Resource single:resourceNameList2){
+                    int id = single.getId();
+                    if (!idList.contains(id)){
+                        quchu += "and m.id <> " + id + " ";
+                        idList.add(id);
+                    }
                 }
-
+                //根据知识点查找关联资源
+                StatementResult resourceNode = session.run( "MATCH (m:resource)-[r]->(a:concept) where a.name = {name} " + quchu +
+                                "RETURN m.id AS id order by r.weight",
+                        parameters( "name", keyword) );
+                while ( resourceNode.hasNext() )
+                {
+                    Record ResourceRecord = resourceNode.next();
+                    int resourceID = ResourceRecord.get( "id" ).asInt();
+                    idList.add(resourceID);
+                }
             }
         }
         else {
+            //如果没有查到知识节点，则将重难点，知识名称，属性设置为null
+            similarEntity.put("goalAndKey", null);
+            similarEntity.put("entityName", null);
+            similarEntity.put("properties", null);
+        }
+        //根据前面生成的idList从mysql中查资源
+        if (sort == 0){ //对排序无要求则直接根据id查
+            for (int resourceID:idList){
+                Resource resource = resourceMapper.queryResourceByID(resourceID);
+                //判断资源类型是否符合
+                if (resource.getResourceType()==type || type==0){
+                    resourceArrayList.add(resource);
+                }
+            }
+        }
+        else {
+            //根据排序，类型获取资源
             resourceArrayList = resourceMapper.queryResourceByIDList(idList,sort,type);
         }
-
         for (Resource resource:resourceArrayList){
             int resourceID = resource.getId();
+            //在neo4j中获取资源包含的知识点，生成list
             StatementResult conceptNode = session.run( "MATCH (m:resource)-[r]->(a:concept) where m.id = {id} " +
                             "RETURN a.name AS name order by r.tfidf",
                     parameters( "id", resourceID) );
@@ -157,10 +227,14 @@ public class EntityService {
                 entityList.add(name);
             }
             resource.setEntityList(entityList);
+            //设置资源封面路径
             resource.setCover("/cover/" + resource.getId() + ".png");
+            //资源总个数
             totalEntity++;
+            //extendID：资源在额外表中的id； tableID，资源额外属性存在哪张表里
             int extendID = resource.getTableResourceID();
             int tableID = resource.getTable();
+            //根据资源类型获取资源属性
             switch (tableID) {
                 case 1:
                     Map bvideoInfo = resourceMapper.queryBvideo(extendID);
@@ -174,14 +248,21 @@ public class EntityService {
                     resource.setUrl((String) documentInfo.get("url"));
                     resource.setViewUrl((String) documentInfo.get("view_url"));
                     break;
+                case 3:
+                    Map videoInfo = resourceMapper.queryVideo(extendID);
+                    resource.setUrl((String) videoInfo.get("url"));
+                    break;
             }
         }
+        //根据页码与每页个数获取资源
         JSONArray resourceTotal = new JSONArray();
         for (int i = skip;i<skip+perPage && i<totalEntity;i++){
             resourceTotal.add(resourceArrayList.get(i));
         }
         similarEntity.put("resources", resourceTotal);
-        similarEntity.put("goalAndKey", goalAndKey(entityName));
+        //建立返回json数据类型
+        JSONObject resObject = new JSONObject();
+        JSONArray resArray = new JSONArray();
         resArray.add(similarEntity);
         resObject.put("resources", resArray);
         resObject.put("total", totalEntity);

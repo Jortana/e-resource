@@ -23,6 +23,20 @@
             <if test="sort == 2">order by updateTime desc</if>
         </trim>
     </select>
+    <!-- 根据ID查资源 -->
+    <select id="queryResourceByContent" resultType="resource" >
+        select id, resource_name, download, collection, browse, `period`, grade, subject, updateTime, `table`, tableResourceID, resource_type, rate, file_type from t_resource
+        <where>
+            <trim suffixOverrides="and">
+                <if test="content!=null">resource_name like concat('%',#{content},'%') and </if>
+                <if test="type!=0">resource_type =#{type} and </if>
+            </trim>
+        </where>
+        <trim>
+            <if test="sort == 1">order by browse desc</if>
+            <if test="sort == 2">order by updateTime desc</if>
+        </trim>
+    </select>
     <!-- 获取资源类型 -->
     <select id="queryType" resultType="HashMap">
         select type_id, resource_type from t_resource_type
@@ -71,6 +85,10 @@
     <!-- 查bilibili -->
     <select id="queryBvideo" resultType="HashMap">
         select *from t_bvideo where id = #{id}
+    </select>
+    <!-- 查本地视频 -->
+    <select id="queryVideo" resultType="HashMap">
+        select *from t_video where id = #{id}
     </select>
 </mapper>
 
