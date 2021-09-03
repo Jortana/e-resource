@@ -4,7 +4,8 @@
       <div class="resource-info">
         <div class="thumbnail-container flex">
           <el-image
-            :src="'http://222.192.6.62:8082/pic/file.png'"
+            :src="'http://222.192.6.62:8082' + resource.cover"
+            fit="contain"
             class="thumbnail"
           ></el-image>
         </div>
@@ -20,7 +21,12 @@
             </div>
             <div v-if="resource['entityList'] !== null" class="entity-list">
               <div v-for="entity in resource['entityList']" :key="entity">
-                <el-button size="mini" @click="searchEntity(entity)">
+                <el-button
+                  class="entity-btn"
+                  type="text"
+                  size="mini"
+                  @click="searchEntity(entity)"
+                >
                   {{ entity }}
                 </el-button>
               </div>
@@ -175,5 +181,14 @@ export default {
 .name-in-url {
   color: #555555;
   margin-bottom: 0.6rem;
+}
+
+.entity-btn {
+  color: #555555;
+}
+
+/* 测试 */
+.entity-list {
+  margin-top: -0.6rem;
 }
 </style>
