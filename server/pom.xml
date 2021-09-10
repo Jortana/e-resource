@@ -12,7 +12,7 @@
 	<artifactId>e-resource</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<!-- 打包方式 -->
-	<!-- <packaging>war</packaging> -->
+	<packaging>war</packaging>
 	<name>e-resource</name>
 	<description>Demo project for Spring Boot</description>
 

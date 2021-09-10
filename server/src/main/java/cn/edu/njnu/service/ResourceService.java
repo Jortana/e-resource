@@ -128,13 +128,13 @@ public class ResourceService {
             int resourceID = record.get( "ID" ).asInt();
             HashMap<String, Integer> hm1 = new HashMap<String, Integer>();
             StatementResult tfidf = session.run( "MATCH (n:resource)-[r]->(m:concept) where id(n)={id} " +
-                        "RETURN m.name, r.tf",
+                        "RETURN m.name, r.num",
                 parameters("id", resourceID) );
             while ( tfidf.hasNext() )
             {
                 Record tfidfRecord = tfidf.next();
                 String word = tfidfRecord.get("m.name").asString();
-                int tf = tfidfRecord.get("r.tf").asInt();
+                int tf = tfidfRecord.get("r.num").asInt();
                 hm1.put(word, tf);
             }
             HashMap<Integer, HashMap<String, Integer>> map = new HashMap<Integer, HashMap<String, Integer>>();
@@ -150,14 +150,14 @@ public class ResourceService {
                 Record other = otherResource.next();
                 int otherID = other.get( "ID" ).asInt();
                 StatementResult otherTFIDF = session.run( "MATCH (n:resource)-[r]->(m:concept) where id(n)={id} " +
-                                "RETURN m.name, r.tf",
+                                "RETURN m.name, r.num",
                         parameters("id", otherID) );
                 HashMap<String, Integer> hm2 = new HashMap<String, Integer>();
                 while ( otherTFIDF.hasNext() )
                 {
                     Record tfidfRecord = otherTFIDF.next();
                     String word = tfidfRecord.get("m.name").asString();
-                    int tf = tfidfRecord.get("r.tf").asInt();
+                    int tf = tfidfRecord.get("r.num").asInt();
                     hm2.put(word, tf);
                 }
                 HashMap<Integer, HashMap<String, Integer>> map1= new HashMap<Integer, HashMap<String, Integer>>();
@@ -337,23 +337,25 @@ public class ResourceService {
     //获取相似资源
     public Result relatedResource(Map<String, Object> resourceIDMap){
         int resourceID = Integer.parseInt((String)resourceIDMap.get("resourceID"));
-//        Driver driver = createDrive();
-//        Session session = driver.session();
-//        StatementResult resourceNode = session.run( "MATCH (n:resource)-[r]->(m:resource) where r.weight>0.5 and n.id = {resourceID} " +
-//                        "RETURN m.id AS id order by r.weight",
-//                parameters("resourceID", resourceID) );
+        Driver driver = createDrive();
+        Session session = driver.session();
+        StatementResult resourceNode = session.run( "MATCH (n:resource)-[r]->(m:resource) where r.weight>0.5 and n.id = {resourceID} " +
+                        "RETURN m.id AS id order by r.weight",
+                parameters("resourceID", resourceID) );
 //        int userID = 0;
 //        if (resourceIDMap.containsKey("userId")){
 //            userID = Integer.parseInt((String)resourceIDMap.get("userId"));
 //        }
-//        JSONArray resourceArray = new JSONArray();
-//        int resourceNum = 0;
-//        while ( resourceNode.hasNext() && resourceNum < 10)
-//        {
-//            Record resourceRecord = resourceNode.next();
-//            int id = resourceRecord.get("id").asInt();
-//            Resource resource = resourceMapper.queryResourceByID(id);
-//            System.out.println(resource);
+        JSONArray resourceArray = new JSONArray();
+        int resourceNum = 0;
+        while ( resourceNode.hasNext() && resourceNum < 10)
+        {
+            Record resourceRecord = resourceNode.next();
+            int id = resourceRecord.get("id").asInt();
+            Resource resource = resourceMapper.queryResourceByID(id);
+            System.out.println(resource);
+            resourceArray.add(resource);
+            resourceNum++;
 //            if (userID==0){
 //                resourceArray.add(resource);
 //                resourceNum++;
@@ -366,14 +368,14 @@ public class ResourceService {
 //                    resourceNum++;
 //                }
 //            }
-//        }
-//        return ResultFactory.buildSuccessResult("查询成功",resourceArray);
-        ArrayList<Integer> idList = new ArrayList<>();
-        for (int i = 1;i<11;i++){
-            idList.add(resourceID+i);
         }
-        ArrayList<Resource> resList = resourceMapper.queryResourceByIDList(idList,0,0);
-        return ResultFactory.buildSuccessResult("查询成功",resList);
+        return ResultFactory.buildSuccessResult("查询成功",resourceArray);
+//        ArrayList<Integer> idList = new ArrayList<>();
+//        for (int i = 1;i<11;i++){
+//            idList.add(resourceID+i);
+//        }
+//        ArrayList<Resource> resList = resourceMapper.queryResourceByIDList(idList,0,0);
+//        return ResultFactory.buildSuccessResult("查询成功",resList);
     }
 
     public Result queryHot(){
