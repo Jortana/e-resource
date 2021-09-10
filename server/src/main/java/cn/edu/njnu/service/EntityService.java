@@ -9,13 +9,14 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.ansj.domain.Term;
 import org.ansj.splitWord.analysis.ToAnalysis;
-import org.neo4j.cypherdsl.core.Case;
 import org.neo4j.driver.v1.*;
 import static org.neo4j.driver.v1.Values.parameters;
 
+import org.neo4j.driver.v1.types.Node;
+import org.neo4j.driver.v1.types.Path;
+import org.neo4j.driver.v1.types.Relationship;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.AbstractDocument;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -51,13 +52,73 @@ public class EntityService {
         Session session = driver.session();
         JSONArray resArray = new JSONArray();
         if (keyword.length > 1) {
+            String Cypher = "with [";
             for (String entityName : keyword){
-                System.out.println(entityName);
-                JSONObject similarEntity = new JSONObject();
-                similarEntity.put("relatedEntity", getRelatedEntity(entityName, session, entityName));
-                similarEntity.put("entityName", entityName);
-                resArray.add(similarEntity);
+                Cypher += "\"" + entityName + "\",";
             }
+            Cypher = Cypher.substring(0, Cypher.length()-1) + "] as l match p=shortestpath((n:concept)-[*]->(m:concept)) where n.name in l and m.name in l and n.name<>m.name return p as path ";
+            Cypher = Cypher + "limit " + (2*keyword.length);
+            //System.out.println(Cypher);
+            StatementResult result = session.run( Cypher, parameters(  ) );
+            Map<Long, Value> nodesMap = new HashMap<>();
+            HashMap<String, ArrayList<String>> relationshipMap = new HashMap<>();
+            while ( result.hasNext() )
+            {
+                Record record = result.next();
+                //System.out.println(record);
+                List<Value> values = record.values();
+                for (Value value : values) {
+                    if (value.type().name().equals("PATH")) {
+                        Path p = value.asPath();
+                        Iterable<Node> nodes = p.nodes();
+                        for (Node node : nodes) {
+                            if (!nodesMap.containsKey(node.id())){
+                                nodesMap.put(node.id(), node.get("name"));
+                            }
+                        }
+                        Iterable<Relationship> relationships = p.relationships();
+                        for (Relationship relationship : relationships) {
+                            String entityName = nodesMap.get(relationship.startNodeId()).asString();
+                            String related = nodesMap.get(relationship.endNodeId()).asString();
+                            ArrayList<String> relateNode;
+                            if (!relationshipMap.containsKey(entityName)){
+                                relateNode = new ArrayList<>();
+                            }
+                            else {
+                                relateNode = relationshipMap.get(entityName);
+                            }
+                            if (!relateNode.contains(related)){
+                                relateNode.add(related);
+                            }
+                            relationshipMap.put(entityName, relateNode);
+                        }
+                    }
+                }
+            }
+//            System.out.println(relationshipMap);
+            Iterator iter = relationshipMap.entrySet().iterator();
+            while (iter.hasNext()) {
+                Map.Entry entry = (Map.Entry) iter.next();
+                String key = (String) entry.getKey();
+                ArrayList<String> val = (ArrayList<String>) entry.getValue();
+//                System.out.println(key);
+//                System.out.println(val);
+                if (Cypher.contains(key)){
+                    JSONObject similarEntity = new JSONObject();
+                    similarEntity.put("entityName", key);
+                    JSONArray relatedEntity = new JSONArray();
+                    for (String entity:val){
+                        relatedEntity.add(entity);
+                    }
+                    similarEntity.put("relatedEntity", relatedEntity);
+                    resArray.add(similarEntity);
+                }
+            }
+//            System.out.println(entityName);
+//            JSONObject similarEntity = new JSONObject();
+//            similarEntity.put("relatedEntity", getRelatedEntity(entityName, session, entityName));
+//            similarEntity.put("entityName", entityName);
+//            resArray.add(similarEntity);
         }
         else {
             StatementResult result = session.run( "MATCH (a:concept)-[]->(n:concept) where a.name = {name} " +
