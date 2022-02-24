@@ -1,11 +1,11 @@
 <template>
   <el-input
-    class="main-search"
     v-model="searchQ"
+    class="main-search"
     @change="changeSearchContent">
     <i slot="prefix" class="el-input__icon el-icon-search"></i>
-    <el-button class="search-btn phone-btn" slot="append" icon="el-icon-microphone"></el-button>
-    <el-button class="search-btn" slot="append" icon="el-icon-search" @click="search"></el-button>
+    <el-button slot="append" class="search-btn phone-btn" icon="el-icon-microphone"></el-button>
+    <el-button slot="append" class="search-btn" icon="el-icon-search" @click="search"></el-button>
   </el-input>
 </template>
 
@@ -15,30 +15,30 @@ export default {
   props: {
     searchContent: String
   },
-  computed: {
-    queryQ () {
-      return this.$route.query.q
-    }
-  },
-  watch: {
-    queryQ () {
-      this.searchQ = this.$route.query.q
-    }
-  },
-  data () {
+  data() {
     return {
       searchQ: this.searchContent
       // searchQ: this.$route.query.q === undefined ? '' : this.$route.query.q
     }
   },
+  computed: {
+    queryQ() {
+      return this.$route.query.q
+    }
+  },
+  watch: {
+    queryQ() {
+      this.searchQ = this.$route.query.q
+    }
+  },
   methods: {
-    changeSearchContent () {
+    changeSearchContent() {
       this.$emit('update:searchContent', this.searchQ)
     },
-    search () {
+    search() {
       this.$emit('search')
     },
-    test () {
+    test() {
       console.log('a')
     }
   }
@@ -47,7 +47,7 @@ export default {
 
 <style scoped>
 .main-search {
-  width: 50vw;
+  /*width: 50vw;*/
   height: 3rem;
 }
 

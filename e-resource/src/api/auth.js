@@ -1,6 +1,6 @@
 import http from '@/utils/http'
 
-let baseURL = '/v1.0'
+const baseURL = '/v1.0'
 
 /**
  * 注册
@@ -36,7 +36,7 @@ export const logout = () => {
 }
 
 /**
- * 每次切换页面都发送一个验证请求，防止偷鸡登录
+ * 每次切换页面都发送一个验证请求，验证是否登录
  */
 export const authentication = () => {
   return http.get(`${baseURL}/public/authentication`)

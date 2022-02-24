@@ -1,6 +1,6 @@
 import http from '@/utils/http'
 
-let baseURL = '/v1.0'
+const baseURL = '/v1.0'
 
 /**
  * 根据条件查找资源
@@ -17,7 +17,7 @@ let baseURL = '/v1.0'
  */
 export const resource = (params) => {
   let data = ''
-  for (let info in params) {
+  for (const info in params) {
     data += info + '=' + params[info] + '&'
   }
   // console.log(data)
@@ -50,4 +50,13 @@ export const related = (resourceID) => {
 export const download = (resourceID) => {
   window.location.href = `http://127.0.0.1:9000/e-resource/api${baseURL}/public/download?resourceID=${resourceID}`
   // return http.download(`${baseURL}/public/download?resourceID=${resourceID}`)
+}
+
+/**
+ * 根据资源 ID 获取评论
+ * @param {Number} resourceID- 资源 ID
+ * @returns {AxiosPromise}
+ */
+export const getComment = (resourceID) => {
+  return http.get(`${baseURL}/public/comment?resourceID=${resourceID}`)
 }

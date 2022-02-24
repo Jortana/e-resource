@@ -12,23 +12,7 @@ export default {
       required: true
     }
   },
-  mounted () {
-    // this.initCharts()
-    setTimeout(() => {
-      window.onresize = () => {
-        this.chart.resize()
-      }
-    }, 200)
-  },
-  watch: {
-    entities: {
-      handler (entities) {
-        this.resetData()
-        this.formatData(entities)
-      }
-    }
-  },
-  data () {
+  data() {
     return {
       chart: '',
       nodes: [],
@@ -38,11 +22,27 @@ export default {
       // ['#d87c7c', '#919e8b', '#d7ab82', '#6e7074', '#61a0a8', '#efa18d', '#787464', '#cc7e63', '#724e58', '#4b565b']
     }
   },
+  watch: {
+    entities: {
+      handler(entities) {
+        this.resetData()
+        this.formatData(entities)
+      }
+    }
+  },
+  mounted() {
+    // this.initCharts()
+    setTimeout(() => {
+      window.onresize = () => {
+        this.chart.resize()
+      }
+    }, 200)
+  },
   methods: {
     /**
      * 重置数据
      */
-    resetData () {
+    resetData() {
       this.chart = ''
       this.nodes = []
       this.links = []
@@ -50,8 +50,7 @@ export default {
     /**
      * 节点点击事件
      */
-    nodeClick (node) {
-      console.log(node.data)
+    nodeClick(node) {
       if (node.data.name === this.$route.query.q) {
         return
       }
@@ -63,16 +62,16 @@ export default {
       })
     },
     /**
-     * 格式化数据为echarts需要的格式
+     * 格式化数据为 echarts 需要的格式
      */
-    formatData (entities) {
-      let nodes = new Set()
-      let links = new Set()
-      let directEntities = []
-      for (let entity of entities) {
+    formatData(entities) {
+      const nodes = new Set()
+      const links = new Set()
+      const directEntities = []
+      for (const entity of entities) {
         nodes.add(entity['entityName'])
         directEntities.push(entity['entityName'])
-        for (let relEntity of entity['relatedEntity']) {
+        for (const relEntity of entity['relatedEntity']) {
           nodes.add(relEntity)
           links.add({
             source: entity['entityName'],
@@ -80,7 +79,7 @@ export default {
           })
         }
       }
-      for (let node of nodes) {
+      for (const node of nodes) {
         if (directEntities.indexOf(node) !== -1) {
           this.nodes.push({
             name: node,
@@ -105,8 +104,7 @@ export default {
     /**
      * 设置echarts配置项
      */
-    initCharts () {
-      console.log('init chart')
+    initCharts() {
       if (!this.chart) {
         this.chart = echarts.init(document.getElementById('chart'))
         this.chart.on('click', (event) => {
@@ -116,10 +114,10 @@ export default {
           }
         })
       }
-      let nodes = JSON.parse(JSON.stringify(this.nodes))
-      let links = JSON.parse(JSON.stringify(this.links))
+      const nodes = JSON.parse(JSON.stringify(this.nodes))
+      const links = JSON.parse(JSON.stringify(this.links))
       // 指定图表的配置项和数据
-      let option = {
+      const option = {
         // 动画更新变化时间
         animationDurationUpdate: 500,
         animationEasingUpdate: 'quinticInOut',
@@ -134,7 +132,7 @@ export default {
             focus: 'adjacency',
             force: {
               edgeLength: 50,
-              repulsion: 200
+              repulsion: 180
             },
             label: {
               show: true,

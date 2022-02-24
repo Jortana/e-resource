@@ -1,16 +1,17 @@
 <template>
   <div class="resource-container">
     <div
-      class="flex"
       v-for="resource in resourceList"
-      :key="resource.id">
+      :key="resource.id"
+      class="flex">
       <svg class="type-icon" aria-hidden="true">
-        <use v-if="resource.suffix === 'doc' || resource.suffix === 'docx'" xlink:href="#e-resource-icon-word"></use>
-        <use v-else-if="resource.suffix === 'ppt' || resource.suffix === 'pptx'" xlink:href="#e-resource-icon-ppt"></use>
-        <use v-else-if="resource.suffix === 'pdf'" xlink:href="#e-resource-icon-pdf"></use>
+        <use v-if="resource['fileType'] === 'doc' || resource['fileType'] === 'docx'" xlink:href="#e-resource-icon-word"></use>
+        <use v-else-if="resource['fileType'] === 'ppt' || resource['fileType'] === 'pptx'" xlink:href="#e-resource-icon-ppt"></use>
+        <use v-else-if="resource['fileType'] === 'pdf'" xlink:href="#e-resource-icon-pdf"></use>
+        <use v-else-if="resource['fileType'] === 'video'" xlink:href="#e-resource-icon-video"></use>
         <use v-else xlink:href="#e-resource-icon-unknown"></use>
       </svg>
-      <resource-link class="resource-name" :resource="resource" :browseTime="browseTime"></resource-link>
+      <resource-link :resource="resource" :browseTime="browseTime" :isHidden="isHidden" class="resource-name"></resource-link>
       <span v-if="browseTime === true" class="flex browse-time">{{ resource['browse'] }}</span>
     </div>
   </div>
@@ -25,7 +26,11 @@ export default {
   },
   props: {
     resourceList: Array,
-    browseTime: Boolean
+    browseTime: Boolean,
+    isHidden: {
+      type: Boolean,
+      default: false
+    }
   }
 }
 </script>
@@ -34,7 +39,7 @@ export default {
 .type-icon {
   height: 1.2rem;
   width: 1.2rem;
-  margin-right: .2rem;
+  margin-right: .3rem;
 }
 
 .resource-container div {
@@ -42,10 +47,11 @@ export default {
 }
 
 .resource-name {
-  font-size: 1rem;
+  font-size: .9rem;
   line-height: 1.5rem;
   color: #409eff;
   cursor: pointer;
+  width: calc(100% - 1.2rem - 1.5rem);
 }
 
 .resource-name:hover {
@@ -57,5 +63,7 @@ export default {
   display: inline-block;
   margin-left: auto;
   color: #909399;
+  width: 1.2rem;
+  text-align: right;
 }
 </style>

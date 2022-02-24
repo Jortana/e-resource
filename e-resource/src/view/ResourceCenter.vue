@@ -1,39 +1,34 @@
 <template>
-  <div>
+  <div class="lg-container">
     <nav-menu :searchInfo.sync="searchInfo"></nav-menu>
     <div class="main-container resource-container">
       <div class="resources">
         <div class="flex-1">
           <!-- 知识卡片 -->
-          <knowledge-card class="knowledge-card" :entityInfo="cardInfo" v-if="JSON.stringify(cardInfo) !== '{}'"></knowledge-card>
+          <knowledge-card
+            v-if="JSON.stringify(cardInfo) !== '{}'"
+            :entityInfo="cardInfo"
+            class="knowledge-card"
+          ></knowledge-card>
           <!-- 找到的实体和资源信息 -->
           <div class="resource">
             <div>
               <!-- 这里的v-for的数组实际上是只有一个元素的，后端问题，之前的想法和现在不一样，我发现这个问题的时候已经写了很多了，改起来太麻烦了，懒得改了 -->
-              <div
-              >
+              <div>
                 <!-- 教学目标和教学重难点 -->
-                <div v-if="goal.length > 0">
-                  <div class="subtitle">教学目标</div>
-                  <div
-                    v-for="(goal, index) in goal"
-                    :key="index"
-                    v-if="index < 5"
-                    :class="goal.content.length > 43 ? 'content-link overflow-content' : 'content-link'"
-                    @click="viewResource(goal.resourceID)">
-                    {{ goal.content }}
-                  </div>
-                </div>
-                <div v-if="key.length > 0">
-                  <div class="subtitle">教学重难点</div>
-                  <div
-                    v-for="(key, index) in key"
-                    :key="'key' + index"
-                    v-if="index < 5"
-                    :class="key.content.length > 43 ? 'content-link overflow-content' : 'content-link'"
-                    @click="viewResource(key.resourceID)">
-                    {{ key.content }}
-                  </div>
+                <div class="flex goal-and-key-container">
+                  <goal-and-key-card
+                    v-if="goal.length > 0"
+                    :list="goal"
+                    :title="'学习目标'"
+                    class="goal-and-key-card"
+                  />
+                  <goal-and-key-card
+                    v-if="key.length > 0"
+                    :list="key"
+                    :title="'学习重难点'"
+                    class="goal-and-key-card"
+                  />
                 </div>
                 <!-- ----------------- -->
                 <!-- ------------------------------ 筛选 ---------------------------------------- -->
@@ -42,86 +37,58 @@
                     v-for="type in resourceTypes"
                     :key="type.code"
                     :label="type.label"
-                    :name="String(type.code)">
-                  </el-tab-pane>
+                    :name="String(type.code)"
+                  ></el-tab-pane>
                 </el-tabs>
                 <div class="sort">
-                  <el-radio-group v-model="sort" size="mini" @change="changeSort">
+                  <el-radio-group
+                    v-model="searchInfo.sort"
+                    size="mini"
+                    @change="changeSort"
+                  >
                     <el-radio-button label="0">综合</el-radio-button>
                     <el-radio-button label="1">最热</el-radio-button>
                     <el-radio-button label="2">最新</el-radio-button>
                   </el-radio-group>
                 </div>
                 <!-- -------------------------------------------------------------------------------- -->
-<!--                {{ resources.resources.resources }}-->
-                <div class="resource-list" v-if="resources.resources.length > 0">
-                  <div
-                    v-for="resource in resources.resources"
-                    :key="resource.id"
-                  >
-                    <div class="resource-info">
-                      <div class="info">
-                        <resource-link :resource="resource"></resource-link>
-<!--                        <span class="resource-name" @click="viewResource(resource['id'])">-->
-<!--                          {{ resource['resourceName'] }}-->
-<!--                        </span>-->
-                        <div class="file-name">
-                          {{ `${resource['resourceName']}.${resource['url'].split('.').slice(-1)}` }}
-                        </div>
-                        <div class="entity-list">
-                          <div
-                            v-for="entity in resource['entity'].split('#').slice(0, resource['entity'].split('#').length - 1)"
-                            :key = entity
-                          >
-                            <el-button size="mini">
-                              {{ entity }}
-                            </el-button>
-                          </div>
-                        </div>
-                        <div class="extra">
-                          <div class="extra-info"><i class="el-icon-time"></i> {{ resource['updateTime'] }}</div>
-                          <div class="extra-info"><i class="el-icon-download"></i> {{ resource['download'] }} 下载</div>
-                        </div>
-                      </div>
-                      <div class="operation">
-                        <div class="full-width">
-                          <download-button :resourceID="resource['id']"></download-button>
-                        </div>
-                        <div class="full-width">
-                          <el-button class="full-width" size="medium" icon="el-icon-document-add">
-                            加入资源包
-                          </el-button>
-                        </div>
-                        <div class="full-width">
-                          <el-button class="full-width" size="medium" icon="el-icon-star-off">
-                            收藏
-                          </el-button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <resource-list-with-info
+                  v-if="resources.resources.length > 0"
+                  :resources="resources.resources"
+                ></resource-list-with-info>
                 <div v-else>{{ noResourceHint }}</div>
               </div>
             </div>
             <!-- 隐藏的a元素，用来在新窗口打开资源页面 -->
             <!-- 这个本来应该和资源名称一起封装在ResourceLink里了，但是教学重难点还需要使用，懒得封装了，也包括下面的ViewResource method -->
-            <a class="resource-target" ref="resourceTarget" href="" target="_blank" v-show="false"></a>
+            <a
+              v-show="false"
+              ref="resourceTarget"
+              class="resource-target"
+              href=""
+              target="_blank"
+            ></a>
             <!-- 触发下载测试 -->
-            <a ref="download" href="" target="_blank" download v-show="false"></a>
+            <a
+              v-show="false"
+              ref="download"
+              href=""
+              target="_blank"
+              download
+            ></a>
           </div>
-          <div class="pages" v-if="resources.total > 10">
+          <div v-if="resources.total > 10" class="pages">
             <el-pagination
-              layout="prev, pager, next"
               :total="resources.total"
               :current-page="Number(query.page)"
-              @current-change="changePage">
-            </el-pagination>
+              layout="prev, pager, next"
+              @current-change="changePage"
+            ></el-pagination>
           </div>
         </div>
         <!-- 知识图谱 -->
-        <div class="graph flex-1">
-            <k-g-chart :entities="entities.entities" ref="chart"></k-g-chart>
+        <div class="graph">
+          <k-g-chart ref="chart" :entities="entities.entities"></k-g-chart>
         </div>
       </div>
     </div>
@@ -132,7 +99,9 @@
 import NavMenu from '@/components/NavMenu'
 import KnowledgeCard from '@/components/KnowledgeCard'
 import ResourceLink from '@/components/ResourceLink'
-import DownloadButton from '@/components/DownloadButton'
+import DownloadButton from '@/components/Buttons/DownloadButton'
+import ResourceListWithInfo from '@/components/ResourceListWithInfo'
+import GoalAndKeyCard from '@/components/GoalAndKeyCard'
 import { record } from '@/api/record'
 // import { recommendByUserEntity } from '@/api/recommend'
 // import { download } from '@/api/resource'
@@ -146,76 +115,51 @@ export default {
     KGChart,
     KnowledgeCard,
     ResourceLink,
-    DownloadButton
+    DownloadButton,
+    ResourceListWithInfo,
+    GoalAndKeyCard
   },
-  mounted () {
-    this.goSearch()
-  },
-  computed: {
-    query () {
-      return this.$route.query
-    },
-    graphEntity () {
-      return this.entities.entities
-    }
-  },
-  watch: {
-    query: {
-      handler (newQuery, oldQuery) {
-        console.log('query changed')
-        this.resetResource()
-        this.searchInfo.type = newQuery.type === undefined ? 0 : newQuery.type
-        this.searchInfo.content = newQuery.q === undefined ? 0 : newQuery.q
-        this.pageInfo.page = newQuery.page === undefined ? 1 : newQuery.page
-        this.goSearch()
-        if (oldQuery === undefined || newQuery.q !== oldQuery.q) {
-          this.resetCardInfo()
-          this.resetEntity()
-          this.resetGoalAndKey()
-          this.getRelatedEntity(newQuery.q)
-        }
-      },
-      immediate: true
-    },
-    graphEntity: {
-      handler () {
-        // this.$refs.chart.initCharts()
-      }
-    }
-  },
-  data () {
-    console.log(this.$route.query)
+  data() {
     return {
       searchInfo: {
         type: this.$route.query.type === undefined ? 0 : this.$route.query.type,
-        content: this.$route.query.q
+        content: this.$route.query.q,
+        sort: this.$route.query.sort === undefined ? 0 : this.$route.query.sort
       },
       pageInfo: {
         page: this.$route.query.page === undefined ? 1 : this.$route.query.page,
         perPage: 10
       },
-      resourceTypes: [{
-        label: '全部',
-        code: 0
-      }, {
-        label: '视频',
-        code: 1
-      }, {
-        label: '试题',
-        code: 2
-      }, {
-        label: '试卷',
-        code: 3
-      }, {
-        label: '课件',
-        code: 4
-      }, {
-        label: '文献资料',
-        code: 5
-      }, {
-        label: '教学案例',
-        code: 6
-      }],
+      resourceTypes: [
+        {
+          label: '全部',
+          code: 0
+        },
+        {
+          label: '视频',
+          code: 1
+        },
+        {
+          label: '试题',
+          code: 2
+        },
+        {
+          label: '试卷',
+          code: 3
+        },
+        {
+          label: '课件',
+          code: 4
+        },
+        {
+          label: '文献资料',
+          code: 5
+        },
+        {
+          label: '教学案例',
+          code: 6
+        }
+      ],
       resources: {
         resources: {},
         total: 0,
@@ -228,40 +172,76 @@ export default {
       cardInfo: {},
       goal: [],
       key: [],
-      sort: this.$route.query.sort === undefined ? 0 : this.$route.query.sort,
       activeEntity: ''
     }
   },
+  computed: {
+    query() {
+      return this.$route.query
+    },
+    graphEntity() {
+      return this.entities.entities
+    }
+  },
+  watch: {
+    query: {
+      handler(newQuery, oldQuery) {
+        // console.log(this.searchInfo)
+        this.resetResource()
+        this.searchInfo.type = newQuery.type === undefined ? 0 : newQuery.type
+        this.searchInfo.sort = newQuery.sort === undefined ? 0 : newQuery.sort
+        this.searchInfo.content = newQuery.q === undefined ? 0 : newQuery.q
+        this.pageInfo.page = newQuery.page === undefined ? 1 : newQuery.page
+        // console.log(this.searchInfo)
+        this.goSearch()
+        if (oldQuery === undefined || newQuery.q !== oldQuery.q) {
+          this.resetCardInfo()
+          this.resetEntity()
+          this.resetGoalAndKey()
+          this.getRelatedEntity(newQuery.q)
+        }
+      },
+      immediate: true
+    },
+    graphEntity: {
+      handler() {
+        // this.$refs.chart.initCharts()
+      }
+    }
+  },
+  mounted() {
+    // this.goSearch()
+  },
   methods: {
-    changeType (tab) {
+    changeType(tab) {
       this.searchInfo.type = tab.name
       this.$router.push({
         query: merge(this.$route.query, {
-          'type': this.searchInfo.type,
-          'page': 1
+          type: this.searchInfo.type,
+          sort: 0,
+          page: 1
         })
       })
     },
-    goSearch () {
+    goSearch() {
       this.noResourceHint = ''
       searchEntity({
         keyword: this.searchInfo.content,
         type: this.searchInfo.type,
-        sort: this.sort,
+        sort: this.searchInfo.sort,
         page: this.pageInfo.page,
         perPage: this.pageInfo.perPage
-      }).then(response => {
-        console.log(response.data)
+      }).then((response) => {
         this.resetResource()
+        console.log(response)
         if (response.data.code === 200) {
-          console.log(response.data.data)
-          let resource = response.data.data.resources[0]
+          const resource = response.data.data.resources[0]
           this.resources.total = response.data.data.total
           this.resources.pages = response.data.data.pages
           // 提取出教学目标和重难点以数组的形式存储
-          let goal = []
-          let key = []
-          resource['goalAndKey'].forEach(goalAndKey => {
+          const goal = []
+          const key = []
+          resource['goalAndKey'].forEach((goalAndKey) => {
             if (goalAndKey['objectives'] !== null) {
               goal.push({
                 content: goalAndKey['objectives'],
@@ -270,7 +250,7 @@ export default {
             }
             if (goalAndKey['keyPoint'] !== null) {
               key.push({
-                content: goalAndKey['keyPoint'],
+                content: goalAndKey['objectives'],
                 resourceID: goalAndKey['resourceID']
               })
             }
@@ -282,62 +262,60 @@ export default {
             this.cardInfo = resource.properties
           }
           this.resources.resources = resource.resources
-          console.log(this.resources)
         }
         if (this.resources.resources.length === 0) {
           this.noResourceHint = '未查询到相关资源'
         }
       })
     },
-    changeSort (sort) {
-      console.log(sort)
+    changeSort(sort) {
       this.$router.push({
         query: merge(this.$route.query, {
-          'type': this.searchInfo.type,
-          'page': 1,
-          'sort': sort
+          type: this.searchInfo.type,
+          page: 1,
+          sort: sort
         })
       })
     },
-    resetResource () {
+    resetResource() {
       this.resources.resources = []
       this.resources.total = 0
       this.resources.pages = 0
     },
-    resetGoalAndKey () {
+    resetGoalAndKey() {
       this.goal = []
       this.key = []
     },
-    resetCardInfo () {
+    resetCardInfo() {
       this.cardInfo = {}
     },
-    resetEntity () {
+    resetEntity() {
       this.entities.entities = []
     },
-    getRelatedEntity (keyword) {
+    getRelatedEntity(keyword) {
       this.resetEntity()
-      console.log(keyword)
-      relatedEntity(keyword)
-        .then(response => {
-          console.log(response)
-          if (response.data.code === 200) {
-            this.entities.entities = response.data.data
-          }
-        })
+      relatedEntity(keyword).then((response) => {
+        if (response.data.code === 200) {
+          this.entities.entities = response.data.data
+        }
+      })
     },
-    changePage (curPage) {
+    changePage(curPage) {
       this.$router.push({
         query: merge(this.$route.query, {
-          'page': curPage
+          page: curPage
         })
       })
     },
-    viewResource (resourceID) {
-      let target = this.$refs.resourceTarget
+    viewResource(resourceID) {
+      const target = this.$refs.resourceTarget
       record({
         resourceID: resourceID
       })
-      target.setAttribute('href', `${window.location.origin}/resource/${resourceID}`)
+      target.setAttribute(
+        'href',
+        `${window.location.origin}/resource/${resourceID}`
+      )
       target.click()
     }
   }
@@ -346,8 +324,8 @@ export default {
 
 <style scoped>
 .sort {
-  margin-top: -.5rem;
-  margin-bottom: .5rem;
+  margin-top: -0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .resources {
@@ -367,7 +345,7 @@ export default {
 
 .resource .subtitle {
   color: #606266;
-  margin-top: .5rem;
+  margin-top: 0.5rem;
 }
 
 .content-link {
@@ -376,7 +354,7 @@ export default {
   cursor: pointer;
   text-align: justify;
   width: 100%;
-  font-size: .8rem;
+  font-size: 0.8rem;
   line-height: 1.2rem;
   height: 1.2rem;
   color: #909399;
@@ -385,12 +363,12 @@ export default {
 .content-link:hover {
   color: #53a8ff;
   text-decoration: underline;
-  text-underline-offset: .2rem;
+  text-underline-offset: 0.2rem;
 }
 
 /*省略号*/
 .overflow-content::after {
-  content: "...";
+  content: '...';
   position: absolute;
   bottom: 0;
   right: 0;
@@ -398,78 +376,6 @@ export default {
   width: 1em;
   /*设置背景，将最后一个字覆盖掉*/
   background: #fff;
-}
-
-.resource-info {
-  height: 190px;
-  display: flex;
-  justify-content: space-between;
-  border-bottom: 1px solid #dcdfe6;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
-}
-
-.info {
-  display: flex;
-  flex-direction: column;
-  position: relative;
-}
-
-.entity-list {
-  /* 这里的间距要减去按钮设置的间距，但不完全减 */
-  margin-top: calc(.5rem - 5px);
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.entity-list div {
-  margin-right: 10px;
-  margin-top: 10px;
-}
-
-.extra {
-  display: flex;
-  margin-top: .8rem;
-  position: absolute;
-  bottom: 0;
-  min-width: 220px;
-}
-
-.extra .extra-info {
-  color: #909399;
-  font-size: .9rem;
-  line-height: 1rem;
-  margin-right: 1rem;
-}
-
-.operation {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  margin-left: .8rem;
-  justify-content: center;
-  align-items: center;
-}
-
-.operation button {
-  margin-bottom: 10px;
-}
-
-.resource-name {
-  /*color: #1a0dab;*/
-  font-size: 1.2rem;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.resource-name:hover {
-  text-decoration: underline;
-  text-underline-offset: .1rem;
-}
-
-.name-in-url {
-  color: #555555;
-  margin-bottom: .6rem;
 }
 
 .resource {
@@ -488,15 +394,33 @@ export default {
 .pages {
   display: flex;
   justify-content: center;
+  padding-bottom: 2rem;
 }
 
 .graph {
-  padding-left: 2rem;
-  height: 500px;
-  min-height: 500px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  margin-top: 1rem;
+  margin-left: 1rem;
+  border: 1px solid #ebeef5;
+  border-radius: 4px;
+  width: 400px;
+  height: 420px;
+  min-height: 400px;
 }
 
 .graph button {
   margin-top: 10px;
+}
+
+/*教学目标和教学重难点卡片*/
+.goal-and-key-container {
+  margin-bottom: 1rem;
+  justify-content: space-between;
+}
+
+.goal-and-key-card {
+  width: calc(50% - 10px);
+  height: 190px;
 }
 </style>

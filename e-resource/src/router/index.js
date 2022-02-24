@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import { authentication } from '@/api/auth'
 // import store from '@/store'
 
 Vue.use(VueRouter)
@@ -36,6 +37,15 @@ const routes = [
       }
     ]
   },
+  // 收藏
+  {
+    path: '/package',
+    name: 'Package',
+    component: () => import('@/view/Package'),
+    meta: {
+      requireAuth: true
+    }
+  },
   // 资源页面
   {
     path: '/resource/:resourceID',
@@ -53,7 +63,7 @@ const routes = [
 const router = new VueRouter({
   mode: 'history',
   routes,
-  scrollBehavior (to, from, savedPosition) {
+  scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {
       return savedPosition
     } else {
@@ -62,22 +72,28 @@ const router = new VueRouter({
   }
 })
 
-// router.beforeEach((to, from, next) => {
-//   if (to.meta.requireAuth) {
-//     if (store.state.user) {
-//       axios.get('/authentication').then(resp => {
-//         if (resp) next()
-//       })
-//     } else {
-//       next({
-//         path: 'login',
-//         query: {redirect: to.fullPath}
-//       })
-//     }
-//   } else {
-//     next()
-//   }
-// }
-// )
+router.beforeEach((to, from, next) => {
+  // 如果访问的页面需要登录
+  if (to.meta.requireAuth) {
+    authentication().then((response) => {
+      const {
+        data: { code }
+      } = response
+      if (code !== 200) {
+        // 未登录
+        next({
+          path: 'login',
+          query: {
+            redirect: to.fullPath
+          }
+        })
+      } else {
+        next()
+      }
+    })
+  } else {
+    next()
+  }
+})
 
 export default router

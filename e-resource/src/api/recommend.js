@@ -1,15 +1,17 @@
 import http from '@/utils/http'
 import store from '@/store'
 
-let baseURL = '/v1.0'
+const baseURL = '/v1.0'
 
 /**
  * 搜索某一知识点后根据用户和知识点推荐资源
  * @param entity
  */
 export const recommendByUserEntity = (entity) => {
-  let userId = store.state.user !== '' ? store.state.user['userId'] : ''
-  return http.get(`${baseURL}/public/recommendResource?userId=${userId}&entity=${entity}`)
+  const userId = store.state.user !== '' ? store.state.user['userId'] : ''
+  return http.get(
+    `${baseURL}/public/recommendResource?userId=${userId}&entity=${entity}`
+  )
 }
 
 /**
@@ -18,8 +20,10 @@ export const recommendByUserEntity = (entity) => {
  * @returns {AxiosPromise}
  */
 export const recommendByResourceUser = (resourceID) => {
-  let userId = store.state.user !== '' ? store.state.user['userId'] : ''
-  return http.get(`${baseURL}/public/recommendResource?resourceID=${resourceID}&userId=${userId}`)
+  const userId = store.state.user !== '' ? store.state.user['userId'] : ''
+  return http.get(
+    `${baseURL}/public/recommendResource?resourceID=${resourceID}&userId=${userId}`
+  )
 }
 
 /**
@@ -43,6 +47,6 @@ export const newResource = () => {
  * @returns {AxiosPromise}
  */
 export const userRecommendResource = () => {
-  let userId = store.state.user !== '' ? store.state.user['userId'] : ''
+  const userId = store.state.user !== '' ? store.state.user['userId'] : ''
   return http.get(`${baseURL}/public/recommendUser?userId=${userId}`)
 }

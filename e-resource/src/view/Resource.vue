@@ -1,54 +1,92 @@
 <template>
-<div class="lg-container">
-  <nav-menu></nav-menu>
-  <div class="main-container flex">
-    <div class="resource-info flex-1">
-      <div class="flex">
-        <div class="basic-info flex-1">
-          <h2 @click="addToCart(resource.id)">{{ resource['resourceName'] }}</h2>
-          <div class="resource-name" v-if="resource['url'] !== undefined">{{ resource['url'].split('/').slice(-1)[0] }}</div>
+  <div class="lg-container">
+    <nav-menu></nav-menu>
+    <div class="main-container flex">
+      <div class="resource-info left-side flex-1">
+        <div class="flex">
+          <div class="basic-info">
+            <h2 @click="addToCart(resource.id)">
+              {{ resource['resourceName'] }}
+            </h2>
+            <div
+              v-if="resource['url'] !== undefined && resource['url'] !== null"
+              class="resource-name"
+            >
+              {{ resource['url'].split('/').slice(-1)[0] }}
+            </div>
+          </div>
+          <div class="operation flex flex-1">
+            <div class="operation-button">
+              <download-button
+                :resourceID="Number(resourceID)"
+              ></download-button>
+            </div>
+            <div class="operation-button">
+              <add-to-package-button
+                :resourceType="'resource'"
+                :resourceID="String(resourceID)"
+              ></add-to-package-button>
+            </div>
+            <!--          <div class="operation-button">-->
+            <!--            <el-button class="full-width" size="medium" icon="el-icon-star-off">-->
+            <!--              收藏-->
+            <!--            </el-button>-->
+            <!--          </div>-->
+          </div>
         </div>
-        <div class="operation flex flex-1">
-          <div class="operation-button">
-            <download-button :resourceID="Number(resourceID)"></download-button>
-          </div>
-          <div class="operation-button">
-            <el-button class="full-width" size="medium" icon="el-icon-document-add">
-              加入资源包
-            </el-button>
-          </div>
-          <div class="operation-button">
-            <el-button class="full-width" size="medium" icon="el-icon-star-off">
-              收藏
-            </el-button>
-          </div>
+        <!-- 资源展示组件 -->
+        <div class="viewer">
+          <resource-viewer
+            :url="String(resource['viewUrl'])"
+            :bInfo="{
+              aid: resource['aid'],
+              bvid: resource['bvid'],
+              cid: resource['cid'],
+              page: 1
+            }"
+          ></resource-viewer>
         </div>
+        <!-- 评分 -->
+        <div class="rate">
+          <el-rate
+            v-model="resource['rate']"
+            :colors="colors"
+            disabled
+            show-score
+            score-template="{value}"
+          ></el-rate>
+        </div>
+        <div>
+          <comment :id="resource.id" class="comment-container"></comment>
+        </div>
+        <!-- 相关资源 -->
+        <div
+          v-show="false"
+          v-if="relatedResources.length !== 0"
+          class="related-resource flex-1"
+        >
+          <h2>相关资源</h2>
+          <resource-list :resourceList="relatedResources"></resource-list>
+        </div>
+        <!-- ---------- -->
       </div>
-      <!-- 资源展示组件 -->
-      <div class="viewer">
-        <resource-viewer :url="String(resource['viewUrl'])"></resource-viewer>
-      </div>
-      <!-- 相关资源 -->
-      <div class="related-resource flex-1" v-if="relatedResources.length !== 0">
-        <h2>相关资源</h2>
-        <resource-list :resourceList="relatedResources"></resource-list>
-      </div>
-      <!-- ---------- -->
-    </div>
-    <div class="flex-1">
-      <div class="graph">
-        <k-g-chart :entities="entities.entities" ref="chart"></k-g-chart>
-      </div>
-      <!-- 推荐资源 -->
-      <div class="recommend-container flex" v-if="recommendResources.length !== 0">
-        <div class="flex-1">
-          <h2>推荐资源</h2>
-          <resource-list :resourceList="recommendResources"></resource-list>
+      <div class="right-side">
+        <div class="graph">
+          <k-g-chart ref="chart" :entities="entities.entities"></k-g-chart>
+        </div>
+        <!-- 推荐资源 -->
+        <div
+          v-if="recommendResources.length !== 0"
+          class="recommend-container flex"
+        >
+          <div class="flex-1">
+            <h2>推荐资源</h2>
+            <resource-list :resourceList="recommendResources"></resource-list>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 </template>
 
 <script>
@@ -56,9 +94,11 @@ import NavMenu from '@/components/NavMenu'
 import KGChart from '@/components/Chart/KGChart'
 import ResourceViewer from '@/components/ViewResource/ResourceViewer'
 import ResourceLink from '@/components/ResourceLink'
-import DownloadButton from '@/components/DownloadButton'
+import DownloadButton from '@/components/Buttons/DownloadButton'
+import AddToPackageButton from '@/components/Buttons/AddToPackageButton'
 import ResourceList from '@/components/ResourceList'
-import { resourceInfo, related } from '@/api/resource'
+import Comment from '@/components/Comment'
+import { related, resourceInfo } from '@/api/resource'
 import { relatedEntity } from '@/api/entity'
 import { authentication } from '@/api/auth'
 import { record } from '@/api/record'
@@ -72,49 +112,59 @@ export default {
     ResourceViewer,
     ResourceLink,
     DownloadButton,
-    ResourceList
+    ResourceList,
+    Comment,
+    AddToPackageButton
   },
-  props: {
+  props: {},
+  data() {
+    return {
+      resource: {},
+      entities: {
+        entities: []
+      },
+      relatedResources: [],
+      recommendResources: [],
+      colors: ['#99A9BF', '#F7BA2A', '#FF9900']
+    }
   },
   computed: {
-    resourceID () {
+    resourceID() {
       return this.$route.params.resourceID
     }
   },
   watch: {
     resourceID: {
-      handler (resourceID) {
+      handler(resourceID) {
         // 获取资源信息
-        console.log('query resource')
-        resourceInfo(resourceID)
-          .then(response => {
-            if (response.data.code === 200) {
-              this.resource = response.data.data
-              // 获取相关实体
-              relatedEntity(response.data.data['entity'])
-                .then(entityResponse => {
-                  if (entityResponse.data.code === 200) {
-                    this.entities.entities = entityResponse.data.data
-                  }
-                })
-            } else {
-              console.log('无此资源')
-            }
-          })
+        resourceInfo(resourceID).then((response) => {
+          if (response.data.code === 200) {
+            this.resource = response.data.data
+            console.log(this.resource)
+            // 先处理一下entityList
+            const entityList = response.data.data['entityList']
+            let keyword = ''
+            entityList.forEach((entity) => {
+              keyword += entity + '#'
+            })
+            // 获取相关实体
+            relatedEntity(keyword).then((entityResponse) => {
+              if (entityResponse.data.code === 200) {
+                console.log(entityResponse.data.data)
+                this.entities.entities = entityResponse.data.data
+              }
+            })
+          } else {
+            console.log('无此资源')
+          }
+        })
         // 获取相关资源
-        related(resourceID)
-          .then(response => {
-            // console.log(response)
-            if (response.data.code === 200) {
-              let resources = response.data.data
-              resources.forEach(resource => {
-                // console.log(resource)
-                let suffix = resource.url.split('.').slice(-1)[0]
-                resource.suffix = suffix
-              })
-              this.relatedResources = resources
-            }
-          })
+        related(resourceID).then((response) => {
+          // console.log(response)
+          if (response.data.code === 200) {
+            this.relatedResources = response.data.data
+          }
+        })
         // 上传用户访问记录
         this.record()
         // 获取推荐资源
@@ -123,66 +173,53 @@ export default {
       immediate: true
     }
   },
-  data () {
-    return {
-      resource: {},
-      entities: {
-        entities: []
-      },
-      relatedResources: [],
-      recommendResources: []
-    }
-  },
   methods: {
-    addToCart (resourceID) {
-      authentication()
-        .then(response => {
-          if (response.data.code === 200) {
-            this.$store.commit('addToCart', resourceID)
-          } else {
-            this.$message({
-              message: '请先登录',
-              type: 'warning',
-              duration: 1500
-            })
-            this.$router.push({
-              path: '/login',
-              query: { redirect: this.$route.fullPath }
-            })
-          }
-        })
+    addToCart(resourceID) {
+      authentication().then((response) => {
+        if (response.data.code === 200) {
+          this.$store.commit('addToCart', resourceID)
+        } else {
+          this.$message({
+            message: '请先登录',
+            type: 'warning',
+            duration: 1500
+          })
+          this.$router.push({
+            path: '/login',
+            query: { redirect: this.$route.fullPath }
+          })
+        }
+      })
     },
-    record () {
+    record() {
       record({
         resourceID: Number(this.resourceID)
       })
     },
     // 获取推荐信息
-    getRecommendResources () {
-      authentication()
-        .then(response => {
-          if (response.data.code === 200) {
-            recommendByResourceUser(Number(this.resourceID))
-              .then(response => {
-                if (response.data.code === 200) {
-                  let resources = response.data.data
-                  resources.forEach(resource => {
-                    let suffix = resource.url.split('.').slice(-1)[0]
-                    resource.suffix = suffix
-                  })
-                  this.recommendResources = resources
-                }
-              })
-          }
-        })
+    getRecommendResources() {
+      authentication().then((response) => {
+        if (response.data.code === 200) {
+          recommendByResourceUser(Number(this.resourceID)).then((response) => {
+            if (response.data.code === 200) {
+              this.recommendResources = response.data.data
+            }
+          })
+        }
+      })
     }
   }
 }
 </script>
 
 <style scoped>
-.main-container {
-  /*border-bottom: 1px solid #dcdfe6;*/
+.left-side {
+  padding-right: 2rem;
+}
+
+.right-side {
+  margin-left: 1rem;
+  width: 400px;
 }
 
 .operation {
@@ -194,16 +231,21 @@ export default {
 }
 
 .graph {
-  height: 100%;
+  height: 500px;
+  /*height: 100%;*/
 }
 
 .resource-info {
   position: relative;
-  border-right: 1px solid #dcdfe6;
+  /*border-right: 1px solid #dcdfe6;*/
 }
 
 .resource-info >>> h2 {
   color: #222226;
+}
+
+.basic-info {
+  margin-right: 1rem;
 }
 
 .resource-name {
@@ -212,7 +254,7 @@ export default {
 
 .viewer {
   margin-top: 1rem;
-  padding-bottom: .4rem;
+  padding-bottom: 0.4rem;
 }
 
 .related-resource,
@@ -231,10 +273,17 @@ export default {
   border-top: 1px solid #dcdfe6;
 }
 
-/*.recommend-container {*/
-/*  margin-left: -.5px;*/
-/*  border-left: 1px solid #dcdfe6;*/
-/*}*/
+.rate {
+  border-top: 1px solid #e4e7ed;
+  padding-top: 1rem;
+  margin-top: 1rem;
+}
+
+.comment-container {
+  /*margin-top: 1rem;*/
+  padding-top: 1rem;
+  padding-bottom: 5rem;
+}
 
 /*@media only screen and (max-width : 768px) {*/
 /*  .main-container {*/

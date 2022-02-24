@@ -1,6 +1,7 @@
 import http from '@/utils/http'
+import store from '@/store'
 
-let baseURL = '/v1.0'
+const baseURL = '/v1.0'
 
 /**
  * 根据关键词查找对应的知识点
@@ -19,10 +20,9 @@ let baseURL = '/v1.0'
  */
 export const searchEntity = (params) => {
   let data = ''
-  for (let info in params) {
+  for (const info in params) {
     data += info + '=' + params[info] + '&'
   }
-  console.log(data)
   return http.get(`${baseURL}/public/queryEntity?${data}`)
 }
 
@@ -46,4 +46,15 @@ export const relatedEntity = (keyword) => {
  */
 export const properties = (keyword) => {
   return http.get(`${baseURL}/public/getProperties?keyword=${keyword}`)
+}
+
+/**
+ * 根据用户 ID 获取分学科推荐知识点
+ * @returns {AxiosPromise}
+ */
+export const recommend = () => {
+  const userId = store.state.user !== '' ? store.state.user['userId'] : ''
+  if (userId) {
+    return http.get(`${baseURL}/private/userGraph/${userId}`)
+  }
 }

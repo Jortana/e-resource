@@ -1,20 +1,35 @@
 <template>
   <div>
-    <div
-      class="avatar"
-      @mouseenter="showCard"
-      @mouseleave="hideCard">
-      <el-avatar class="img" size="medium" icon="el-icon-user-solid" :src="userInfo !== '' ? userInfo['avatar'] : ''"></el-avatar>
+    <div class="avatar" @mouseenter="showCard" @mouseleave="hideCard">
+      <el-avatar
+        :src="userInfo !== '' ? userInfo['avatar'] : ''"
+        class="img"
+        size="medium"
+        icon="el-icon-user-solid"
+      ></el-avatar>
       <transition name="el-fade-in-linear">
-        <el-card v-show="cardVisible" class="submenu-card" :body-style="{ padding: 0 }">
+        <el-card
+          v-show="cardVisible"
+          :body-style="{ padding: 0 }"
+          class="submenu-card"
+        >
           <div slot="header" class="clearfix">
-            <el-avatar icon="el-icon-user-solid" :src="userInfo !== '' ? userInfo['avatar'] : ''"></el-avatar>
+            <el-avatar
+              :src="userInfo !== '' ? userInfo['avatar'] : ''"
+              icon="el-icon-user-solid"
+            ></el-avatar>
             <div class="username">{{ this.$store.state.user['username'] }}</div>
             <div class="email">{{ this.$store.state.user['userEmail'] }}</div>
           </div>
           <div class="submenus">
-            <div class="submenu" v-for="submenu in submenus" :key="submenu.index" @click="jumpTo(submenu.index)">
-              <i class="icon" :class="submenu.icon"></i> <span v-html="submenu.label"></span>
+            <div
+              v-for="submenu in submenus"
+              :key="submenu.index"
+              class="submenu"
+              @click="jumpTo(submenu.index)"
+            >
+              <i :class="submenu.icon" class="icon"></i>
+              <span v-html="submenu.label"></span>
             </div>
           </div>
         </el-card>
@@ -27,11 +42,16 @@
 import { logout } from '@/api/auth'
 export default {
   name: 'Avatar',
-  data () {
+  data() {
     return {
       submenus: [
+        {
+          label: '资源包',
+          index: '/package',
+          icon: 'el-icon-folder-opened'
+        },
         { label: '个人中心', index: '/account', icon: 'el-icon-user' },
-        { label: '我的收藏', index: '/favourite', icon: 'el-icon-folder-opened' },
+        { label: '历史记录', index: '/history', icon: 'el-icon-time' },
         { label: '退出', index: 'logout', icon: 'el-icon-switch-button' }
       ],
       cardVisible: false,
@@ -39,22 +59,22 @@ export default {
     }
   },
   methods: {
-    showCard () {
+    showCard() {
       this.cardVisible = true
     },
-    hideCard () {
+    hideCard() {
       this.cardVisible = false
     },
-    jumpTo (index) {
+    jumpTo(index) {
       if (index === 'logout') {
         this.$confirm('确认登出吗', '登出', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
-        }).then(() => {
-          console.log('logout')
-          logout()
-            .then(response => {
+        })
+          .then(() => {
+            console.log('logout')
+            logout().then((response) => {
               console.log(response)
               if (response.data.code === 200) {
                 this.$message({
@@ -68,14 +88,12 @@ export default {
                 this.$message.error(response.data.message)
               }
             })
-        }).catch(() => {
-        })
-      } else {
-        this.$router
-          .push(index)
-          .catch(() => {
-            this.$router.go(0)
           })
+          .catch(() => {})
+      } else {
+        this.$router.push(index).catch(() => {
+          this.$router.go(0)
+        })
       }
     }
   }
@@ -123,7 +141,7 @@ export default {
 }
 
 .submenu:last-child::after {
-  content: "";
+  content: '';
   position: absolute;
   top: -10px;
   left: 0;
@@ -142,6 +160,6 @@ export default {
 }
 
 .submenu:hover {
-  background-color: #f4f4f4
+  background-color: #f4f4f4;
 }
 </style>

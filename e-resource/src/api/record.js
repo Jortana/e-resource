@@ -1,7 +1,7 @@
 import http from '@/utils/http'
 import store from '@/store'
 
-let baseURL = '/v1.0'
+const baseURL = '/v1.0'
 
 /**
  * 添加一条用户的浏览记录
