@@ -2,6 +2,7 @@ package cn.edu.njnu.service;
 
 import cn.edu.njnu.mapper.RecordMapper;
 import cn.edu.njnu.mapper.ResourceMapper;
+import cn.edu.njnu.mapper.UserMapper;
 import cn.edu.njnu.pojo.Resource;
 import cn.edu.njnu.pojo.Result;
 import cn.edu.njnu.pojo.ResultFactory;
@@ -9,7 +10,9 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.ansj.domain.Term;
 import org.ansj.splitWord.analysis.ToAnalysis;
+import org.apache.shiro.SecurityUtils;
 import org.neo4j.driver.v1.*;
+
 import static org.neo4j.driver.v1.Values.parameters;
 
 import org.neo4j.driver.v1.types.Node;
@@ -24,13 +27,16 @@ import java.util.*;
 public class EntityService {
     private final ResourceMapper resourceMapper;
     private final RecordMapper recordMapper;
-    public EntityService(ResourceMapper resourceMapper, RecordMapper recordMapper) {
+    private final UserMapper userMapper;
+    public EntityService(ResourceMapper resourceMapper, RecordMapper recordMapper, UserMapper userMapper) {
         this.resourceMapper = resourceMapper;
         this.recordMapper = recordMapper;
+        this.userMapper = userMapper;
     }
-    String resourceRoot = "http://222.192.6.62:8082";
+    // String resourceRoot = "http://222.192.6.62:8082";
     private Driver createDrive(){
         return GraphDatabase.driver( "bolt://222.192.6.62:7687", AuthTokens.basic( "neo4j", "123456" ) );
+//        return GraphDatabase.driver( "bolt://39.105.139.205:7687", AuthTokens.basic( "neo4j", "123456" ) );
     }
     public JSONArray getRelatedEntity(String entityName, Session session, String mainEntityName){
         StatementResult result = session.run( "MATCH (a:concept) -[k:相关关系]-> (m:concept) where a.name = { name } and m.name<>{mainEntity}" +
@@ -143,21 +149,28 @@ public class EntityService {
             mainEntity.put("entityName", keyword[0]);
             resArray.add(mainEntity);
         }
-
+        driver.close();
         return ResultFactory.buildSuccessResult("查询成功", resArray);
     }
 
     public Result queryEntity(Map<String, Object> keywordMap) {
+        System.out.println(keywordMap);
+        String browser = (String) keywordMap.get("browser");
+        String OS = (String) keywordMap.get("OS");
+        String ipAddress = (String) keywordMap.get("ipAddress");
         Date date = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        String browseDate = formatter.format(date);
+//        String browseDate = formatter.format(date);
+        long browseDate = System.currentTimeMillis();
         //获取用户输入的内容
         String keyword = (String) keywordMap.get("keyword");
         String content = keyword;
         //向数据库添加用户浏览记录
-        if (keywordMap.containsKey("userId")){
-            int userId = Integer.parseInt((String) keywordMap.get("userId"));
-            recordMapper.addEntityRecord(userId,browseDate,keyword);
+        String username = (String) SecurityUtils.getSubject().getPrincipal();
+        System.out.println(username);
+        if (username!=null){
+            int userId = userMapper.queryUserByName(username).getUserId();
+            recordMapper.addEntityRecord(userId,browseDate,keyword, browser, OS, ipAddress);
         }
         int sort = 0;  //0默认，1最热，2最新
         int type = 0;  //0全部
@@ -329,7 +342,7 @@ public class EntityService {
         resObject.put("total", totalEntity);
         resObject.put("pages", (int)Math.ceil(totalEntity * 1.0 / perPage));
         session.close();
-//        driver.close();
+        driver.close();
         return ResultFactory.buildSuccessResult("查询成功", resObject);
     }
     //根据entity查找重难点,从mysql里面查
@@ -352,6 +365,8 @@ public class EntityService {
             singleGK.put("resourceID", id);
             resArray.add(singleGK);
         }
+        session.close();
+        driver.close();
         return resArray;
     }
     //根据用户浏览记录生成图谱
@@ -472,6 +487,8 @@ public class EntityService {
             subjectObject.put("node", node);
             resArray.add(subjectObject);
         }
+        session.close();
+        driver.close();
         return ResultFactory.buildSuccessResult("success", resArray);
     }
 }

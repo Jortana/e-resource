@@ -7,13 +7,14 @@ spring:
   datasource:
     username: root
     password: 123456
-    url: jdbc:mysql://222.192.6.62:3306/resources_class?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8
+#    url: jdbc:mysql://222.192.6.62:3306/resources_class?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8
+    url: jdbc:mysql://s4.z100.vip:8497/resources_class?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8
     driver-class-name: com.mysql.cj.jdbc.Driver
-  data:
-    neo4j:
-      username: root
+  neo4j:
+    uri: http://127.0.0.1:7474
+    authentication:
+      username: neo4j
       password: 123456
-      uri: bolt://222.192.6.62:7687
 # 整合mybatis
 mybatis:
   type-aliases-package: cn.edu.njnu.pojo

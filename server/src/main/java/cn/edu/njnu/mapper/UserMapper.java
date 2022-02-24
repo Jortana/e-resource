@@ -1,6 +1,7 @@
 package cn.edu.njnu.mapper;
 
 import cn.edu.njnu.pojo.User;
+import cn.edu.njnu.pojo.UserNode;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
@@ -21,10 +22,14 @@ public interface UserMapper {
     void updateUser(User user);
     //获取用户ID
     List<Map> queryUserID();
+    //获取用户ID
+    List<Map> browseUserID();
     //浏览记录
     List<Map> browseRecord(int user_id);
     List<Map> entityRecord(int user_id);
     void updateRelated(int user_id, String related_user);
     String queryRelatedUser(int user_id);
     User queryUserByID(int user_id);
+
+    UserNode getByID(int user_id);
 }

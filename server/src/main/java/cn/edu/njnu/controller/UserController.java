@@ -35,4 +35,10 @@ public class UserController {
     public Result recommend(@RequestParam Map<String, Object> userIDMap){
         return userService.recommend(userIDMap);
     }
+
+    @CrossOrigin
+    @GetMapping("/v1.0/public/test")
+    public Result recommend(){
+        return userService.test();
+    }
 }

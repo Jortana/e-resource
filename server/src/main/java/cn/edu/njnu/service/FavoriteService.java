@@ -24,6 +24,7 @@ public class FavoriteService {
     }
     private Driver createDrive(){
         return GraphDatabase.driver( "bolt://222.192.6.62:7687", AuthTokens.basic( "neo4j", "123456" ) );
+//        return GraphDatabase.driver( "bolt://39.105.139.205:7687", AuthTokens.basic( "neo4j", "123456" ) );
     }
     //生成8位id
     public static  String getUUID()
@@ -176,6 +177,8 @@ public class FavoriteService {
             }
         }
         folder.put("key", key);
+        session.close();
+        driver.close();
         return ResultFactory.buildSuccessResult("获取资源成功", folder);
     }
     //用户创建收藏夹

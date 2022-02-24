@@ -26,6 +26,7 @@ public interface ResourceMapper {
     boolean updateDownload(int download, int resourceID);
     //根据条件查询资源
     ArrayList<Resource> queryHot();
+    ArrayList<Resource> queryHot2();
     //根据条件查询资源
     ArrayList<Resource> queryTime();
 
@@ -34,4 +35,5 @@ public interface ResourceMapper {
     Map queryVideo(int id);
 
     String queryUrl(int resourceID);
+    String queryVideoUrl(int resourceID);
 }

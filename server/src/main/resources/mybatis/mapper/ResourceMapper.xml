@@ -70,6 +70,9 @@
     <select id="queryHot" resultType="resource">
         SELECT id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type FROM t_resource ORDER BY browse DESC LIMIT 8
     </select>
+    <select id="queryHot2" resultType="resource">
+        SELECT id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type FROM t_resource ORDER BY browse DESC LIMIT 8,80
+    </select>
     <!-- 查最新资源 -->
     <select id="queryTime" resultType="resource">
         select id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type from t_resource order by updateTime desc limit 8
@@ -80,7 +83,10 @@
         select *from t_document where id = #{id}
     </select>
     <select id="queryUrl" resultType="String">
-        select url from t_document inner join t_resource where t_resource.tableResourceID = t_document.id and t_resource.id = #{resourceID}
+        select url from t_document inner join t_resource where t_resource.tableResourceID = t_document.id and t_resource.id = #{resourceID} and t_resource.`table` = 2
+    </select>
+    <select id="queryVideoUrl" resultType="String">
+        select url from t_video inner join t_resource where t_resource.tableResourceID = t_video.id and t_resource.id = #{resourceID} and t_resource.`table` = 3
     </select>
     <!-- 查bilibili -->
     <select id="queryBvideo" resultType="HashMap">

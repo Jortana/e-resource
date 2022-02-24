@@ -18,9 +18,14 @@ public class RecordService {
     }
 
     public void addRecord(Map recordMap){
+        System.out.println("添加记录");
+        String browser = (String) recordMap.get("browser");
+        String OS = (String) recordMap.get("OS");
+        String ipAddress = (String) recordMap.get("ipAddress");
         Date date = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        String browseDate = formatter.format(date);
+        long browseDate = System.currentTimeMillis();
+//        String browseDate = formatter.format(date);
         if (recordMap.containsKey("resourceID")){
             int resourceID = (int) recordMap.get("resourceID");
             int browse = resourceMapper.queryResourceByID(resourceID).getBrowse() + 1;
@@ -31,11 +36,11 @@ public class RecordService {
             int userID = (int) recordMap.get("userId");
             if (recordMap.containsKey("entityName")){
                 String entityName = (String) recordMap.get("entityName");
-                recordMapper.addEntityRecord(userID, browseDate, entityName);
+                recordMapper.addEntityRecord(userID, browseDate, entityName, browser, OS, ipAddress);
             }
             if (recordMap.containsKey("resourceID")){
                 int resourceID = (int) recordMap.get("resourceID");
-                recordMapper.addResourceRecord(userID, browseDate, resourceID);
+                recordMapper.addResourceRecord(userID, browseDate, resourceID, browser, OS, ipAddress);
             }
         }
     }
