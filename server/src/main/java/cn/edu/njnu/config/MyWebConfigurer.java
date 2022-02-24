@@ -12,6 +12,7 @@ public class MyWebConfigurer implements WebMvcConfigurer {
         //所有请求都允许跨域，使用这种配置方法就不能在 interceptor 中再配置 header 了
         registry.addMapping("/**")
                 .allowCredentials(true)
+//                .allowedOrigins("http://39.105.139.205")
                 .allowedOrigins("http://127.0.0.1:8080")
                 .allowedMethods("POST", "GET", "PUT", "OPTIONS", "DELETE")
                 .allowedHeaders("*")
@@ -21,6 +22,6 @@ public class MyWebConfigurer implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/e-resource/api/file/avatar/**").addResourceLocations("file:" + "d:/e-resource/avatar/");
-        registry.addResourceHandler("/e-resource/api/file/resource/**").addResourceLocations("file:" + "d:/e-resource/resource");
+        //registry.addResourceHandler("/e-resource/api/file/resource/**").addResourceLocations("file:" + "d:/e-resource/resource");
     }
 }

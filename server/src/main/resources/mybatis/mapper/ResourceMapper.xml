@@ -3,46 +3,47 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.edu.njnu.mapper.ResourceMapper">
-    <!-- 根据关键词查资源 -->
-    <select id="queryResourceByKeywords" resultType="resource">
-        select id, resource_name, download, collection, `period`, grade, subject, url, view_url, entity, updateTime from t_resource where
-        <trim suffixOverrides="and">
-            <if test="keyword!=null">entity like concat('%',#{keyword},'%') and </if>
-            <if test="resourceType!=0">resource_type=#{resourceType} and </if>
-            <if test="period!=0">`period` = #{period} and </if>
-            <if test="grade!=0">grade = #{grade} and </if>
-            <if test="subject!=0">subject = #{subject} and </if>
-            <if test="updateTime!=null">updateTime >= #{updateTime}and </if>
-        </trim>
-        limit #{limit},#{perPage};
+    <!-- 根据ID查资源 -->
+    <select id="queryResourceByID" resultType="resource" >
+         select id, resource_name, download, collection, browse, `period`, grade, subject, updateTime, `table`, tableResourceID, resource_type, rate, file_type from t_resource where id = #{id}
     </select>
-    <!-- 根据关键词查资源个数 -->
-    <select id="queryResourceNumByKeywords" resultType="int">
-        select count(id) from t_resource where
-        <trim suffixOverrides="and">
-            <if test="keyword!=null">entity like concat('%',#{keyword},'%') and </if>
-            <if test="resourceType!=0">resource_type=#{resourceType} and </if>
-            <if test="period!=0">period = #{period} and </if>
-            <if test="grade!=0">grade = #{grade}and </if>
-            <if test="subject!=0">subject = #{subject} and </if>
-            <if test="updateTime!=null">updateTime >= #{updateTime} and </if>
+    <!-- 根据ID查资源 -->
+    <select id="queryResourceByIDList" resultType="resource" >
+        select id, resource_name, download, collection, browse, `period`, grade, subject, updateTime, `table`, tableResourceID, resource_type, rate, file_type from t_resource
+        <where>
+            <if test="type!=0">resource_type =#{type} and </if>
+            (
+            <trim suffixOverrides="or">
+                <foreach item="id" collection="IDList">(id = #{id}) or </foreach>
+            </trim>
+            )
+        </where>
+        <trim>
+            <if test="sort == 1">order by browse desc</if>
+            <if test="sort == 2">order by updateTime desc</if>
         </trim>
     </select>
     <!-- 根据ID查资源 -->
-    <select id="queryResourceByID" resultType="resource">
-         select id, resource_name, download, collection, browse, `period`, grade, subject, url, view_url, entity, updateTime from t_resource where id = #{resource_id}
+    <select id="queryResourceByContent" resultType="resource" >
+        select id, resource_name, download, collection, browse, `period`, grade, subject, updateTime, `table`, tableResourceID, resource_type, rate, file_type from t_resource
+        <where>
+            <trim suffixOverrides="and">
+                <if test="content!=null">resource_name like concat('%',#{content},'%') and </if>
+                <if test="type!=0">resource_type =#{type} and </if>
+            </trim>
+        </where>
+        <trim>
+            <if test="sort == 1">order by browse desc</if>
+            <if test="sort == 2">order by updateTime desc</if>
+        </trim>
     </select>
     <!-- 获取资源类型 -->
     <select id="queryType" resultType="HashMap">
         select type_id, resource_type from t_resource_type
     </select>
-    <!-- 根据资源ID查找相关资源 -->
-    <select id="queryRelated" resultType="string">
-        select related_10 from t_resource where id = #{resource_id}
-    </select>
     <!-- 通过实体找资源 -->
     <select id="queryResource" resultType="resource">
-        select id, resource_name, download, collection, `period`, grade, subject, url, view_url, entity, updateTime, resource_type, browse from t_resource where
+        select id, resource_name, download, collection, `period`, grade, subject, url, view_url, entity, updateTime, resource_type, browse, rate, file_type from t_resource where
         <trim suffixOverrides="and">
             <if test="entity!=null">entity like concat('%',#{entity},'%') and </if>
             <if test="type!=0">resource_type =#{type} and </if>
@@ -55,7 +56,7 @@
     </select>
     <!-- 查教学目标和重难点 -->
     <select id="queryGoalAndKey" resultType="HashMap">
-        select distinct t_goal, t_key, resource_id from t_instruction_plan_clips inner join t_resource on t_instruction_plan_clips.resource_id = t_resource.id where entity like concat('%',#{entity},'%')
+        select distinct t_goal, t_key from t_instruction_plan_clips
     </select>
     <!-- 更新资源浏览次数 -->
     <update id="updateBrowse">
@@ -67,11 +68,33 @@
     </update>
     <!-- 查热门资源 -->
     <select id="queryHot" resultType="resource">
-        SELECT id, resource_name, download, collection, `period`, grade, browse, `subject`, url, view_url, entity, updateTime FROM t_resource ORDER BY browse DESC LIMIT 10
+        SELECT id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type FROM t_resource ORDER BY browse DESC LIMIT 8
+    </select>
+    <select id="queryHot2" resultType="resource">
+        SELECT id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type FROM t_resource ORDER BY browse DESC LIMIT 8,80
     </select>
     <!-- 查最新资源 -->
     <select id="queryTime" resultType="resource">
-        select id, resource_name, download, collection, `period`, grade, browse, `subject`, url, view_url, entity, updateTime from t_resource order by updateTime desc limit 10
+        select id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type from t_resource order by updateTime desc limit 8
+    </select>
+
+    <!-- 查文档url -->
+    <select id="queryDocument" resultType="HashMap">
+        select *from t_document where id = #{id}
+    </select>
+    <select id="queryUrl" resultType="String">
+        select url from t_document inner join t_resource where t_resource.tableResourceID = t_document.id and t_resource.id = #{resourceID} and t_resource.`table` = 2
+    </select>
+    <select id="queryVideoUrl" resultType="String">
+        select url from t_video inner join t_resource where t_resource.tableResourceID = t_video.id and t_resource.id = #{resourceID} and t_resource.`table` = 3
+    </select>
+    <!-- 查bilibili -->
+    <select id="queryBvideo" resultType="HashMap">
+        select *from t_bvideo where id = #{id}
+    </select>
+    <!-- 查本地视频 -->
+    <select id="queryVideo" resultType="HashMap">
+        select *from t_video where id = #{id}
     </select>
 </mapper>
 

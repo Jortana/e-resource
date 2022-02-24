@@ -11,6 +11,8 @@
 	<groupId>cn.edu.njnu</groupId>
 	<artifactId>e-resource</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<!-- 打包方式 -->
+	<packaging>jar</packaging>
 	<name>e-resource</name>
 	<description>Demo project for Spring Boot</description>
 
@@ -19,6 +21,13 @@
 	</properties>
 
 	<dependencies>
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<!--mybatis-spring-boot-->
 		<dependency>
 			<groupId>org.mybatis.spring.boot</groupId>
 			<artifactId>mybatis-spring-boot-starter</artifactId>
@@ -32,7 +41,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
@@ -61,7 +69,6 @@
 			<artifactId>fastjson</artifactId>
 			<version>1.2.75</version>
 		</dependency>
-
 		<!-- neo4j -->
 		<dependency>
 			<groupId>org.neo4j.driver</groupId>
@@ -86,7 +93,7 @@
 		<dependency>
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-jdbc-driver</artifactId>
-			<version>3.1.0</version>
+			<version>3.4.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mybatis</groupId>
@@ -104,14 +111,27 @@
 			<artifactId>ansj_seg</artifactId>
 			<version>5.1.6</version>
 		</dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.6</version>
-        </dependency>
+		<!-- 新建word并写入 -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>4.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>4.1.0</version>
+		</dependency>
+		<!-- 获取ip用的 -->
+		<dependency>
+			<groupId>eu.bitwalker</groupId>
+			<artifactId>UserAgentUtils</artifactId>
+			<version>1.21</version>
+		</dependency>
     </dependencies>
 
 	<build>
+		<finalName>e-resource</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

@@ -1,17 +1,25 @@
 package cn.edu.njnu.pojo;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class Resource {
     int id;
     String resourceName;
     String remark;
+
     String url;
     String viewUrl;
-    String related_10;
+    String cover;
+
+    String aid;
+    String bvid;
+    String cid;
+    int page;
+
     String keywords;
-    String entity;
-    String[] entityList;
+    ArrayList<String> entityList;
     String updateTime;
     int download;
     int collection;
@@ -21,18 +29,28 @@ public class Resource {
     String grade;
     int subject;
 
+    int table;
+    Integer tableResourceID;
+
+    double rate;
+    String fileType;
+    String content;
+
     public Resource() {
     }
 
-    public Resource(int id, String resourceName, String remark, String url, String viewUrl, String related_10, String keywords, String entity, String[] entityList, String updateTime, int download, int collection, int browse, int type, String period, String grade, int subject) {
+    public Resource(int id, String resourceName, String remark, String url, String viewUrl, String cover, String aid, String bvid, String cid, int page, String keywords, ArrayList<String> entityList, String updateTime, int download, int collection, int browse, int resourceType, String period, String grade, int subject, int table, Integer tableResourceID, double rate, String fileType, String content) {
         this.id = id;
         this.resourceName = resourceName;
         this.remark = remark;
         this.url = url;
         this.viewUrl = viewUrl;
-        this.related_10 = related_10;
+        this.cover = cover;
+        this.aid = aid;
+        this.bvid = bvid;
+        this.cid = cid;
+        this.page = page;
         this.keywords = keywords;
-        this.entity = entity;
         this.entityList = entityList;
         this.updateTime = updateTime;
         this.download = download;
@@ -42,29 +60,11 @@ public class Resource {
         this.period = period;
         this.grade = grade;
         this.subject = subject;
-    }
-
-    @Override
-    public String toString() {
-        return "Resource{" +
-                "id=" + id +
-                ", resourceName='" + resourceName + '\'' +
-                ", remark='" + remark + '\'' +
-                ", url='" + url + '\'' +
-                ", viewUrl='" + viewUrl + '\'' +
-                ", related_10='" + related_10 + '\'' +
-                ", keywords='" + keywords + '\'' +
-                ", entity='" + entity + '\'' +
-                ", entityList=" + Arrays.toString(entityList) +
-                ", updateTime='" + updateTime + '\'' +
-                ", download=" + download +
-                ", collection=" + collection +
-                ", browse=" + browse +
-                ", resourceType=" + resourceType +
-                ", period='" + period + '\'' +
-                ", grade='" + grade + '\'' +
-                ", subject=" + subject +
-                '}';
+        this.table = table;
+        this.tableResourceID = tableResourceID;
+        this.rate = rate;
+        this.fileType = fileType;
+        this.content = content;
     }
 
     public int getId() {
@@ -107,12 +107,44 @@ public class Resource {
         this.viewUrl = viewUrl;
     }
 
-    public String getRelated_10() {
-        return related_10;
+    public String getCover() {
+        return cover;
     }
 
-    public void setRelated_10(String related_10) {
-        this.related_10 = related_10;
+    public void setCover(String cover) {
+        this.cover = cover;
+    }
+
+    public String getAid() {
+        return aid;
+    }
+
+    public void setAid(String aid) {
+        this.aid = aid;
+    }
+
+    public String getBvid() {
+        return bvid;
+    }
+
+    public void setBvid(String bvid) {
+        this.bvid = bvid;
+    }
+
+    public String getCid() {
+        return cid;
+    }
+
+    public void setCid(String cid) {
+        this.cid = cid;
+    }
+
+    public int getPage() {
+        return page;
+    }
+
+    public void setPage(int page) {
+        this.page = page;
     }
 
     public String getKeywords() {
@@ -123,19 +155,11 @@ public class Resource {
         this.keywords = keywords;
     }
 
-    public String getEntity() {
-        return entity;
-    }
-
-    public void setEntity(String entity) {
-        this.entity = entity;
-    }
-
-    public String[] getEntityList() {
+    public ArrayList<String> getEntityList() {
         return entityList;
     }
 
-    public void setEntityList(String[] entityList) {
+    public void setEntityList(ArrayList<String> entityList) {
         this.entityList = entityList;
     }
 
@@ -201,5 +225,76 @@ public class Resource {
 
     public void setSubject(int subject) {
         this.subject = subject;
+    }
+
+    public int getTable() {
+        return table;
+    }
+
+    public void setTable(int table) {
+        this.table = table;
+    }
+
+    public Integer getTableResourceID() {
+        return tableResourceID;
+    }
+
+    public void setTableResourceID(Integer tableResourceID) {
+        this.tableResourceID = tableResourceID;
+    }
+
+    public double getRate() {
+        return rate;
+    }
+
+    public void setRate(double rate) {
+        this.rate = rate;
+    }
+
+    public String getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    @Override
+    public String toString() {
+        return "Resource{" +
+                "id=" + id +
+                ", resourceName='" + resourceName + '\'' +
+                ", remark='" + remark + '\'' +
+                ", url='" + url + '\'' +
+                ", viewUrl='" + viewUrl + '\'' +
+                ", cover='" + cover + '\'' +
+                ", aid='" + aid + '\'' +
+                ", bvid='" + bvid + '\'' +
+                ", cid='" + cid + '\'' +
+                ", page=" + page +
+                ", keywords='" + keywords + '\'' +
+                ", entityList=" + entityList +
+                ", updateTime='" + updateTime + '\'' +
+                ", download=" + download +
+                ", collection=" + collection +
+                ", browse=" + browse +
+                ", resourceType=" + resourceType +
+                ", period='" + period + '\'' +
+                ", grade='" + grade + '\'' +
+                ", subject=" + subject +
+                ", table=" + table +
+                ", tableResourceID=" + tableResourceID +
+                ", rate=" + rate +
+                ", fileType='" + fileType + '\'' +
+                ", content='" + content + '\'' +
+                '}';
     }
 }

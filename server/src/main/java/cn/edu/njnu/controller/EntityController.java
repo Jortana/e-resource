@@ -23,19 +23,12 @@ public class EntityController {
 
     @CrossOrigin
     @GetMapping("/v1.0/public/queryEntity")
-    public Result getEntity(@RequestParam Map<String, Object> keywordMap){
-        return entityService.getEntity(keywordMap);
+    public Result queryEntity(@RequestParam Map<String, Object> keywordMap){
+        return entityService.queryEntity(keywordMap);
     }
-//    //根据entity查找重难点,从neo4j里面查
-//    @CrossOrigin
-//    @GetMapping("/v1.0/public/queryEntity_neo4j")
-//    public Result getEntity_neo4j(@RequestParam Map<String, Object> keywordMap){
-//        return entityService.getEntity_neo4j(keywordMap);
-//    }
 
-    @CrossOrigin
-    @GetMapping("/v1.0/public/getProperties")
-    public Result getProperties(@RequestParam Map<String, Object> nameMap){
-        return entityService.getProperties(nameMap);
+    @GetMapping("/v1.0/private/userGraph/{userID}")
+    public Result userGraph(@PathVariable(name = "userID") int userID){
+        return entityService.userGraph(userID);
     }
 }
