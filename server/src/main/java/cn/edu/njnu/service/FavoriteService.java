@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.shiro.SecurityUtils;
 import org.neo4j.driver.v1.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
@@ -17,14 +18,12 @@ import static org.neo4j.driver.v1.Values.parameters;
 
 @Service
 public class FavoriteService {
-    private final FavoriteMapper favoriteMapper;
+    @Autowired
+    private FavoriteMapper favoriteMapper;
 
-    public FavoriteService(FavoriteMapper favoriteMapper) {
-        this.favoriteMapper = favoriteMapper;
-    }
     private Driver createDrive(){
         return GraphDatabase.driver( "bolt://222.192.6.62:7687", AuthTokens.basic( "neo4j", "123456" ) );
-//        return GraphDatabase.driver( "bolt://39.105.139.205:7687", AuthTokens.basic( "neo4j", "123456" ) );
+//        return GraphDatabase.driver( "bolt://202.102.89.244:7687", AuthTokens.basic( "neo4j", "123456" ) );
     }
     //生成8位id
     public static  String getUUID()

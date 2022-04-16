@@ -2,6 +2,7 @@ package cn.edu.njnu.service;
 
 import cn.edu.njnu.mapper.RecordMapper;
 import cn.edu.njnu.mapper.ResourceMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
@@ -10,15 +11,14 @@ import java.util.Map;
 
 @Service
 public class RecordService {
-    private final RecordMapper recordMapper;
-    private final ResourceMapper resourceMapper;
-    public RecordService(RecordMapper recordMapper, ResourceMapper resourceMapper) {
-        this.recordMapper = recordMapper;
-        this.resourceMapper = resourceMapper;
-    }
+    @Autowired
+    private RecordMapper recordMapper;
+    @Autowired
+    private ResourceMapper resourceMapper;
+
 
     public void addRecord(Map recordMap){
-        System.out.println("添加记录");
+//        System.out.println("添加记录");
         String browser = (String) recordMap.get("browser");
         String OS = (String) recordMap.get("OS");
         String ipAddress = (String) recordMap.get("ipAddress");

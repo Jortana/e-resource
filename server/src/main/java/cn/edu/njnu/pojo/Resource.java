@@ -1,10 +1,11 @@
 package cn.edu.njnu.pojo;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Resource {
+public class Resource implements Serializable {
     int id;
     String resourceName;
     String remark;

@@ -36,9 +36,4 @@ public class UserController {
         return userService.recommend(userIDMap);
     }
 
-    @CrossOrigin
-    @GetMapping("/v1.0/public/test")
-    public Result recommend(){
-        return userService.test();
-    }
 }

@@ -14,6 +14,8 @@ public class MyWebConfigurer implements WebMvcConfigurer {
                 .allowCredentials(true)
 //                .allowedOrigins("http://39.105.139.205")
                 .allowedOrigins("http://127.0.0.1:8080")
+//                .allowedOrigins("http://202.102.89.244:8010")
+
                 .allowedMethods("POST", "GET", "PUT", "OPTIONS", "DELETE")
                 .allowedHeaders("*")
                 .maxAge(3600);

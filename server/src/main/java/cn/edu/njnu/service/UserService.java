@@ -11,6 +11,7 @@ import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.neo4j.driver.internal.logging.ConsoleLogging;
 import org.neo4j.driver.v1.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -21,17 +22,19 @@ import static org.neo4j.driver.v1.Values.parameters;
 
 @Service
 public class UserService {
-    private final UserMapper userMapper;
-    private final ResourceMapper resourceMapper;
-    private final RecordMapper recordMapper;
-    public UserService(UserMapper userMapper, ResourceMapper resourceMapper, RecordMapper recordMapper) {
-        this.userMapper = userMapper;
-        this.resourceMapper = resourceMapper;
-        this.recordMapper = recordMapper;
-    }
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private ResourceMapper resourceMapper;
+
+    @Autowired
+    private RecordMapper recordMapper;
+
     private Driver createDrive(){
         return GraphDatabase.driver( "bolt://222.192.6.62:7687", AuthTokens.basic( "neo4j", "123456" ) );
-//        return GraphDatabase.driver( "bolt://39.105.139.205:7687", AuthTokens.basic( "neo4j", "123456" ) );
+//        return GraphDatabase.driver( "bolt://202.102.89.244:7687", AuthTokens.basic( "neo4j", "123456" ) );
     }
     public User getByName(String username) {
         return userMapper.queryUserByName(username);
@@ -544,7 +547,7 @@ public class UserService {
                         user_entity.put(temp,itemRecommendDegree);
                         //  System.out.println(user_entity.entrySet());
                     }
-                    System.out.println("The item " + item + " for " + recommendUserId + "'s recommended degree:" + itemRecommendDegree);
+//                    System.out.println("The item " + item + " for " + recommendUserId + "'s recommended degree:" + itemRecommendDegree);
 //                    resourceArray.add(resourceMapper.queryResourceByID(item));
                     JSONObject userWeight = new JSONObject();
                     userWeight.put("resourceID", item);
@@ -552,20 +555,20 @@ public class UserService {
                     userArray.add(userWeight);
                 }
             }
-            System.out.println(userArray);
+//            System.out.println(userArray);
             int userLength = userArray.size();
             double[] weightList = new double[userLength];
             int[] userList = new int[userLength];
             for (int i = 0;i < userLength;i++){
                 weightList[i] = (double) userArray.getJSONObject(i).get("weight");
                 userList[i] = (int) userArray.getJSONObject(i).get("resourceID");
-                System.out.println(userList[i] + ":" + weightList[i]);
+//                System.out.println(userList[i] + ":" + weightList[i]);
             }
             for (int i = 0;i < userLength-1;i++){
                 for (int j = i+1; j < userLength; j++){
                     if (weightList[i] < weightList[j]){
-                        System.out.println(i);
-                        System.out.println(j);
+//                        System.out.println(i);
+//                        System.out.println(j);
                         double tempWeight = weightList[i];
                         weightList[i] = weightList[j];
                         weightList[j] = tempWeight;
@@ -577,14 +580,14 @@ public class UserService {
             }
             ArrayList<Integer> resourceIDList = new ArrayList<>();
             for (int i = 0;i < userLength;i++){
-                System.out.println(weightList[i]);
+//                System.out.println(weightList[i]);
                 if (weightList[i]!=0){
                     resourceArray.add(resourceMapper.queryResourceByID(userList[i]));
                     resourceIDList.add(userList[i]);
                 }
             }
             ArrayList<Map<String, Object>> resourceRecord = recordMapper.resourceRecord(recommendUserId);
-            System.out.println(resourceRecord);
+//            System.out.println(resourceRecord);
             Driver driver = createDrive();
             Session session = driver.session();
             for (Map<String, Object> resourceMap : resourceRecord){
@@ -625,21 +628,15 @@ public class UserService {
                 resourceArray.remove(80);
             }
         }
-        System.out.println("前80条推荐资源：");
-        for (int i = 0;i<80;i++){
-            System.out.println("位列："+(i+1)+"       资源ID:"+resourceArray.getJSONObject(i).get("id").toString() + "       资源名称："+resourceArray.getJSONObject(i).get("resourceName").toString());
-        }
+//        System.out.println("前80条推荐资源：");
+//        for (int i = 0;i<80;i++){
+//            System.out.println("位列："+(i+1)+"       资源ID:"+resourceArray.getJSONObject(i).get("id").toString() + "       资源名称："+resourceArray.getJSONObject(i).get("resourceName").toString());
+//        }
         if (resourceArray.size()>8){
             while (resourceArray.size()!=8){
                 resourceArray.remove(8);
             }
         }
         return ResultFactory.buildSuccessResult("成功查询推荐资源", resourceArray);
-    }
-    public Result test () {
-        UserNode model = userMapper.getByID(21);
-        System.out.println(1);
-        System.out.println(model);
-        return ResultFactory.buildSuccessResult("ok",model);
     }
 }

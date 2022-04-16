@@ -19,7 +19,13 @@ export default {
   },
   methods: {
     download() {
-      download(this.resourceID)
+      // download(this.resourceID)
+      download(this.resourceID).then((response) => {
+        const { code, data } = response.data
+        if (code === 200) {
+          window.location.href = data
+        }
+      })
     }
   }
 }

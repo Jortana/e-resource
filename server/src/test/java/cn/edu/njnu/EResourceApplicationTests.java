@@ -1,14 +1,17 @@
 package cn.edu.njnu;
 
 
+import cn.edu.njnu.mapper.Neo4jUtil;
 import cn.edu.njnu.mapper.UserMapper;
-import cn.edu.njnu.pojo.UserNode;
+
+import com.alibaba.fastjson.JSON;
 import org.junit.jupiter.api.Test;
+import org.neo4j.driver.internal.value.MapValue;
+import org.neo4j.driver.internal.value.StringValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.sql.DataSource;
-import java.sql.SQLException;
+import java.util.*;
 
 
 @SpringBootTest
@@ -16,11 +19,17 @@ class EResourceApplicationTests {
     @Autowired
     UserMapper userMapper;
 
+    @Autowired
+    private Neo4jUtil neo4jUtil;
+
     @Test
-    UserNode getById() {
-        UserNode model = userMapper.getByID(21);
-        System.out.println(1);
-        System.out.println(model);
-        return model;
+    void testNeo4j(){
+        Map<String, Object> retMap = new HashMap<>();
+        //cql语句
+        String cql = "match (m:concept{name: \"欧洲\"}) return m";
+        Set<Map<String, Object>> nodeList = new HashSet<>();
+        neo4jUtil.getList(cql, nodeList);
+        retMap.put("nodeList", nodeList);
+        System.out.println(nodeList);
     }
 }

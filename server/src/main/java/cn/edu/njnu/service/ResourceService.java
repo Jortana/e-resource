@@ -12,25 +12,33 @@ import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import org.ansj.domain.Term;
 import org.ansj.splitWord.analysis.ToAnalysis;
 import org.neo4j.driver.v1.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigurationPackage;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static org.neo4j.driver.v1.Values.parameters;
 
 @Service
 public class ResourceService {
 
-    private final ResourceMapper resourceMapper;
-    private final UserMapper userMapper;
-     String resourceRoot = "http://222.192.6.62:8082";
-    public ResourceService(ResourceMapper resourceMapper, UserMapper userMapper) {
-        this.resourceMapper = resourceMapper;
-        this.userMapper = userMapper;
-    }
+    @Autowired
+    private ResourceMapper resourceMapper;
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+//     String resourceRoot = "http://222.192.6.62:8082";
+
     private static Driver createDrive(){
         return GraphDatabase.driver( "bolt://222.192.6.62:7687", AuthTokens.basic( "neo4j", "123456" ) );
-//        return GraphDatabase.driver( "bolt://39.105.139.205:7687", AuthTokens.basic( "neo4j", "123456" ) );
+//        return GraphDatabase.driver( "bolt://202.102.89.244:7687", AuthTokens.basic( "neo4j", "123456" ) );
     }
     //获取资源类型
     public Result getResourceType(){
@@ -78,7 +86,13 @@ public class ResourceService {
         Driver driver = createDrive();
         Session session = driver.session();
         int resourceID = Integer.parseInt ((String) ResourceIDMap.get("resourceID"));
-        Resource queryResource = resourceMapper.queryResourceByID(resourceID);
+        Resource queryResource = (Resource) redisTemplate.opsForValue().get("resource_"+resourceID);
+        if (queryResource != null){
+            session.close();
+            driver.close();
+            return ResultFactory.buildSuccessResult("查询成功",queryResource);
+        }
+        queryResource = resourceMapper.queryResourceByID(resourceID);
         StatementResult conceptNode = session.run( "MATCH (m:resource)-[r]->(a:concept) where m.id = {id} " +
                         "RETURN a.name as concept",
                 parameters( "id", resourceID) );
@@ -113,6 +127,8 @@ public class ResourceService {
 //        resourceMapper.updateBrowse(queryResource.getBrowse() + 1,queryResource.getId());
         session.close();
         driver.close();
+        redisTemplate.opsForValue().set("resource_"+resourceID, queryResource);
+        redisTemplate.expire("resource_"+resourceID, 10, TimeUnit.MINUTES);
         return ResultFactory.buildSuccessResult("查询成功",queryResource);
     }
 
