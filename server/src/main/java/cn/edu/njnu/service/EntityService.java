@@ -165,7 +165,7 @@ public class EntityService {
     }
 
     public Result queryEntity(Map<String, Object> keywordMap) {
-        System.out.println(keywordMap);
+        //System.out.println(keywordMap);
         String browser = (String) keywordMap.get("browser");
         String OS = (String) keywordMap.get("OS");
         String ipAddress = (String) keywordMap.get("ipAddress");

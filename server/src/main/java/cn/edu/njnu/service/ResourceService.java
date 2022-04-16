@@ -278,7 +278,7 @@ public class ResourceService {
         }
         else {
             int resourceID = Integer.parseInt((String) IDMap.get("resourceID"));
-            StatementResult resourceWeight = session.run( "MATCH (n:resource)-[r]->(m:resource) where n.id={id} " +
+            StatementResult resourceWeight = session.run( "MATCH (n:resource)-[r]->(m:resource) where n.id={id} and n.学科 = m.学科 " +
                             "RETURN m.id, r.weight order by r.weight desc limit 10",
                     parameters("id", resourceID) );
             HashMap<Integer, Double> resourceMap = new HashMap<>();
@@ -319,8 +319,12 @@ public class ResourceService {
                     return o2.getValue().compareTo(o1.getValue());
                 }
             });
+            List<Integer> resourceIDList = new ArrayList<>();
             for(Map.Entry<Integer, Double> mapping:list){
-                recommendResource.add(resourceMapper.queryResourceByID(mapping.getKey()));
+                Integer key = mapping.getKey();
+                resourceIDList.add(key);
+                Resource resource = resourceMapper.queryResourceByID(key);
+                if (resource!=null) recommendResource.add(resource);
             }
 
             session.close();
@@ -334,13 +338,14 @@ public class ResourceService {
         int resourceID = Integer.parseInt((String)resourceIDMap.get("resourceID"));
         Driver driver = createDrive();
         Session session = driver.session();
-        StatementResult resourceNode = session.run( "MATCH (n:resource)-[r]->(m:resource) where r.weight>0.5 and n.id = {resourceID} " +
+        StatementResult resourceNode = session.run( "MATCH (n:resource)-[r]->(m:resource) where r.weight>0.5 and m.学科 = n.学科 and n.id = {resourceID} " +
                         "RETURN m.id AS id order by r.weight desc",
                 parameters("resourceID", resourceID) );
         int userID = 0;
         if (resourceIDMap.containsKey("userId")){
             userID = Integer.parseInt((String)resourceIDMap.get("userId"));
         }
+
         JSONArray resourceArray = new JSONArray();
         int resourceNum = 0;
         while ( resourceNode.hasNext() && resourceNum < 10)
@@ -348,14 +353,15 @@ public class ResourceService {
             Record resourceRecord = resourceNode.next();
             int id = resourceRecord.get("id").asInt();
             Resource resource = resourceMapper.queryResourceByID(id);
-            System.out.println(resource);
+            if (resource==null){
+                continue;
+            }
             if (userID==0){
                 resourceArray.add(resource);
                 resourceNum++;
             }
             else {
                 User user = userMapper.queryUserByID(userID);
-                System.out.println(user);
                 if (Integer.parseInt(resource.getPeriod()) == user.getPeriod()){
                     resourceArray.add(resource);
                     resourceNum++;

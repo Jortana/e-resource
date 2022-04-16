@@ -29,7 +29,7 @@ public class RecordService {
         if (recordMap.containsKey("resourceID")){
             int resourceID = (int) recordMap.get("resourceID");
             int browse = resourceMapper.queryResourceByID(resourceID).getBrowse() + 1;
-            System.out.println(browse);
+//            System.out.println("browse:"+browse);
             resourceMapper.updateBrowse(browse, resourceID);
         }
         if (recordMap.containsKey("userId")){

@@ -1,7 +1,10 @@
 <template>
   <div class="logo-container" @click="goHome">
-    <div class="logo"></div>
-    <div class="title"><h1>智能学伴</h1></div>
+    <div class="logo">
+      <!--临时logo created by 买大米种水稻 2022/04/16-->
+      <img src="../../assets/WDM.jpg" STYLE="width: 120%"/>
+    </div>
+    <div class="title"><h1>智慧学伴</h1></div>
   </div>
 </template>
 
@@ -27,7 +30,7 @@ export default {
 .logo {
   width: 50px;
   height: 50px;
-  background-color: #aaa;
+  /*background-color: #aaa;*/
 }
 
 .title {

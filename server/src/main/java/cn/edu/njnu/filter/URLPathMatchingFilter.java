@@ -25,7 +25,6 @@ public class URLPathMatchingFilter extends PathMatchingFilter {
         }
 
         String requestAPI = getPathWithinApplication(request);
-        System.out.println("访问接口：" + requestAPI);
 
         // if (requestAPI.contains("public")) {
         //     System.out.println("不需登录");

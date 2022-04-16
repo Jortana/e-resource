@@ -172,7 +172,6 @@ public class UserService {
                 s[i][j+1] = resourceID;
             }
         }
-        System.out.println("打印二维数组");
         for (int i = 0; i < resArray.size(); i++)
         {
             for (int j = 0; j < col; j++){
@@ -313,7 +312,6 @@ public class UserService {
     }
     public Result recommend(Map<String, Object> userIDMap) {
         int recommendUserID = Integer.parseInt((String)userIDMap.get("userId"));
-        System.out.println(recommendUserID);
         ArrayList<Integer> userList = new ArrayList<Integer>();
         userList.add(recommendUserID);
         JSONArray resArray = new JSONArray();
@@ -421,14 +419,6 @@ public class UserService {
                 int resourceID = resourceList.get(j);
                 s[i][j+1] = resourceID;
             }
-        }
-        System.out.println("打印二维数组");
-        for (int i = 0; i < resArray.size(); i++)
-        {
-            for (int j = 0; j < col; j++){
-                System.out.print(s[i][j]+" ");
-            }
-            System.out.print("\n");
         }
         session.close();
         driver.close();

@@ -84,6 +84,16 @@
             <resource-list :resourceList="recommendResources"></resource-list>
           </div>
         </div>
+        <!--不会改 created by 买大米种水稻 2022/04/16-->
+        <div
+          v-else
+          class="recommend-container flex"
+        >
+          <div class="flex-1">
+            <h2>推荐资源</h2>
+            <p>暂无推荐资源</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>

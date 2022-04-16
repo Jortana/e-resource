@@ -15,7 +15,7 @@ public interface ResourceMapper {
     //通过ID获取资源信息
     Resource queryResourceByID(int id);
     ArrayList<Resource> queryResourceByContent(String content, int sort, int type);
-    ArrayList<Resource> queryResourceByIDList(ArrayList<Integer> IDList, int sort, int type);
+    ArrayList<Resource> queryResourceByIDList(List<Integer> IDList, int sort, int type);
     List<Map> queryType();
     //根据ID查相关资源
     String queryRelated(int resource_id);
