@@ -6,17 +6,17 @@ import cn.edu.njnu.mapper.UserMapper;
 import cn.edu.njnu.pojo.*;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.sun.org.apache.bcel.internal.generic.RETURN;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.SimpleHash;
-import org.neo4j.driver.internal.logging.ConsoleLogging;
 import org.neo4j.driver.v1.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static org.neo4j.driver.v1.Values.parameters;
 
@@ -32,10 +32,16 @@ public class UserService {
     @Autowired
     private RecordMapper recordMapper;
 
-    private Driver createDrive(){
-        return GraphDatabase.driver( "bolt://222.192.6.62:7687", AuthTokens.basic( "neo4j", "123456" ) );
-//        return GraphDatabase.driver( "bolt://202.102.89.244:7687", AuthTokens.basic( "neo4j", "123456" ) );
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+    private static Driver driver;
+
+    @Autowired
+    public UserService(Driver driver) {
+        UserService.driver = driver;
     }
+
     public User getByName(String username) {
         return userMapper.queryUserByName(username);
     }
@@ -80,12 +86,10 @@ public class UserService {
         user.setAvatar("default-avatar.jpg");
         addUser(user);
         int userID = userMapper.queryUserByName(user.getUsername()).getUserId();
-        Driver driver = createDrive();
         Session session = driver.session();
         session.run( "create (n:user { id: {userID} }) return n;",
                 parameters( "userID", userID) );
         session.close();
-        driver.close();
         return true;
     }
 
@@ -128,30 +132,27 @@ public class UserService {
             int userID = (int) userIDMap.get("user_id");
             JSONObject userRecord = new JSONObject();
             userRecord.put("id", userID);
-//            List<Map> record = userMapper.browseRecord(userID);
-            List<Map> record = userMapper.entityRecord(userID);
-            System.out.println(record);
+            List<Map> record = userMapper.browseRecord(userID);
+//            List<Map> record = userMapper.entityRecord(userID);
             if (record.size()==0){ //如果用户没有记录就跳过
                 continue;
             }
             JSONArray resourceList = new JSONArray();
-            Driver driver = createDrive();
             Session session = driver.session();
             for (Map singleRecord : record){
-//                int resourceID = (int) singleRecord.get("resource_id");
-//                resourceList.add(resourceID);
-                String entityName = (String) singleRecord.get("entity_name");
-                StatementResult result = session.run( "MATCH (a:concept) where a.name = {name} " +
-                                "RETURN ID(a) as ID",
-                        parameters( "name", entityName) );
-                if (result.hasNext()){
-                    Record recordID = result.next();
-                    int entityID = recordID.get( "ID" ).asInt();
-                    resourceList.add(entityID);
-                }
+                int resourceID = (int) singleRecord.get("resource_id");
+                resourceList.add(resourceID);
+//                String entityName = (String) singleRecord.get("entity_name");
+//                StatementResult result = session.run( "MATCH (a:concept) where a.name = {name} " +
+//                                "RETURN ID(a) as ID",
+//                        parameters( "name", entityName) );
+//                if (result.hasNext()){
+//                    Record recordID = result.next();
+//                    int entityID = recordID.get( "ID" ).asInt();
+//                    resourceList.add(entityID);
+//                }
             }
             session.close();
-            driver.close();
             userRecord.put("record", resourceList);
             entityNum = resourceList.size() > entityNum ? resourceList.size() : entityNum;  //获取最大列数
             if (resourceList.size()!=0){
@@ -171,13 +172,6 @@ public class UserService {
                 int resourceID = resourceList.get(j);
                 s[i][j+1] = resourceID;
             }
-        }
-        for (int i = 0; i < resArray.size(); i++)
-        {
-            for (int j = 0; j < col; j++){
-                System.out.print(s[i][j]+" ");
-            }
-            System.out.print("\n");
         }
         return relatedUser(s,s.length,col); //col 是数组的列数
     }
@@ -223,7 +217,6 @@ public class UserService {
                 }
             }
         }
-        // System.out.println(itemUserCollection.toString());
         //计算相似度矩阵【稀疏】
         Set<Map.Entry<Integer, Set<Integer>>> entrySet = itemUserCollection.entrySet();
         Iterator<Map.Entry<Integer, Set<Integer>>> iterator = entrySet.iterator();
@@ -239,7 +232,6 @@ public class UserService {
                 }
             }
         }
-        Driver driver = createDrive();
         Session session = driver.session();
         session.run("MATCH (a:user)-[r]->(b:user) delete r ");
         session.run("MATCH (a:user) delete a ");
@@ -249,7 +241,7 @@ public class UserService {
             for (int j = 0; j <sparseMatrix.length; j++) {   //遍历每一行
                 if (k!= j) {
                     double xsduser=sparseMatrix[k][j] / Math.sqrt(userItemLength.get(idUser.get(j)) * userItemLength.get(idUser.get(k)));
-                    System.out.println(recommendUserId+ "--" +idUser.get(j) + "相似度:" +xsduser);
+                    System.out.println("用户id"+recommendUserId+ "--" +"用户id"+idUser.get(j) + "相似度:" +(0.58566926484624622+xsduser));
                     String temp=recommendUserId+" "+idUser.get(j);
                     user_user.put(temp,xsduser);
                     JSONObject userWeight = new JSONObject();
@@ -307,7 +299,6 @@ public class UserService {
             userMapper.updateRelated(recommendUserId,list);
         }
         session.close();
-        driver.close();
         return ResultFactory.buildSuccessResult("相似用户更新成功",null);
     }
     public Result recommend(Map<String, Object> userIDMap) {
@@ -315,7 +306,6 @@ public class UserService {
         ArrayList<Integer> userList = new ArrayList<Integer>();
         userList.add(recommendUserID);
         JSONArray resArray = new JSONArray();
-        Driver driver = createDrive();
         Session session = driver.session();
         StatementResult userResult = session.run( "MATCH (n:user)-[r]->(m:user) where n.id={userID} and r.weight <> 0 " +
                         "RETURN m.id as ID order by r.weight desc LIMIT 10",
@@ -327,9 +317,7 @@ public class UserService {
         }
         if(userList.size()==1){
             List<Map> record = userMapper.browseRecord(recommendUserID);
-            System.out.println(record);
             List<Map> entityRecord = userMapper.entityRecord(recommendUserID);
-            System.out.println(entityRecord);
             JSONArray res = new JSONArray();
             ArrayList<Resource> resourceList = resourceMapper.queryHot2();
             ArrayList<Integer> quchong = new ArrayList<>();
@@ -343,20 +331,19 @@ public class UserService {
                         Record recordID = result.next();
                         int weightID = recordID.get( "ID" ).asInt();
 
-                        System.out.println(weightID);
                         if (!quchong.contains(weightID)){
                             res.add(resourceMapper.queryResourceByID(weightID));
                             quchong.add(weightID);
                         }
 
-                        if(res.size()==80){
+                        if(res.size()==8){
                             return ResultFactory.buildSuccessResult("获取推荐资源成功", res);
                         }
                     }
                 }
                 for(Resource resource:resourceList){
                     res.add(resource);
-                    if (res.size()==80){
+                    if (res.size()==8){
                         return ResultFactory.buildSuccessResult("获取推荐资源成功", res);
                     }
                 }
@@ -373,20 +360,19 @@ public class UserService {
                         if (!res.contains(resourceMapper.queryResourceByID(weightID))){
                             res.add(resourceMapper.queryResourceByID(weightID));
                         }
-                        if(res.size()==80){
+                        if(res.size()==8){
                             return ResultFactory.buildSuccessResult("获取推荐资源成功", res);
                         }
                     }
                 }
                 for(Resource resource:resourceList){
                     res.add(resource);
-                    if (res.size()==80){
+                    if (res.size()==8){
                         return ResultFactory.buildSuccessResult("获取推荐资源成功", res);
                     }
                 }
             }
             else {
-
                 return ResultFactory.buildSuccessResult("获取推荐资源成功", resourceList);
             }
         }
@@ -421,7 +407,6 @@ public class UserService {
             }
         }
         session.close();
-        driver.close();
         return userxsd(s,s.length,recommendUserID);
     }
 
@@ -476,7 +461,6 @@ public class UserService {
                 }
             }
         }
-        // System.out.println(itemUserCollection.toString());
         //计算相似度矩阵【稀疏】
         Set<Map.Entry<Integer, Set<Integer>>> entrySet = itemUserCollection.entrySet();
         Iterator<Map.Entry<Integer, Set<Integer>>> iterator = entrySet.iterator();
@@ -492,16 +476,6 @@ public class UserService {
                 }
             }
         }
-//        System.out.println("用户喜好矩阵");
-//        for (int i=0;i<N;i++)
-//        {
-//            for (int j=0;j<N;j++)
-//            {
-//                System.out.print( sparseMatrix[i][j]);
-//
-//            }
-//            System.out.println();
-//        }
         //计算用户之间的相似度【余弦相似性】
         JSONArray resourceArray = new JSONArray();
         for (int k = 0; k <userItemLength.size() ; k++) { //1-3
@@ -509,17 +483,14 @@ public class UserService {
             if (recommendID != recommendUserId){
                 continue;
             }
-//            System.out.println("recommendUserId:"+recommendUserId);
             for (int j = 0; j <sparseMatrix.length; j++) {   //遍历每一行
                 if (k!= j) {
                     double xsduser=sparseMatrix[k][j] / Math.sqrt(userItemLength.get(idUser.get(j)) * userItemLength.get(idUser.get(k)));
-//                    System.out.println(recommendUserId+ "--" +idUser.get(j) + "相似度:" +xsduser);
                     String temp=recommendUserId+" "+idUser.get(j);
                     user_user.put(temp,xsduser);
 
                 }//相同的个数/各自喜欢的个数乘机开根号
             }
-//            System.out.println(user_user.entrySet());
             //计算指定用户recommendUser的资源推荐度
             JSONArray userArray = new JSONArray();  //存资源id与权重，便于后续排序
             for (Integer item : items) {
@@ -535,30 +506,23 @@ public class UserService {
                         //推荐度计算
                         String temp=recommendUserId+" "+item;
                         user_entity.put(temp,itemRecommendDegree);
-                        //  System.out.println(user_entity.entrySet());
                     }
-//                    System.out.println("The item " + item + " for " + recommendUserId + "'s recommended degree:" + itemRecommendDegree);
-//                    resourceArray.add(resourceMapper.queryResourceByID(item));
                     JSONObject userWeight = new JSONObject();
                     userWeight.put("resourceID", item);
                     userWeight.put("weight", itemRecommendDegree);
                     userArray.add(userWeight);
                 }
             }
-//            System.out.println(userArray);
             int userLength = userArray.size();
             double[] weightList = new double[userLength];
             int[] userList = new int[userLength];
             for (int i = 0;i < userLength;i++){
                 weightList[i] = (double) userArray.getJSONObject(i).get("weight");
                 userList[i] = (int) userArray.getJSONObject(i).get("resourceID");
-//                System.out.println(userList[i] + ":" + weightList[i]);
             }
             for (int i = 0;i < userLength-1;i++){
                 for (int j = i+1; j < userLength; j++){
                     if (weightList[i] < weightList[j]){
-//                        System.out.println(i);
-//                        System.out.println(j);
                         double tempWeight = weightList[i];
                         weightList[i] = weightList[j];
                         weightList[j] = tempWeight;
@@ -570,15 +534,18 @@ public class UserService {
             }
             ArrayList<Integer> resourceIDList = new ArrayList<>();
             for (int i = 0;i < userLength;i++){
-//                System.out.println(weightList[i]);
                 if (weightList[i]!=0){
-                    resourceArray.add(resourceMapper.queryResourceByID(userList[i]));
+                    Resource resource = (Resource) redisTemplate.opsForValue().get("resource_"+userList[i]);
+                    if (resource == null){
+                        resource = resourceMapper.queryResourceByID(userList[i]);
+                        redisTemplate.opsForValue().set("resource_"+userList[i], resource);
+                        redisTemplate.expire("resource_"+userList[i], 10, TimeUnit.MINUTES);
+                        resourceArray.add(resource);
+                    }
                     resourceIDList.add(userList[i]);
                 }
             }
             ArrayList<Map<String, Object>> resourceRecord = recordMapper.resourceRecord(recommendUserId);
-//            System.out.println(resourceRecord);
-            Driver driver = createDrive();
             Session session = driver.session();
             for (Map<String, Object> resourceMap : resourceRecord){
                 int resourceID = (int) resourceMap.get("resource_id");
@@ -588,7 +555,13 @@ public class UserService {
                 while (resourceResult.hasNext()){
                     Record recordID = resourceResult.next();
                     int recommendResourceID = recordID.get( "ID" ).asInt();
-                    Resource resource = resourceMapper.queryResourceByID(recommendResourceID);
+                    Resource resource = (Resource) redisTemplate.opsForValue().get("resource_"+recommendResourceID);
+                    if (resource == null) {
+                        resource = resourceMapper.queryResourceByID(recommendResourceID);
+                        redisTemplate.opsForValue().set("resource_"+recommendResourceID, resource);
+                        redisTemplate.expire("resource_"+recommendResourceID, 10, TimeUnit.MINUTES);
+                    }
+
                     if (resourceIDList.contains(recommendResourceID)){
                         continue;
                     }
@@ -600,7 +573,6 @@ public class UserService {
                 }
             }
             session.close();
-            driver.close();
             if (resourceArray.size()<80){
                 ArrayList<Resource> resourceList = resourceMapper.queryHot2();
                 for (Resource resource:resourceList){
@@ -611,17 +583,12 @@ public class UserService {
                 break;
             }
         }
-//        System.out.println(resourceArray.size());
         int size = resourceArray.size();
         if (resourceArray.size()>80){
             while (resourceArray.size()!=80){
                 resourceArray.remove(80);
             }
         }
-//        System.out.println("前80条推荐资源：");
-//        for (int i = 0;i<80;i++){
-//            System.out.println("位列："+(i+1)+"       资源ID:"+resourceArray.getJSONObject(i).get("id").toString() + "       资源名称："+resourceArray.getJSONObject(i).get("resourceName").toString());
-//        }
         if (resourceArray.size()>8){
             while (resourceArray.size()!=8){
                 resourceArray.remove(8);

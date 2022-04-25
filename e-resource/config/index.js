@@ -8,10 +8,11 @@ module.exports = {
   dev: {
     // Paths
     assetsSubDirectory: 'static',
-    assetsPublicPath: '/', // tomcat
+    assetsPublicPath: '/',
     proxyTable: {
       // 配置跨域
       '/api': {
+        // target: 'http://202.102.89.244:9000/e-resource/api',
         target: 'http://127.0.0.1:9000/e-resource/api',
         changeOrigin: true,
         pathRewrite: {
@@ -58,7 +59,7 @@ module.exports = {
     // Paths
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',
-    assetsPublicPath: '/', // tomcat
+    assetsPublicPath: '/e-resource/',
 
     /**
      * Source Maps

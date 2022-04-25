@@ -26,6 +26,7 @@ import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.neo4j.driver.v1.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -37,12 +38,68 @@ public class DownloadService {
     private ResourceMapper resourceMapper;
     @Autowired
     private FavoriteMapper favoriteMapper;
-    //在文件操作中，不用/或者\最好，推荐使用File.separator
-//    private  final static String rootPath = "http://202.102.89.244:8082";
+    @Value("${file.root}")
+    private String root;
+
+    private static Driver driver;
+
+    @Autowired
+    public DownloadService(Driver driver) {
+        DownloadService.driver = driver;
+    }
+
     private  final static String rootPath = "http://s4.z100.vip:7716";
-    private Driver createDrive(){
-        return GraphDatabase.driver( "bolt://222.192.6.62:7687", AuthTokens.basic( "neo4j", "123456" ) );
-//        return GraphDatabase.driver( "bolt://202.102.89.244:7687", AuthTokens.basic( "neo4j", "123456" ) );
+
+    public void getFile(@RequestParam Map<String, Object> resourceIDMap, final HttpServletResponse response, final HttpServletRequest request) throws IOException {
+        //读取路径下面的文件
+        int resourceID = Integer.parseInt((String)resourceIDMap.get("resourceID"));
+        Resource resource = resourceMapper.queryResourceByID(resourceID);
+        String resultWordPath="";
+        String url="";
+        if (resource.getTable()==2){
+            url = resourceMapper.queryUrl(resourceID);
+        }
+        else if (resource.getTable()==3){
+            url = resourceMapper.queryVideoUrl(resourceID);
+        }
+        else{
+        }
+        resultWordPath = root + url;
+        File file = new File(resultWordPath);
+        StringBuilder sb = new StringBuilder();
+        for (int i = resultWordPath.length()-1; i >= 0; i--){
+            if (resultWordPath.charAt(i)=='.') break;
+            sb.append(resultWordPath.charAt(i));
+        }
+        //获取文件后缀名格式
+        String ext = sb.reverse().toString();
+        //判断格式,设置相应的输出文件格式
+        if(ext.equals("mp4")){
+            response.setContentType("video/quicktime");
+        }else if(ext.equals("pptx")){
+            response.setContentType("application/vnd.openxmlformats-officedocument.presentationml.presentation");
+        }else if(ext.equals("txt")){
+            response.setContentType("text/plain");
+        }else if(ext.equals("docx")){
+            response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+        }
+        //读取指定路径下面的文件
+        InputStream in = new FileInputStream(file);
+        OutputStream outputStream = new BufferedOutputStream(response.getOutputStream());
+        //创建存放文件内容的数组
+        byte[] buff =new byte[1024];
+        //所读取的内容使用n来接收
+        int n;
+        //当没有读取完时,继续读取,循环
+        while((n=in.read(buff))!=-1){
+            //将字节数组的数据全部写入到输出流中
+            outputStream.write(buff,0,n);
+        }
+        //强制将缓存区的数据进行输出
+        outputStream.flush();
+        //关流
+        outputStream.close();
+        in.close();
     }
 
 
@@ -50,16 +107,12 @@ public class DownloadService {
         int resourceID = Integer.parseInt((String)resourceIDMap.get("resourceID"));
         Resource resource = resourceMapper.queryResourceByID(resourceID);
         if (resource.getTable()==2){
-            System.out.println(resourceID);
             String url = resourceMapper.queryUrl(resourceID);
-            System.out.println(url);
             String resultWordPath = encode(rootPath + url);
             return ResultFactory.buildSuccessResult("下载成功",resultWordPath);
         }
         else if (resource.getTable()==3){
-            System.out.println(resourceID);
             String url = resourceMapper.queryVideoUrl(resourceID);
-            System.out.println(url);
             String resultWordPath = encode(rootPath + url);
             return ResultFactory.buildSuccessResult("下载成功",resultWordPath);
         }
@@ -97,12 +150,10 @@ public class DownloadService {
         return String.valueOf(c).matches("[\u4e00-\u9fa5]");
     }
 
-    public Result downloadFolder(Map<String, Object> folderIDMap) throws FileNotFoundException {
+    public void downloadFolder(Map<String, Object> folderIDMap, HttpServletResponse response) throws IOException {
         long start = System.currentTimeMillis();
         String folderID = (String) folderIDMap.get("folderID");
-        System.out.println(folderID);
-        String path = "E:\\e-resource\\TestResource\\download\\" + folderID + "\\";
-//        String path = "D:\\" + folderID + "\\";
+        String path = root + "\\download\\" + folderID + "\\";
         File file = new File(path);
         file.mkdirs();
         String fileName = "知识点+学习目标+学习重难点收藏.docx";
@@ -113,26 +164,37 @@ public class DownloadService {
         ArrayList<String> data = getStr(folderID);
         writeDataDocx(filePath,data,false,12);
         copyAll(folderID, path);
-        String zipPath = "E:\\e-resource\\TestResource\\download\\" + folderID + ".zip";
-//        String zipPath = "D:\\" + folderID + ".zip";
-        System.out.println(zipPath);
+        String zipPath = root + "\\download\\" + folderID + ".zip";
         FileOutputStream fos1 = new FileOutputStream(zipPath);
         toZip(path, fos1, true);
-        long end = System.currentTimeMillis();
-        System.out.println("打包完成，耗时：" + (end - start) +" ms");
-//        return ResultFactory.buildSuccessResult("success",null);
         File zip = new File(zipPath);
-        String zipURl = rootPath + "\\download\\" + folderID + ".zip";
+        String zipURl = root + "\\download\\" + folderID + ".zip";
         if (zip.exists()){
-            return ResultFactory.buildSuccessResult("success",zipURl);
+            File zipFile = new File(zipURl);
+            //读取指定路径下面的文件
+            InputStream in = new FileInputStream(zipFile);
+            OutputStream outputStream = new BufferedOutputStream(response.getOutputStream());
+            //创建存放文件内容的数组
+            byte[] buff =new byte[1024];
+            //所读取的内容使用n来接收
+            int n;
+            //当没有读取完时,继续读取,循环
+            while((n=in.read(buff))!=-1){
+                //将字节数组的数据全部写入到输出流中
+                outputStream.write(buff,0,n);
+            }
+            //强制将缓存区的数据进行输出
+            outputStream.flush();
+            //关流
+            outputStream.close();
+            in.close();
         }
-        else {
-            return ResultFactory.buildFailResult("下载失败");
-        }
+//        else {
+//            return ResultFactory.buildFailResult("下载失败");
+//        }
     }
     //获取收藏的文本
     public ArrayList<String> getStr(String folderID){
-        Driver driver = createDrive();
         Session session = driver.session();
         ArrayList<String> text = new ArrayList<>();
         ArrayList<Map> contentList = favoriteMapper.collectionStr(folderID);
@@ -180,7 +242,6 @@ public class DownloadService {
 
             }
         }
-        driver.close();
         return text;
     }
     public static void createWord(String path, String fileName) {
@@ -243,7 +304,6 @@ public class DownloadService {
              r1.testSetShdStyle(doc);//设置文字底纹
              */
             document.write(ostream);
-            System.out.println("创建word成功");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -271,15 +331,12 @@ public class DownloadService {
         for (Resource resource:collection){
             int id = resource.getId();
             String url = resourceMapper.queryUrl(id);
-//            System.out.println(url);
-            copyFile("E:\\e-resource\\TestResource" + url, path);
+            copyFile(root + url, path);
         }
     }
     public void copyFile(String oldPath, String newPath) {
         int l = oldPath.split("/").length;
         newPath = newPath + oldPath.split("/")[l-1];
-        System.out.println(oldPath);
-        System.out.println(newPath);
         try {
             int bytesum = 0;
             int byteread = 0;
@@ -291,14 +348,12 @@ public class DownloadService {
                 int length;
                 while ( (byteread = inStream.read(buffer)) != -1) {
                     bytesum += byteread; //字节数 文件大小
-                    System.out.println(bytesum);
                     fs.write(buffer, 0, byteread);
                 }
                 inStream.close();
             }
         }
         catch (Exception e) {
-            System.out.println("复制单个文件操作出错");
             e.printStackTrace();
         }
     }
@@ -312,14 +367,11 @@ public class DownloadService {
      */
     public static void toZip(String srcDir, OutputStream out, boolean KeepDirStructure)
         throws RuntimeException{
-        long start = System.currentTimeMillis();
         ZipOutputStream zos = null ;
         try {
             zos = new ZipOutputStream(out);
             File sourceFile = new File(srcDir);
             compress(sourceFile,zos,sourceFile.getName(),KeepDirStructure);
-            long end = System.currentTimeMillis();
-            System.out.println("压缩完成，耗时：" + (end - start) +" ms");
         } catch (Exception e) {
             throw new RuntimeException("zip error from ZipUtils",e);
         }finally{

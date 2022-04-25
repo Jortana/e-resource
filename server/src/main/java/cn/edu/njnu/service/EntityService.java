@@ -18,15 +18,11 @@ import static org.neo4j.driver.v1.Values.parameters;
 import org.neo4j.driver.v1.types.Node;
 import org.neo4j.driver.v1.types.Path;
 import org.neo4j.driver.v1.types.Relationship;
-import org.neo4j.jdbc.Neo4jCallableStatement;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.neo4j.Neo4jAutoConfiguration;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -44,11 +40,13 @@ public class EntityService {
     @Autowired
     private RedisTemplate redisTemplate;
 
-    // String resourceRoot = "http://222.192.6.62:8082";
-    private Driver createDrive(){
-        return GraphDatabase.driver( "bolt://222.192.6.62:7687", AuthTokens.basic( "neo4j", "123456" ) );
-//        return GraphDatabase.driver( "bolt://202.102.89.244:7687", AuthTokens.basic( "neo4j", "123456" ) );
+    private static Driver driver;
+
+    @Autowired
+    public EntityService(Driver driver) {
+        EntityService.driver = driver;
     }
+
     public JSONArray getRelatedEntity(String entityName, Session session, String mainEntityName){
         StatementResult result = session.run( "MATCH (a:concept) -[k:相关关系]-> (m:concept) where a.name = { name } and m.name<>{mainEntity}" +
                         "RETURN m.name AS name limit 3",
@@ -65,7 +63,7 @@ public class EntityService {
 
     public Result getRelatedEntity(Map<String, Object> keywordMap){
         String[] keyword = ((String) keywordMap.get("keyword")).split("#");
-        Driver driver = createDrive();
+//        Driver driver = createDrive();
         Session session = driver.session();
         JSONArray resArray = new JSONArray();
         if (keyword.length > 1) {
@@ -75,14 +73,12 @@ public class EntityService {
             }
             Cypher = Cypher.substring(0, Cypher.length()-1) + "] as l match p=shortestpath((n:concept)-[*]->(m:concept)) where n.name in l and m.name in l and n.name<>m.name return p as path ";
             Cypher = Cypher + "limit " + (2*keyword.length);
-            //System.out.println(Cypher);
             StatementResult result = session.run( Cypher, parameters(  ) );
             Map<Long, Value> nodesMap = new HashMap<>();
             HashMap<String, ArrayList<String>> relationshipMap = new HashMap<>();
             while ( result.hasNext() )
             {
                 Record record = result.next();
-                //System.out.println(record);
                 List<Value> values = record.values();
                 for (Value value : values) {
                     if (value.type().name().equals("PATH")) {
@@ -112,14 +108,11 @@ public class EntityService {
                     }
                 }
             }
-//            System.out.println(relationshipMap);
             Iterator iter = relationshipMap.entrySet().iterator();
             while (iter.hasNext()) {
                 Map.Entry entry = (Map.Entry) iter.next();
                 String key = (String) entry.getKey();
                 ArrayList<String> val = (ArrayList<String>) entry.getValue();
-//                System.out.println(key);
-//                System.out.println(val);
                 if (Cypher.contains(key)){
                     JSONObject similarEntity = new JSONObject();
                     similarEntity.put("entityName", key);
@@ -131,7 +124,6 @@ public class EntityService {
                     resArray.add(similarEntity);
                 }
             }
-//            System.out.println(entityName);
 //            JSONObject similarEntity = new JSONObject();
 //            similarEntity.put("relatedEntity", getRelatedEntity(entityName, session, entityName));
 //            similarEntity.put("entityName", entityName);
@@ -160,18 +152,14 @@ public class EntityService {
             mainEntity.put("entityName", keyword[0]);
             resArray.add(mainEntity);
         }
-        driver.close();
+//        driver.close();
         return ResultFactory.buildSuccessResult("查询成功", resArray);
     }
 
     public Result queryEntity(Map<String, Object> keywordMap) {
-        //System.out.println(keywordMap);
         String browser = (String) keywordMap.get("browser");
         String OS = (String) keywordMap.get("OS");
         String ipAddress = (String) keywordMap.get("ipAddress");
-        Date date = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-//        String browseDate = formatter.format(date);
         long browseDate = System.currentTimeMillis();
         //获取用户输入的内容
         String keyword = (String) keywordMap.get("keyword");
@@ -212,7 +200,7 @@ public class EntityService {
             idList.add(id);
         }
         //与neo4j建立连接
-        Driver driver = createDrive();
+//        Driver driver = createDrive();
         Session session = driver.session();
         //根据用户输入在neo4j中查找对应节点
         StatementResult result = session.run( "MATCH (a:concept) where a.name = {name} " +
@@ -295,13 +283,10 @@ public class EntityService {
         }
 
         //根据前面生成的idList从mysql中查资源
-//        List<Resource> resourceArrayList = (List) redisTemplate.opsForList().leftPop("resourceArrayList_"+keyword);
-//        System.out.println(System.currentTimeMillis());
         List<Resource> resourceArrayList = resourceMapper.queryResourceByIDList(idList,sort,type);
-//        System.out.println(System.currentTimeMillis());
         for (Resource resource:resourceArrayList){
             int resourceID = resource.getId();
-            Resource resourceInRedis = (Resource) redisTemplate.opsForValue().get("resource_in_query_"+resourceID);
+            Resource resourceInRedis = (Resource) redisTemplate.opsForValue().get("resource_"+resourceID);
             if (resourceInRedis == null){
             //在neo4j中获取资源包含的知识点，生成list
                 StatementResult conceptNode = session.run( "MATCH (m:resource)-[r]->(a:concept) where m.id = {id} " +
@@ -340,14 +325,13 @@ public class EntityService {
                         resource.setUrl((String) videoInfo.get("url"));
                         break;
                 }
-                redisTemplate.opsForValue().set("resource_in_query_"+resourceID,resource);
-                redisTemplate.expire("resource_in_query_"+resourceID, 10, TimeUnit.MINUTES);
+                redisTemplate.opsForValue().set("resource_"+resourceID,resource);
+                redisTemplate.expire("resource_"+resourceID, 10, TimeUnit.MINUTES);
             }
             else{
                 BeanUtils.copyProperties(resourceInRedis, resource);
             }
         }
-//        System.out.println(System.currentTimeMillis());
 
         //根据页码与每页个数获取资源
         int totalEntity = resourceArrayList.size();
@@ -365,13 +349,13 @@ public class EntityService {
         resObject.put("total", totalEntity);
         resObject.put("pages", (int)Math.ceil(totalEntity * 1.0 / perPage));
         session.close();
-        driver.close();
+//        driver.close();
         return ResultFactory.buildSuccessResult("查询成功", resObject);
     }
     //根据entity查找重难点,从mysql里面查
     public JSONArray goalAndKey(String entityName){
         JSONArray resArray = new JSONArray();
-        Driver driver = createDrive();
+//        Driver driver = createDrive();
         Session session = driver.session();
         StatementResult goalNode = session.run( "MATCH (m:GoalAndKey)-[r]->(a:concept) where a.name = {name} " +
                         "RETURN m.key, m.goal, m.id",
@@ -389,12 +373,12 @@ public class EntityService {
             resArray.add(singleGK);
         }
         session.close();
-        driver.close();
+//        driver.close();
         return resArray;
     }
     //根据用户浏览记录生成图谱
     public Result userGraph(int userID){
-        Driver driver = createDrive();
+//        Driver driver = createDrive();
         Session session = driver.session();
         HashMap<String, Integer> entityNumMap = new HashMap<>();
         HashMap<String, Integer> subjectMap = new HashMap<>();
@@ -511,7 +495,7 @@ public class EntityService {
             resArray.add(subjectObject);
         }
         session.close();
-        driver.close();
+//        driver.close();
         return ResultFactory.buildSuccessResult("success", resArray);
     }
 }

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/e-resource/api")
-public class AuthenticationController {
+public class AuthenticationController extends BaseController{
     @GetMapping("/v1.0/public/authentication")
     public Result authentication(){
         Subject subject = SecurityUtils.getSubject();

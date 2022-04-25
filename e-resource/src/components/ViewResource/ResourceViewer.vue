@@ -5,6 +5,11 @@
         <pdf v-for="i in pdf.numPages" :key="i" :src="pdf.src" :page="i"></pdf>
       </el-scrollbar>
     </div>
+    <div v-else-if="suffix === 'mp4'">
+      <video controls="controls" class="videoDemo">
+        <source :src="videoUrl">
+      </video>
+    </div>
     <iframe
       v-else-if="bInfo.bvid !== null"
       :src="bSrc"
@@ -23,7 +28,7 @@
 
 <script>
 import pdf from 'vue-pdf'
-const baseUrl = 'http://222.192.6.62:8082'
+const baseUrl = 'http://s4.z100.vip:7716'
 export default {
   name: 'ResourceViewer',
   components: {
@@ -47,7 +52,8 @@ export default {
       comment: {
         rate: '',
         content: ''
-      }
+      },
+      videoUrl: ''
     }
   },
   computed: {
@@ -75,6 +81,9 @@ export default {
           console.log(this.viewUrl)
           this.pdf.src = pdf.createLoadingTask(this.viewUrl)
           // console.log(this.pdf.src)
+        } else if (suffix === 'mp4') {
+          console.log(this.viewUrl)
+          this.videoUrl = this.viewUrl
         }
       },
       immediate: true
@@ -104,6 +113,10 @@ export default {
 }
 
 .b-video {
+  width: 100%;
+  height: 500px;
+}
+.videoDemo{
   width: 100%;
   height: 500px;
 }

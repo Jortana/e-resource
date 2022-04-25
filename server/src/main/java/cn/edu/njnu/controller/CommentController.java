@@ -3,6 +3,7 @@ package cn.edu.njnu.controller;
 import cn.edu.njnu.pojo.Comment;
 import cn.edu.njnu.pojo.Result;
 import cn.edu.njnu.service.CommentService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
@@ -11,20 +12,17 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/e-resource/api")
-public class CommentController {
-    private final CommentService commentService;
+@CrossOrigin
+public class CommentController extends BaseController{
 
-    public CommentController(CommentService commentService) {
-        this.commentService = commentService;
-    }
+    @Autowired
+    private CommentService commentService;
 
-    @CrossOrigin
     @GetMapping("/v1.0/public/comment")
     public Result comment(@RequestParam Map<String, Object> resourceIDMap){
         return commentService.comment(resourceIDMap);
     }
 
-    @CrossOrigin
     @PostMapping("/v1.0/public/addComment")
     public Result addComment(@RequestBody Comment comment){
         return commentService.addComment(comment);

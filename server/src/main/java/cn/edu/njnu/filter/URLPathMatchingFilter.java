@@ -24,13 +24,6 @@ public class URLPathMatchingFilter extends PathMatchingFilter {
             return true;
         }
 
-        String requestAPI = getPathWithinApplication(request);
-
-        // if (requestAPI.contains("public")) {
-        //     System.out.println("不需登录");
-        //     return true;
-        // }
-
         Subject subject = SecurityUtils.getSubject();
         if (!subject.isAuthenticated()) {
             System.out.println("需要登录");

@@ -8,12 +8,8 @@ import cn.edu.njnu.pojo.ResultFactory;
 import cn.edu.njnu.pojo.User;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
-import org.ansj.domain.Term;
-import org.ansj.splitWord.analysis.ToAnalysis;
 import org.neo4j.driver.v1.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigurationPackage;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -34,16 +30,16 @@ public class ResourceService {
     @Autowired
     private RedisTemplate redisTemplate;
 
-//     String resourceRoot = "http://222.192.6.62:8082";
+    private static Driver driver;
 
-    private static Driver createDrive(){
-        return GraphDatabase.driver( "bolt://222.192.6.62:7687", AuthTokens.basic( "neo4j", "123456" ) );
-//        return GraphDatabase.driver( "bolt://202.102.89.244:7687", AuthTokens.basic( "neo4j", "123456" ) );
+    @Autowired
+    public ResourceService(Driver driver) {
+        ResourceService.driver = driver;
     }
+
     //获取资源类型
     public Result getResourceType(){
         List<Map> typeMap = resourceMapper.queryType();
-        System.out.println(typeMap);
         JSONArray typeArray = new JSONArray();
         JSONObject typeAll = new JSONObject();
         typeAll.put("type", "全部");
@@ -83,13 +79,11 @@ public class ResourceService {
     }
     //根据ID查资源属性
     public Result queryResource(Map<String, Object> ResourceIDMap){
-        Driver driver = createDrive();
         Session session = driver.session();
         int resourceID = Integer.parseInt ((String) ResourceIDMap.get("resourceID"));
         Resource queryResource = (Resource) redisTemplate.opsForValue().get("resource_"+resourceID);
         if (queryResource != null){
             session.close();
-            driver.close();
             return ResultFactory.buildSuccessResult("查询成功",queryResource);
         }
         queryResource = resourceMapper.queryResourceByID(resourceID);
@@ -106,13 +100,6 @@ public class ResourceService {
         int extendID = queryResource.getTableResourceID();
         int tableID = queryResource.getTable();
         switch (tableID) {
-            case 1:
-                Map bvideoInfo = resourceMapper.queryBvideo(extendID);
-                queryResource.setAid((String) bvideoInfo.get("aid"));
-                queryResource.setBvid((String) bvideoInfo.get("bvid"));
-                queryResource.setCid((String) bvideoInfo.get("cid"));
-                queryResource.setPage((int)bvideoInfo.get("page"));
-                break;
             case 2:
                 Map documentInfo = resourceMapper.queryDocument(extendID);
                 queryResource.setUrl((String) documentInfo.get("url"));
@@ -124,9 +111,7 @@ public class ResourceService {
                 queryResource.setViewUrl((String) videoInfo.get("url"));
                 break;
         }
-//        resourceMapper.updateBrowse(queryResource.getBrowse() + 1,queryResource.getId());
         session.close();
-        driver.close();
         redisTemplate.opsForValue().set("resource_"+resourceID, queryResource);
         redisTemplate.expire("resource_"+resourceID, 10, TimeUnit.MINUTES);
         return ResultFactory.buildSuccessResult("查询成功",queryResource);
@@ -135,7 +120,6 @@ public class ResourceService {
 
     //更新资源相似度
     public Result updateRelatedResource(){
-        Driver driver = createDrive();
         Session session = driver.session();
         StatementResult result = session.run( "MATCH (n:resource)" +
                         "RETURN id(n) AS ID order by ID",
@@ -145,6 +129,7 @@ public class ResourceService {
         {
             Record record = result.next();
             int resourceID = record.get( "ID" ).asInt();
+            if (resourceID < 811077) continue; // 跳过已经计算过的资源
             HashMap<String, Integer> hm1 = new HashMap<String, Integer>();
             StatementResult tfidf = session.run( "MATCH (n:resource)-[r]->(m:concept) where id(n)={id} " +
                         "RETURN m.name, r.num",
@@ -161,9 +146,7 @@ public class ResourceService {
             mapArray.add(map);
         }
         int arrayLength = mapArray.size();
-        System.out.println(arrayLength);
-        for (int i = (int) (0.4*arrayLength); i<arrayLength-1; i++){
-            System.out.println(i);
+        for (int i = 0; i<arrayLength; i++){
             for(int j = i+1;j<arrayLength;j++){
                 HashMap<Integer, HashMap<String, Integer>> map1 = mapArray.get(i);
                 HashMap<Integer, HashMap<String, Integer>> map2 = mapArray.get(j);
@@ -171,17 +154,11 @@ public class ResourceService {
             }
         }
         session.close();
-        driver.close();
         return ResultFactory.buildSuccessResult("资源相似度更新成功", null);
     }
 
     public static void resxsd(HashMap<Integer, HashMap<String, Integer>> keywords, HashMap<Integer, HashMap<String, Integer>> keywords1) {  //读取与Resid在同一个知识点下面的资源以及与该知识点直接相连的知识下的资源
-        Driver driver = createDrive();
         Session session = driver.session();
-        for (Map.Entry<Integer, HashMap<String, Integer>> entrytemp : keywords.entrySet()) {
-            // nu = entrytemp.getKey();
-//            System.out.println("待测资源"+keywords);
-        }
         for (Map.Entry<Integer, HashMap<String, Integer>> entry : keywords1.entrySet()) {//遍历每一个相关资源
             int num=entry.getKey();
             int nu=0;
@@ -194,21 +171,18 @@ public class ResourceService {
                 fenmu1 += Math.pow(entry1.getValue(), 2);
                 for (Map.Entry<Integer, HashMap<String, Integer>> entrytemp : keywords.entrySet()) {
                     nu = entrytemp.getKey();
-                    // System.out.println("待测资源"+keywords);
                     HashMap<String, Integer> st = entrytemp.getValue();
                     for (HashMap.Entry<String, Integer> entryt : st.entrySet()) {  //遍历待测资源
                         if (flag == 1) {
                             fenmu2 += Math.pow(entryt.getValue(), 2);
                         }
                         if (entryt.getKey().equals(entry1.getKey())) {
-//                            System.out.println("相同关键词："+entryt.getKey()+"---"+entry1.getKey());
                             fenzi += entryt.getValue() * entry1.getValue();
                         }
                     }
                     flag = 0;
                 }
             }
-//            System.out.println(fenmu1 + "  " + fenmu2 + " " + fenzi);
             double result = fenzi / (Math.sqrt(fenmu1) * Math.sqrt(fenmu2));
             double xsd= 0.5*result+0.5;
             System.out.println(nu + "  " + num + "的相似度为" +xsd);
@@ -222,11 +196,9 @@ public class ResourceService {
             }
         }
         session.close();
-        driver.close();
     }
 
     public Result recommendResource(Map<String, Object> IDMap){
-        Driver driver = createDrive();
         Session session = driver.session();
         int userID = Integer.parseInt((String) IDMap.get("userId"));
         if (IDMap.containsKey("entity")){
@@ -240,10 +212,8 @@ public class ResourceService {
                 Record userRecord = resourceID.next();
                 int resID = userRecord.get("id").asInt();
                 Resource resource = resourceMapper.queryResourceByID(resID);
-//                if (resource.getEntity().contains(entity)){
                 resArray.add(resource);
                 resNum++;
-//                }
             }
             if (resNum!=0){
                 return ResultFactory.buildSuccessResult("查询成功",resArray);
@@ -261,18 +231,20 @@ public class ResourceService {
             while ( resourceID.hasNext() && resNum <=10) {
                 Record userRecord = resourceID.next();
                 int resID = userRecord.get("id").asInt();
-                Resource resource = resourceMapper.queryResourceByID(resID);
+                Resource resource = (Resource) redisTemplate.opsForValue().get("resource_"+resID);
+                if (resource==null){
+                    resource = resourceMapper.queryResourceByID(resID);
+                    redisTemplate.opsForValue().set("resource_"+resID, resource);
+                    redisTemplate.expire("resource_"+resID, 10, TimeUnit.MINUTES);
+                }
                 resArray.add(resource);
                 resNum++;
             }
+            session.close();
             if (resNum!=0) {
-                session.close();
-                driver.close();
                 return ResultFactory.buildSuccessResult("查询成功", resArray);
             }
             else {
-                session.close();
-                driver.close();
                 return ResultFactory.buildSuccessResult("未查询到任何推荐资源",resArray);
             }
         }
@@ -296,7 +268,6 @@ public class ResourceService {
             while ( userWeight.hasNext() ) {
                 Record userRecord = userWeight.next();
                 int resID = userRecord.get("m.id").asInt();
-//                double userResourceWeight = userRecord.get("r.weight").asDouble();
                 double userResourceWeight = 0.6; //临时搞的
                 if (resourceMap.containsKey(resID)){
                     recommendResource.add(resourceMapper.queryResourceByID(resID));
@@ -319,16 +290,13 @@ public class ResourceService {
                     return o2.getValue().compareTo(o1.getValue());
                 }
             });
-            List<Integer> resourceIDList = new ArrayList<>();
             for(Map.Entry<Integer, Double> mapping:list){
-                Integer key = mapping.getKey();
-                resourceIDList.add(key);
-                Resource resource = resourceMapper.queryResourceByID(key);
-                if (resource!=null) recommendResource.add(resource);
+                Resource resource = resourceMapper.queryResourceByID(mapping.getKey());
+                if (resource==null) continue;
+                recommendResource.add(resource);
             }
 
             session.close();
-            driver.close();
             return ResultFactory.buildSuccessResult("Success", recommendResource);
         }
     }
@@ -336,16 +304,14 @@ public class ResourceService {
     //获取相似资源
     public Result relatedResource(Map<String, Object> resourceIDMap){
         int resourceID = Integer.parseInt((String)resourceIDMap.get("resourceID"));
-        Driver driver = createDrive();
         Session session = driver.session();
-        StatementResult resourceNode = session.run( "MATCH (n:resource)-[r]->(m:resource) where r.weight>0.5 and m.学科 = n.学科 and n.id = {resourceID} " +
+        StatementResult resourceNode = session.run( "MATCH (n:resource)-[r]->(m:resource) where r.weight>0.5 and n.id = {resourceID} " +
                         "RETURN m.id AS id order by r.weight desc",
                 parameters("resourceID", resourceID) );
         int userID = 0;
         if (resourceIDMap.containsKey("userId")){
             userID = Integer.parseInt((String)resourceIDMap.get("userId"));
         }
-
         JSONArray resourceArray = new JSONArray();
         int resourceNum = 0;
         while ( resourceNode.hasNext() && resourceNum < 10)
@@ -353,9 +319,7 @@ public class ResourceService {
             Record resourceRecord = resourceNode.next();
             int id = resourceRecord.get("id").asInt();
             Resource resource = resourceMapper.queryResourceByID(id);
-            if (resource==null){
-                continue;
-            }
+            if (resource == null) continue;
             if (userID==0){
                 resourceArray.add(resource);
                 resourceNum++;
@@ -369,7 +333,6 @@ public class ResourceService {
             }
         }
         session.close();
-        driver.close();
         return ResultFactory.buildSuccessResult("查询成功",resourceArray);
     }
 

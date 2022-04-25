@@ -48,8 +48,8 @@ export const related = (resourceID) => {
  * @param {Number} resourceID
  */
 export const download = (resourceID) => {
-  // window.location.href = `http://127.0.0.1:9000/e-resource/api${baseURL}/public/download?resourceID=${resourceID}`
-  return http.get(`http://127.0.0.1:9000/e-resource/api${baseURL}/public/download?resourceID=${resourceID}`)
+  // return http.download(`http://202.102.89.244:9000/e-resource/api${baseURL}/public/downloadnew?resourceID=${resourceID}`)
+  return http.download(`http://127.0.0.1:9000/e-resource/api${baseURL}/public/downloadnew?resourceID=${resourceID}`)
 }
 
 /**
@@ -59,4 +59,11 @@ export const download = (resourceID) => {
  */
 export const getComment = (resourceID) => {
   return http.get(`${baseURL}/public/comment?resourceID=${resourceID}`)
+}
+
+/**
+ * 添加资源评论
+ */
+export const addComment = (params) => {
+  return http.post(`${baseURL}/public/addComment`, params)
 }

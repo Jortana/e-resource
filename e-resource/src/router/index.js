@@ -61,8 +61,8 @@ const routes = [
 ]
 
 const router = new VueRouter({
-  mode: 'history',
-  // base: '/e-resource/', // tomcat
+  mode: 'hash',
+  // base: '/e-resource/',
   routes,
   scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {

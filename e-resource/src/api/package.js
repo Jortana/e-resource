@@ -94,5 +94,5 @@ export const deleteResource = (resourceInfo) => {
  * @returns {AxiosPromise}
  */
 export const queryDownload = (folderID) => {
-  return http.post(`${baseURL}/private/downloadFolder`, { folderID })
+  return http.download(`${baseURL}/private/downloadFolder?folderID=${folderID}`)
 }
