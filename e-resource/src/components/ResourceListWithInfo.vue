@@ -4,7 +4,7 @@
       <div class="resource-info">
         <div class="thumbnail-container flex">
           <el-image
-            :src="'http://222.192.6.62:8082' + resource.cover"
+            :src="'http://s4.z100.vip:7716' + resource.cover"
             fit="contain"
             class="thumbnail"
           ></el-image>

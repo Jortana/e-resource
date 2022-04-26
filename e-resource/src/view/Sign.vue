@@ -2,7 +2,7 @@
   <section>
     <div :class="signUpActive === true ? 'container active' : 'container'">
       <div class="user sign-in-box">
-        <div class="img-box"><img src="@/assets/sign/in.jpg" alt="" /></div>
+        <div class="img-box"><img src="../assets/sign/in.jpg" alt="" /></div>
         <div v-loading="signInLoading" class="form-box" @keyup.enter="login">
           <el-form ref="signInForm" :model="signIn" class="form">
             <h2>登录</h2>
@@ -94,7 +94,7 @@
             </p>
           </el-form>
         </div>
-        <div class="img-box"><img src="@/assets/sign/up.jpg" alt="" /></div>
+        <div class="img-box"><img src="../assets/sign/up.jpg" alt="" /></div>
       </div>
     </div>
   </section>

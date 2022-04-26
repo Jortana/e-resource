@@ -18,26 +18,35 @@ import static org.neo4j.driver.v1.Values.parameters;
 import org.neo4j.driver.v1.types.Node;
 import org.neo4j.driver.v1.types.Path;
 import org.neo4j.driver.v1.types.Relationship;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class EntityService {
-    private final ResourceMapper resourceMapper;
-    private final RecordMapper recordMapper;
-    private final UserMapper userMapper;
-    public EntityService(ResourceMapper resourceMapper, RecordMapper recordMapper, UserMapper userMapper) {
-        this.resourceMapper = resourceMapper;
-        this.recordMapper = recordMapper;
-        this.userMapper = userMapper;
+    @Autowired
+    private ResourceMapper resourceMapper;
+
+    @Autowired
+    private RecordMapper recordMapper;
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+    private static Driver driver;
+
+    @Autowired
+    public EntityService(Driver driver) {
+        EntityService.driver = driver;
     }
-    // String resourceRoot = "http://222.192.6.62:8082";
-    private Driver createDrive(){
-        return GraphDatabase.driver( "bolt://222.192.6.62:7687", AuthTokens.basic( "neo4j", "123456" ) );
-//        return GraphDatabase.driver( "bolt://39.105.139.205:7687", AuthTokens.basic( "neo4j", "123456" ) );
-    }
+
     public JSONArray getRelatedEntity(String entityName, Session session, String mainEntityName){
         StatementResult result = session.run( "MATCH (a:concept) -[k:相关关系]-> (m:concept) where a.name = { name } and m.name<>{mainEntity}" +
                         "RETURN m.name AS name limit 3",
@@ -54,7 +63,7 @@ public class EntityService {
 
     public Result getRelatedEntity(Map<String, Object> keywordMap){
         String[] keyword = ((String) keywordMap.get("keyword")).split("#");
-        Driver driver = createDrive();
+//        Driver driver = createDrive();
         Session session = driver.session();
         JSONArray resArray = new JSONArray();
         if (keyword.length > 1) {
@@ -64,14 +73,12 @@ public class EntityService {
             }
             Cypher = Cypher.substring(0, Cypher.length()-1) + "] as l match p=shortestpath((n:concept)-[*]->(m:concept)) where n.name in l and m.name in l and n.name<>m.name return p as path ";
             Cypher = Cypher + "limit " + (2*keyword.length);
-            //System.out.println(Cypher);
             StatementResult result = session.run( Cypher, parameters(  ) );
             Map<Long, Value> nodesMap = new HashMap<>();
             HashMap<String, ArrayList<String>> relationshipMap = new HashMap<>();
             while ( result.hasNext() )
             {
                 Record record = result.next();
-                //System.out.println(record);
                 List<Value> values = record.values();
                 for (Value value : values) {
                     if (value.type().name().equals("PATH")) {
@@ -101,14 +108,11 @@ public class EntityService {
                     }
                 }
             }
-//            System.out.println(relationshipMap);
             Iterator iter = relationshipMap.entrySet().iterator();
             while (iter.hasNext()) {
                 Map.Entry entry = (Map.Entry) iter.next();
                 String key = (String) entry.getKey();
                 ArrayList<String> val = (ArrayList<String>) entry.getValue();
-//                System.out.println(key);
-//                System.out.println(val);
                 if (Cypher.contains(key)){
                     JSONObject similarEntity = new JSONObject();
                     similarEntity.put("entityName", key);
@@ -120,7 +124,6 @@ public class EntityService {
                     resArray.add(similarEntity);
                 }
             }
-//            System.out.println(entityName);
 //            JSONObject similarEntity = new JSONObject();
 //            similarEntity.put("relatedEntity", getRelatedEntity(entityName, session, entityName));
 //            similarEntity.put("entityName", entityName);
@@ -149,25 +152,20 @@ public class EntityService {
             mainEntity.put("entityName", keyword[0]);
             resArray.add(mainEntity);
         }
-        driver.close();
+//        driver.close();
         return ResultFactory.buildSuccessResult("查询成功", resArray);
     }
 
     public Result queryEntity(Map<String, Object> keywordMap) {
-        System.out.println(keywordMap);
         String browser = (String) keywordMap.get("browser");
         String OS = (String) keywordMap.get("OS");
         String ipAddress = (String) keywordMap.get("ipAddress");
-        Date date = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-//        String browseDate = formatter.format(date);
         long browseDate = System.currentTimeMillis();
         //获取用户输入的内容
         String keyword = (String) keywordMap.get("keyword");
         String content = keyword;
         //向数据库添加用户浏览记录
         String username = (String) SecurityUtils.getSubject().getPrincipal();
-        System.out.println(username);
         if (username!=null){
             int userId = userMapper.queryUserByName(username).getUserId();
             recordMapper.addEntityRecord(userId,browseDate,keyword, browser, OS, ipAddress);
@@ -183,7 +181,15 @@ public class EntityService {
         int page = Integer.parseInt( (String) keywordMap.get("page") );
         int perPage = Integer.parseInt( (String) keywordMap.get("perPage") );
         //根据用户输入与资源名进行匹配
-        ArrayList<Resource> resourceNameList = resourceMapper.queryResourceByContent(content, sort, type);
+        ArrayList<Resource> resourceNameList = null;
+        resourceNameList = (ArrayList<Resource>) redisTemplate.opsForValue().get("content_"+sort+"_"+type+"_"+content);
+        if (resourceNameList == null){
+
+            resourceNameList = resourceMapper.queryResourceByContent(content, sort, type);
+            redisTemplate.opsForValue().set("content_"+sort+"_"+type+"_"+content, resourceNameList);
+            redisTemplate.expire(content+"_"+sort+"_"+type, 5, TimeUnit.MINUTES);
+        }
+
         ArrayList<Integer> idList = new ArrayList<>();
         //获取资源id，避免之后在neo4j中重复查找
         String quchu = "";
@@ -194,14 +200,17 @@ public class EntityService {
             idList.add(id);
         }
         //与neo4j建立连接
-        Driver driver = createDrive();
+//        Driver driver = createDrive();
         Session session = driver.session();
         //根据用户输入在neo4j中查找对应节点
         StatementResult result = session.run( "MATCH (a:concept) where a.name = {name} " +
                         "RETURN properties(a) AS props",
                 parameters( "name", keyword) );
 
+
         Record record = null;
+
+
         if (!result.hasNext()){
             //精确匹配没有查到则进行模糊查找，结果限制个数为1
             String keyword1 = ".*" + keyword + ".*";
@@ -234,11 +243,10 @@ public class EntityService {
         else { //将查询结果赋值给record
             record = result.next();
         }
-        int totalEntity = 0;
-        //Record record = result.next();
-        int skip = (page-1)*perPage;
-        ArrayList<Resource> resourceArrayList = new ArrayList<Resource>();
+
+
         JSONObject similarEntity = new JSONObject();
+
         if (record!=null){
             String entityName = record.get( "props" ).get( "name" ).asString();
             similarEntity.put("goalAndKey", goalAndKey(entityName));
@@ -273,62 +281,61 @@ public class EntityService {
             similarEntity.put("entityName", null);
             similarEntity.put("properties", null);
         }
+
         //根据前面生成的idList从mysql中查资源
-        if (sort == 0){ //对排序无要求则直接根据id查
-            for (int resourceID:idList){
-                Resource resource = resourceMapper.queryResourceByID(resourceID);
-                //判断资源类型是否符合
-                if (resource.getResourceType()==type || type==0){
-                    resourceArrayList.add(resource);
-                }
-            }
-        }
-        else {
-            //根据排序，类型获取资源
-            resourceArrayList = resourceMapper.queryResourceByIDList(idList,sort,type);
-        }
+        List<Resource> resourceArrayList = resourceMapper.queryResourceByIDList(idList,sort,type);
         for (Resource resource:resourceArrayList){
             int resourceID = resource.getId();
+            Resource resourceInRedis = (Resource) redisTemplate.opsForValue().get("resource_"+resourceID);
+            if (resourceInRedis == null){
             //在neo4j中获取资源包含的知识点，生成list
-            StatementResult conceptNode = session.run( "MATCH (m:resource)-[r]->(a:concept) where m.id = {id} " +
-                            "RETURN a.name AS name order by r.tfidf",
-                    parameters( "id", resourceID) );
-            ArrayList<String> entityList = new ArrayList<>();
-            while ( conceptNode.hasNext() )
-            {
-                Record entityRecord = conceptNode.next();
-                String name = entityRecord.get( "name" ).asString();
-                entityList.add(name);
+                StatementResult conceptNode = session.run( "MATCH (m:resource)-[r]->(a:concept) where m.id = {id} " +
+                                "RETURN a.name AS name order by r.tfidf",
+                        parameters( "id", resourceID) );
+                ArrayList<String> entityList = new ArrayList<>();
+                while ( conceptNode.hasNext() )
+                {
+                    Record entityRecord = conceptNode.next();
+                    String name = entityRecord.get( "name" ).asString();
+                    entityList.add(name);
+                }
+                resource.setEntityList(entityList);
+                //设置资源封面路径
+                resource.setCover("/cover/" + resource.getId() + ".png");
+
+                //extendID：资源在额外表中的id； tableID，资源额外属性存在哪张表里
+                int extendID = resource.getTableResourceID();
+                int tableID = resource.getTable();
+                //根据资源类型获取资源属性
+                switch (tableID) {
+                    case 1:
+                        Map bvideoInfo = resourceMapper.queryBvideo(extendID);
+                        resource.setAid((String) bvideoInfo.get("aid"));
+                        resource.setBvid((String) bvideoInfo.get("bvid"));
+                        resource.setCid((String) bvideoInfo.get("cid"));
+                        resource.setPage((int)bvideoInfo.get("page"));
+                        break;
+                    case 2:
+                        Map documentInfo = resourceMapper.queryDocument(extendID);
+                        resource.setUrl((String) documentInfo.get("url"));
+                        resource.setViewUrl((String) documentInfo.get("view_url"));
+                        break;
+                    case 3:
+                        Map videoInfo = resourceMapper.queryVideo(extendID);
+                        resource.setUrl((String) videoInfo.get("url"));
+                        break;
+                }
+                redisTemplate.opsForValue().set("resource_"+resourceID,resource);
+                redisTemplate.expire("resource_"+resourceID, 10, TimeUnit.MINUTES);
             }
-            resource.setEntityList(entityList);
-            //设置资源封面路径
-            resource.setCover("/cover/" + resource.getId() + ".png");
-            //资源总个数
-            totalEntity++;
-            //extendID：资源在额外表中的id； tableID，资源额外属性存在哪张表里
-            int extendID = resource.getTableResourceID();
-            int tableID = resource.getTable();
-            //根据资源类型获取资源属性
-            switch (tableID) {
-                case 1:
-                    Map bvideoInfo = resourceMapper.queryBvideo(extendID);
-                    resource.setAid((String) bvideoInfo.get("aid"));
-                    resource.setBvid((String) bvideoInfo.get("bvid"));
-                    resource.setCid((String) bvideoInfo.get("cid"));
-                    resource.setPage((int)bvideoInfo.get("page"));
-                    break;
-                case 2:
-                    Map documentInfo = resourceMapper.queryDocument(extendID);
-                    resource.setUrl((String) documentInfo.get("url"));
-                    resource.setViewUrl((String) documentInfo.get("view_url"));
-                    break;
-                case 3:
-                    Map videoInfo = resourceMapper.queryVideo(extendID);
-                    resource.setUrl((String) videoInfo.get("url"));
-                    break;
+            else{
+                BeanUtils.copyProperties(resourceInRedis, resource);
             }
         }
+
         //根据页码与每页个数获取资源
+        int totalEntity = resourceArrayList.size();
+        int skip = (page-1)*perPage;
         JSONArray resourceTotal = new JSONArray();
         for (int i = skip;i<skip+perPage && i<totalEntity;i++){
             resourceTotal.add(resourceArrayList.get(i));
@@ -342,13 +349,13 @@ public class EntityService {
         resObject.put("total", totalEntity);
         resObject.put("pages", (int)Math.ceil(totalEntity * 1.0 / perPage));
         session.close();
-        driver.close();
+//        driver.close();
         return ResultFactory.buildSuccessResult("查询成功", resObject);
     }
     //根据entity查找重难点,从mysql里面查
     public JSONArray goalAndKey(String entityName){
         JSONArray resArray = new JSONArray();
-        Driver driver = createDrive();
+//        Driver driver = createDrive();
         Session session = driver.session();
         StatementResult goalNode = session.run( "MATCH (m:GoalAndKey)-[r]->(a:concept) where a.name = {name} " +
                         "RETURN m.key, m.goal, m.id",
@@ -366,12 +373,12 @@ public class EntityService {
             resArray.add(singleGK);
         }
         session.close();
-        driver.close();
+//        driver.close();
         return resArray;
     }
     //根据用户浏览记录生成图谱
     public Result userGraph(int userID){
-        Driver driver = createDrive();
+//        Driver driver = createDrive();
         Session session = driver.session();
         HashMap<String, Integer> entityNumMap = new HashMap<>();
         HashMap<String, Integer> subjectMap = new HashMap<>();
@@ -488,7 +495,7 @@ public class EntityService {
             resArray.add(subjectObject);
         }
         session.close();
-        driver.close();
+//        driver.close();
         return ResultFactory.buildSuccessResult("success", resArray);
     }
 }

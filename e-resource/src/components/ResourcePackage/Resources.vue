@@ -105,7 +105,7 @@ export default {
       const target = this.$refs.resourceTarget
       target.setAttribute(
         'href',
-        `${window.location.origin}/resource/${resourceID}`
+        `${window.location.origin}/e-resource/#/resource/${resourceID}`
       )
       target.click()
     }

@@ -5,6 +5,7 @@ import cn.edu.njnu.pojo.Result;
 import cn.edu.njnu.pojo.ResultFactory;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,11 +13,8 @@ import java.util.Map;
 
 @Service
 public class TypeService {
-    private final TypeMapper typeMapper;
-
-    public TypeService(TypeMapper typeMapper) {
-        this.typeMapper = typeMapper;
-    }
+    @Autowired
+    private TypeMapper typeMapper;
 
     public Result classification(){
         JSONArray resArray = new JSONArray();

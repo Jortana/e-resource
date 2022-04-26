@@ -1,7 +1,6 @@
 package cn.edu.njnu.mapper;
 
 import cn.edu.njnu.pojo.User;
-import cn.edu.njnu.pojo.UserNode;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
@@ -31,5 +30,4 @@ public interface UserMapper {
     String queryRelatedUser(int user_id);
     User queryUserByID(int user_id);
 
-    UserNode getByID(int user_id);
 }

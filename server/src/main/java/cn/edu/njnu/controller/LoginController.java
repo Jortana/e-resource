@@ -9,36 +9,28 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/e-resource/api")
-public class LoginController {
+public class LoginController extends BaseController {
 
-    final UserService userService;
-
-    public LoginController(UserService userService) {
-        this.userService = userService;
-    }
+    @Autowired
+    private UserService userService;
 
     @PostMapping("/v1.0/public/login")
     public Result login(@RequestBody User requestUser) {
-        System.out.println(requestUser);
         String username = requestUser.getUsername();
         Subject subject = SecurityUtils.getSubject();
         UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(username, requestUser.getUserPassword());
-        System.out.println("try on");
         try {
             subject.login(usernamePasswordToken);
-            System.out.println(subject.isAuthenticated());
             User userInfo =  userService.getByNameNoPassword(username);
-            System.out.println("try in");
             return ResultFactory.buildSuccessResult("登录成功", userInfo);
         } catch (IncorrectCredentialsException e) {
-            System.out.println("try 1");
             return ResultFactory.buildFailResult("密码错误");
         } catch (AuthenticationException e) {
-            System.out.println("try 2");
             return ResultFactory.buildFailResult("账号不存在");
         }
     }

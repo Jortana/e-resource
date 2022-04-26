@@ -1,5 +1,7 @@
 package cn.edu.njnu.pojo;
 
+import com.sun.istack.internal.NotNull;
+
 public class Comment {
 
     int userID;

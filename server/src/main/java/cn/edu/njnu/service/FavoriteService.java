@@ -8,24 +8,25 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.shiro.SecurityUtils;
 import org.neo4j.driver.v1.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static org.neo4j.driver.v1.Values.parameters;
 
 @Service
 public class FavoriteService {
-    private final FavoriteMapper favoriteMapper;
+    @Autowired
+    private FavoriteMapper favoriteMapper;
 
-    public FavoriteService(FavoriteMapper favoriteMapper) {
-        this.favoriteMapper = favoriteMapper;
+    private static Driver driver;
+
+    @Autowired
+    public FavoriteService(Driver driver) {
+        FavoriteService.driver = driver;
     }
-    private Driver createDrive(){
-        return GraphDatabase.driver( "bolt://222.192.6.62:7687", AuthTokens.basic( "neo4j", "123456" ) );
-//        return GraphDatabase.driver( "bolt://39.105.139.205:7687", AuthTokens.basic( "neo4j", "123456" ) );
-    }
+
     //生成8位id
     public static  String getUUID()
     {
@@ -112,14 +113,12 @@ public class FavoriteService {
 
     //根据收藏夹ID获取资源
     public Result folderResource(String folderID){
-        Driver driver = createDrive();
         Session session = driver.session();
         JSONObject folder = new JSONObject();
         folder.put("resources", favoriteMapper.collection(folderID));
         ArrayList<Map> contentMap = favoriteMapper.collectionStr(folderID);
         ArrayList<String> content = new ArrayList<>();
         if (contentMap.size()>0){
-            System.out.println(contentMap);
             for (Map singleContent:contentMap){
                 if (singleContent!=null){
                     content.add((String) singleContent.get("content"));
@@ -132,7 +131,6 @@ public class FavoriteService {
         JSONArray goal = new JSONArray();
 
         if (goalMap.size()>0){
-            System.out.println(goalMap);
             for (Map singleGoal:goalMap){
                 if (singleGoal!=null){
                     int id = (int) singleGoal.get("goal");
@@ -178,7 +176,6 @@ public class FavoriteService {
         }
         folder.put("key", key);
         session.close();
-        driver.close();
         return ResultFactory.buildSuccessResult("获取资源成功", folder);
     }
     //用户创建收藏夹
@@ -244,7 +241,6 @@ public class FavoriteService {
                 condition.put("username", username);
                 condition.put("folderID", folderID);
                 condition.put("goal", goal);
-                System.out.println(favoriteMapper.yiyou(condition));
                 if (favoriteMapper.yiyou(condition).size() == 0){
                     flag = 1;
                     favoriteMapper.putGoal(goal, folderID, date);
@@ -302,8 +298,6 @@ public class FavoriteService {
         }
         else if (IDMap.containsKey("goal")){
             int goal = (int) IDMap.get("goal");
-            System.out.println(goal);
-            System.out.println(folderID);
             if (favoriteMapper.delFolderGoal(goal, folderID)){
                 flag = 1;
             }

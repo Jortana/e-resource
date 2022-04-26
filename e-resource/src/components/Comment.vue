@@ -26,7 +26,7 @@
             class="textarea"
             type="textarea"
           ></el-input>
-          <el-button class="commit-btn" type="primary">
+          <el-button class="commit-btn" type="primary" @click="addComment">
             <div>发表</div>
             <div>评论</div>
           </el-button>
@@ -66,6 +66,7 @@
 
 <script>
 import { getComment } from '@/api/resource'
+import { addComment } from '@/api/resource'
 import { authentication } from '@/api/auth'
 
 const fileBaseURL = 'http://127.0.0.1:9000/e-resource/api/file/avatar/'
@@ -111,6 +112,20 @@ export default {
           })
           this.comments = response.data.data
         }
+      })
+    },
+    addComment() {
+      const comment = {
+        resourceID: this.id,
+        content: this.editComment.content,
+        rate: this.editComment.rate
+      }
+      addComment(comment).then((response) => {
+        const { code } = response.data
+        if (code === 200) {
+          this.$message.success('发表成功')
+        }
+        this.$refs.pop.doClose()
       })
     }
   }

@@ -7,21 +7,18 @@
     <select id="queryResourceByID" resultType="resource" >
          select id, resource_name, download, collection, browse, `period`, grade, subject, updateTime, `table`, tableResourceID, resource_type, rate, file_type from t_resource where id = #{id}
     </select>
-    <!-- 根据ID查资源 -->
+    <!-- 根据IDList查资源 -->
     <select id="queryResourceByIDList" resultType="resource" >
-        select id, resource_name, download, collection, browse, `period`, grade, subject, updateTime, `table`, tableResourceID, resource_type, rate, file_type from t_resource
-        <where>
-            <if test="type!=0">resource_type =#{type} and </if>
-            (
-            <trim suffixOverrides="or">
-                <foreach item="id" collection="IDList">(id = #{id}) or </foreach>
-            </trim>
-            )
-        </where>
-        <trim>
-            <if test="sort == 1">order by browse desc</if>
-            <if test="sort == 2">order by updateTime desc</if>
-        </trim>
+        select
+        id, resource_name, download, collection, browse, `period`, grade, subject, updateTime, `table`, tableResourceID, resource_type, rate, file_type
+        from t_resource
+        where id in
+        <foreach collection="IDList" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        <if test="type != 0">and resource_type =#{type}</if>
+        <if test="sort == 1">order by browse desc</if>
+        <if test="sort == 2">order by updateTime desc</if>
     </select>
     <!-- 根据ID查资源 -->
     <select id="queryResourceByContent" resultType="resource" >

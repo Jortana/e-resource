@@ -24,8 +24,9 @@ import org.apache.poi.util.IOUtils;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
-import org.bouncycastle.util.test.Test;
 import org.neo4j.driver.v1.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -33,34 +34,85 @@ import static org.neo4j.driver.v1.Values.parameters;
 
 @Service
 public class DownloadService {
-    private final ResourceMapper resourceMapper;
-    private final FavoriteMapper favoriteMapper;
-    //在文件操作中，不用/或者\最好，推荐使用File.separator
-    private  final static String rootPath = "http://222.192.6.62:8082";
-//    private  final static String rootPath = "http://s4.z100.vip:7716";
-    private Driver createDrive(){
-        return GraphDatabase.driver( "bolt://222.192.6.62:7687", AuthTokens.basic( "neo4j", "123456" ) );
-//        return GraphDatabase.driver( "bolt://39.105.139.205:7687", AuthTokens.basic( "neo4j", "123456" ) );
+    @Autowired
+    private ResourceMapper resourceMapper;
+    @Autowired
+    private FavoriteMapper favoriteMapper;
+    @Value("${file.root}")
+    private String root;
+
+    private static Driver driver;
+
+    @Autowired
+    public DownloadService(Driver driver) {
+        DownloadService.driver = driver;
     }
-    public DownloadService(ResourceMapper resourceMapper, FavoriteMapper favoriteMapper) {
-        this.resourceMapper = resourceMapper;
-        this.favoriteMapper = favoriteMapper;
+
+    private  final static String rootPath = "http://s4.z100.vip:7716";
+
+    public void getFile(@RequestParam Map<String, Object> resourceIDMap, final HttpServletResponse response, final HttpServletRequest request) throws IOException {
+        //读取路径下面的文件
+        int resourceID = Integer.parseInt((String)resourceIDMap.get("resourceID"));
+        Resource resource = resourceMapper.queryResourceByID(resourceID);
+        String resultWordPath="";
+        String url="";
+        if (resource.getTable()==2){
+            url = resourceMapper.queryUrl(resourceID);
+        }
+        else if (resource.getTable()==3){
+            url = resourceMapper.queryVideoUrl(resourceID);
+        }
+        else{
+        }
+        resultWordPath = root + url;
+        File file = new File(resultWordPath);
+        StringBuilder sb = new StringBuilder();
+        for (int i = resultWordPath.length()-1; i >= 0; i--){
+            if (resultWordPath.charAt(i)=='.') break;
+            sb.append(resultWordPath.charAt(i));
+        }
+        //获取文件后缀名格式
+        String ext = sb.reverse().toString();
+        //判断格式,设置相应的输出文件格式
+        if(ext.equals("mp4")){
+            response.setContentType("video/quicktime");
+        }else if(ext.equals("pptx")){
+            response.setContentType("application/vnd.openxmlformats-officedocument.presentationml.presentation");
+        }else if(ext.equals("txt")){
+            response.setContentType("text/plain");
+        }else if(ext.equals("docx")){
+            response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+        }
+        //读取指定路径下面的文件
+        InputStream in = new FileInputStream(file);
+        OutputStream outputStream = new BufferedOutputStream(response.getOutputStream());
+        //创建存放文件内容的数组
+        byte[] buff =new byte[1024];
+        //所读取的内容使用n来接收
+        int n;
+        //当没有读取完时,继续读取,循环
+        while((n=in.read(buff))!=-1){
+            //将字节数组的数据全部写入到输出流中
+            outputStream.write(buff,0,n);
+        }
+        //强制将缓存区的数据进行输出
+        outputStream.flush();
+        //关流
+        outputStream.close();
+        in.close();
     }
+
 
     public Result downloadFile(@RequestParam Map<String, Object> resourceIDMap, final HttpServletResponse response, final HttpServletRequest request){
         int resourceID = Integer.parseInt((String)resourceIDMap.get("resourceID"));
         Resource resource = resourceMapper.queryResourceByID(resourceID);
         if (resource.getTable()==2){
-            System.out.println(resourceID);
             String url = resourceMapper.queryUrl(resourceID);
-            System.out.println(url);
             String resultWordPath = encode(rootPath + url);
             return ResultFactory.buildSuccessResult("下载成功",resultWordPath);
         }
         else if (resource.getTable()==3){
-            System.out.println(resourceID);
             String url = resourceMapper.queryVideoUrl(resourceID);
-            System.out.println(url);
             String resultWordPath = encode(rootPath + url);
             return ResultFactory.buildSuccessResult("下载成功",resultWordPath);
         }
@@ -98,12 +150,10 @@ public class DownloadService {
         return String.valueOf(c).matches("[\u4e00-\u9fa5]");
     }
 
-    public Result downloadFolder(Map<String, Object> folderIDMap) throws FileNotFoundException {
+    public void downloadFolder(Map<String, Object> folderIDMap, HttpServletResponse response) throws IOException {
         long start = System.currentTimeMillis();
         String folderID = (String) folderIDMap.get("folderID");
-        System.out.println(folderID);
-        String path = "E:\\TestResource\\download\\" + folderID + "\\";
-//        String path = "D:\\" + folderID + "\\";
+        String path = root + "\\download\\" + folderID + "\\";
         File file = new File(path);
         file.mkdirs();
         String fileName = "知识点+学习目标+学习重难点收藏.docx";
@@ -114,26 +164,37 @@ public class DownloadService {
         ArrayList<String> data = getStr(folderID);
         writeDataDocx(filePath,data,false,12);
         copyAll(folderID, path);
-        String zipPath = "E:\\TestResource\\download\\" + folderID + ".zip";
-//        String zipPath = "D:\\" + folderID + ".zip";
-        System.out.println(zipPath);
+        String zipPath = root + "\\download\\" + folderID + ".zip";
         FileOutputStream fos1 = new FileOutputStream(zipPath);
         toZip(path, fos1, true);
-        long end = System.currentTimeMillis();
-        System.out.println("打包完成，耗时：" + (end - start) +" ms");
-//        return ResultFactory.buildSuccessResult("success",null);
         File zip = new File(zipPath);
-        String zipURl = rootPath + "\\download\\" + folderID + ".zip";
+        String zipURl = root + "\\download\\" + folderID + ".zip";
         if (zip.exists()){
-            return ResultFactory.buildSuccessResult("success",zipURl);
+            File zipFile = new File(zipURl);
+            //读取指定路径下面的文件
+            InputStream in = new FileInputStream(zipFile);
+            OutputStream outputStream = new BufferedOutputStream(response.getOutputStream());
+            //创建存放文件内容的数组
+            byte[] buff =new byte[1024];
+            //所读取的内容使用n来接收
+            int n;
+            //当没有读取完时,继续读取,循环
+            while((n=in.read(buff))!=-1){
+                //将字节数组的数据全部写入到输出流中
+                outputStream.write(buff,0,n);
+            }
+            //强制将缓存区的数据进行输出
+            outputStream.flush();
+            //关流
+            outputStream.close();
+            in.close();
         }
-        else {
-            return ResultFactory.buildFailResult("下载失败");
-        }
+//        else {
+//            return ResultFactory.buildFailResult("下载失败");
+//        }
     }
     //获取收藏的文本
     public ArrayList<String> getStr(String folderID){
-        Driver driver = createDrive();
         Session session = driver.session();
         ArrayList<String> text = new ArrayList<>();
         ArrayList<Map> contentList = favoriteMapper.collectionStr(folderID);
@@ -181,7 +242,6 @@ public class DownloadService {
 
             }
         }
-        driver.close();
         return text;
     }
     public static void createWord(String path, String fileName) {
@@ -237,66 +297,6 @@ public class DownloadService {
                 XWPFRun r = p.createRun();//p1.createRun()将一个新运行追加到这一段
                 r.setText(text);
             }
-            //添加一个段落
-            //XWPFParagraph p1 = document.createParagraph();
-            //setAlignment()指定应适用于此段落中的文本的段落对齐方式。CENTER LEFT...
-            //p1.setAlignment(ParagraphAlignment.LEFT);
-            //p1.setBorderBetween(Borders.APPLES);
-            //p1.setBorderBottom(Borders.APPLES);
-            //p1.setBorderLeft(Borders.APPLES);指定应显示在左边页面指定段周围的边界。
-            //p1.setBorderRight(Borders.ARCHED_SCALLOPS);指定应显示在右侧的页面指定段周围的边界。
-            //p1.setBorderTop(Borders.ARCHED_SCALLOPS);指定应显示上方一组有相同的一组段边界设置的段落的边界。这几个是对段落之间的格式的统一，相当于格式刷
-            //p1.setFirstLineIndent(99);//---正文宽度会稍微变窄
-            //p1.setFontAlignment(1);//---段落的对齐方式 1左 2中 3右 4往上 左 不可写0和负数
-            //p1.setIndentationFirstLine(800);//---首行缩进,指定额外的缩进，应适用于父段的第一行。
-            //p1.setIndentationHanging(400);//---首行前进,指定的缩进量，应通过第一行回到开始的文本流的方向上移动缩进从父段的第一行中删除。
-            //p1.setIndentationLeft(400);//---整段缩进（右移）指定应为从左到右段，该段的内容的左边的缘和这一段文字左边的距和右边文本边距和左段权中的那段文本的右边缘之间的缩进,如果省略此属性，则应假定其值为零。
-            //p1.setIndentationRight(400);//---指定应放置这一段，该段的内容从左到右段的右边缘的正确文本边距和右边文本边距和左段权中的那段文本的右边缘之间的缩进,如果省略此属性，则应假定其值为零。
-            //p1.setIndentFromLeft(400);//---整段右移
-            //p1.setIndentFromRight(400);
-            //p1.setNumID(BigInteger.TEN);
-            //p1.setPageBreak(true);//--指定当渲染此分页视图中的文档，这一段的内容都呈现在文档中的新页的开始。
-            //p1.setSpacingAfter(6);//--指定应添加在文档中绝对单位这一段的最后一行之后的间距。
-            //p1.setSpacingAfterLines(6);//--指定应添加在此线单位在文档中的段落的最后一行之后的间距。
-            //p1.setSpacingBefore(6);//--指定应添加上面这一段文档中绝对单位中的第一行的间距。
-            //p1.setSpacingBeforeLines(6);//--指定应添加在此线单位在文档中的段落的第一行之前的间距。
-            //p1.setSpacingLineRule(LineSpacingRule.AT_LEAST);//--指定行之间的间距如何计算存储在行属性中。
-            //p1.setStyle("");//--此方法提供了样式的段落，这非常有用.
-            //p1.setVerticalAlignment(TextAlignment.CENTER);//---指定的文本的垂直对齐方式将应用于此段落中的文本
-            //p1.setWordWrapped(true);//--此元素指定是否消费者应中断超过一行的文本范围，通过打破这个词 （打破人物等级） 的两行或通过移动到下一行 （在词汇层面上打破） 这个词的拉丁文字。
-            //XWPFRun r1 = p1.createRun();//p1.createRun()将一个新运行追加到这一段
-            //setText(String value)或
-            //setText(String value,int pos)
-            //value - the literal text which shall be displayed in the document
-            //pos - - position in the text array (NB: 0 based)
-            //r1.setText(data);
-            //r1.setTextPosition(20);//这个相当于设置行间距的，具体这个20是怎么算的，不清楚,此元素指定文本应为此运行在关系到周围非定位文本的默认基线升降的量。不是真正意义上的行间距
-            //---This element specifies the amount by which text shall be ★raised or lowered★ for this run in relation to the default baseline of the surrounding non-positioned text.
-            //r1.setStrike(true);//---设置删除线的,坑人!!!
-            //r1.setStrikeThrough(true);---也是设置删除线，可能有细微的区别吧
-            //r1.setEmbossed(true);---变的有重影（变黑了一点）
-            //r1.setDoubleStrikethrough(true);---设置双删除线
-            //r1.setColor("33CC00");//---设置字体颜色 ★
-            //r1.setFontFamily("fantasy");
-            //r1.setFontFamily("cursive");//---设置ASCII(0 - 127)字体样式
-            //r1.setBold(jiacu);//---"加黑加粗"
-            //r1.setFontSize(size);//---字体大小
-
-//            XWPFParagraph p2 = document.createParagraph();
-//            XWPFRun p2Run = p2.createRun();
-//            p2Run.setText("200. 你好");
-            //p2Run.setFontSize(size);//---字体大小
-            //p2.setIndentationFirstLine(800);//---首行缩进,指定额外的缩进，应适用于父段的第一行。
-
-            //r1.setImprinted(true);//感觉与setEmbossed(true)类似，有重影
-            //r1.setItalic(true);//---文本会有倾斜，是一种字体？
-            //r1.setShadow(true);//---文本会变粗有重影，与前面两个有重影效果的方法感觉没什么区别
-            //r1.setSmallCaps(true);//---改变了  英文字母  的格式
-            //r1.setSubscript(VerticalAlign.BASELINE);//---valign垂直对齐的
-            //r1.setUnderline(UnderlinePatterns.DASH);//--填underline type设置下划线
-            //document.createTable(2, 2);//--创建一个制定行列的表
-            //document.enforceReadonlyProtection();//--强制执行制度保护
-
             /**
              * r1.setDocumentbackground(doc, "FDE9D9");//设置页面背景色
              r1.testSetUnderLineStyle(doc);//设置下划线样式以及突出显示文本
@@ -304,7 +304,6 @@ public class DownloadService {
              r1.testSetShdStyle(doc);//设置文字底纹
              */
             document.write(ostream);
-            System.out.println("创建word成功");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -332,15 +331,12 @@ public class DownloadService {
         for (Resource resource:collection){
             int id = resource.getId();
             String url = resourceMapper.queryUrl(id);
-//            System.out.println(url);
-            copyFile("E:\\TestResource" + url, path);
+            copyFile(root + url, path);
         }
     }
     public void copyFile(String oldPath, String newPath) {
         int l = oldPath.split("/").length;
         newPath = newPath + oldPath.split("/")[l-1];
-        System.out.println(oldPath);
-        System.out.println(newPath);
         try {
             int bytesum = 0;
             int byteread = 0;
@@ -352,14 +348,12 @@ public class DownloadService {
                 int length;
                 while ( (byteread = inStream.read(buffer)) != -1) {
                     bytesum += byteread; //字节数 文件大小
-                    System.out.println(bytesum);
                     fs.write(buffer, 0, byteread);
                 }
                 inStream.close();
             }
         }
         catch (Exception e) {
-            System.out.println("复制单个文件操作出错");
             e.printStackTrace();
         }
     }
@@ -373,14 +367,11 @@ public class DownloadService {
      */
     public static void toZip(String srcDir, OutputStream out, boolean KeepDirStructure)
         throws RuntimeException{
-        long start = System.currentTimeMillis();
         ZipOutputStream zos = null ;
         try {
             zos = new ZipOutputStream(out);
             File sourceFile = new File(srcDir);
             compress(sourceFile,zos,sourceFile.getName(),KeepDirStructure);
-            long end = System.currentTimeMillis();
-            System.out.println("压缩完成，耗时：" + (end - start) +" ms");
         } catch (Exception e) {
             throw new RuntimeException("zip error from ZipUtils",e);
         }finally{
