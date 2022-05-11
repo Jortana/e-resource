@@ -36,4 +36,6 @@ public interface ResourceMapper {
 
     String queryUrl(int resourceID);
     String queryVideoUrl(int resourceID);
+
+    Double resourceRate(int resource);
 }

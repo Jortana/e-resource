@@ -15,6 +15,16 @@
               {{ resource['url'].split('/').slice(-1)[0] }}
             </div>
           </div>
+          <!-- 评分 -->
+          <div class="rate">
+            <el-rate
+              v-model="resource['rate']"
+              :colors="colors"
+              disabled
+              show-score
+              score-template="{value}"
+            ></el-rate>
+          </div>
           <div class="operation flex flex-1">
             <div class="operation-button">
               <download-button
@@ -46,16 +56,7 @@
             }"
           ></resource-viewer>
         </div>
-        <!-- 评分 -->
-        <div class="rate">
-          <el-rate
-            v-model="resource['rate']"
-            :colors="colors"
-            disabled
-            show-score
-            score-template="{value}"
-          ></el-rate>
-        </div>
+
         <div>
           <comment :id="resource.id" class="comment-container"></comment>
         </div>
@@ -284,7 +285,7 @@ export default {
 }
 
 .rate {
-  border-top: 1px solid #e4e7ed;
+  /*border-top: 1px solid #e4e7ed;*/
   padding-top: 1rem;
   margin-top: 1rem;
 }

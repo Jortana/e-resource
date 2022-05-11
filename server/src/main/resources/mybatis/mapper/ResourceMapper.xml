@@ -93,6 +93,9 @@
     <select id="queryVideo" resultType="HashMap">
         select *from t_video where id = #{id}
     </select>
+    <select id="resourceRate" resultType="java.lang.Double">
+        SELECT AVG(rate) FROM t_comment where resource_id = #{resourceID};
+    </select>
 </mapper>
 
 

@@ -77,16 +77,26 @@ public class ResourceService {
         ArrayList<Resource> resList = resourceMapper.queryResourceByIDList(idList,0,0);
         return ResultFactory.buildSuccessResult("查询成功",resList);
     }
+
+    public double resourceRate(Integer resourceID){
+        Double rate = resourceMapper.resourceRate(resourceID);
+        if (rate==null) return 0;
+        String rate_str = String.format("%.1f", rate); //以字符串形式保留位数，此处保留3位小数
+        return Double.parseDouble(rate_str);
+    }
+
     //根据ID查资源属性
     public Result queryResource(Map<String, Object> ResourceIDMap){
         Session session = driver.session();
         int resourceID = Integer.parseInt ((String) ResourceIDMap.get("resourceID"));
         Resource queryResource = (Resource) redisTemplate.opsForValue().get("resource_"+resourceID);
         if (queryResource != null){
+            queryResource.setRate(resourceRate(queryResource.getId()));
             session.close();
             return ResultFactory.buildSuccessResult("查询成功",queryResource);
         }
         queryResource = resourceMapper.queryResourceByID(resourceID);
+        queryResource.setRate(resourceRate(resourceID));
         StatementResult conceptNode = session.run( "MATCH (m:resource)-[r]->(a:concept) where m.id = {id} " +
                         "RETURN a.name as concept",
                 parameters( "id", resourceID) );
@@ -121,15 +131,18 @@ public class ResourceService {
     //更新资源相似度
     public Result updateRelatedResource(){
         Session session = driver.session();
-        StatementResult result = session.run( "MATCH (n:resource)" +
-                        "RETURN id(n) AS ID order by ID",
+        System.out.println("in");
+        StatementResult result = session.run(
+                "MATCH (n:resource) RETURN id(n) AS ID order by ID",
                 parameters() );
+        System.out.println("in");
         ArrayList<HashMap> mapArray = new ArrayList<>();
         while ( result.hasNext() )
         {
             Record record = result.next();
             int resourceID = record.get( "ID" ).asInt();
-            if (resourceID < 811077) continue; // 跳过已经计算过的资源
+            System.out.println(resourceID);
+            if (resourceID < 831546) continue; // 跳过已经计算过的资源
             HashMap<String, Integer> hm1 = new HashMap<String, Integer>();
             StatementResult tfidf = session.run( "MATCH (n:resource)-[r]->(m:concept) where id(n)={id} " +
                         "RETURN m.name, r.num",
