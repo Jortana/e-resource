@@ -4,7 +4,6 @@ spring:
   redis:
     password: fzsj@GIS
     database: 3
-    host: 202.102.89.244
 
 # 跨域
 registry:

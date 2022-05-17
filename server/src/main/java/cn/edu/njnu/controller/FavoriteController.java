@@ -9,7 +9,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/e-resource/api")
-public class FavoriteController extends BaseController {
+public class FavoriteController {
 
     @Autowired
     private FavoriteService favoriteService;
@@ -48,4 +48,10 @@ public class FavoriteController extends BaseController {
     public Result delSingle(@RequestBody Map<String, Object> IDMap){
         return favoriteService.delSingle(IDMap);
     }
+
+    @DeleteMapping("/v1.0/public/delMulti")
+    public Result delMulti(@RequestBody Map<String, Object> IDMap){
+        return favoriteService.delMulti(IDMap);
+    }
+
 }

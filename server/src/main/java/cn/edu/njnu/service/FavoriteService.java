@@ -349,4 +349,12 @@ public class FavoriteService {
             return ResultFactory.buildFailResult("删除失败");
         }
     }
+
+    public Result delMulti(Map<String, Object> IDMap) {
+        String folderID = (String) IDMap.get("folderID");
+        List<Integer> resourceList = (List<Integer>) IDMap.get("resourceIDs");
+        boolean result = favoriteMapper.delMulti(folderID, resourceList);
+        return result?ResultFactory.buildSuccessResult("删除成功",null):
+                ResultFactory.buildFailResult("删除失败");
+    }
 }

@@ -78,6 +78,13 @@
     <delete id="delFolderKey">
         delete from t_collection where folder_id = #{folderID} and `key` = #{key}
     </delete>
+    <delete id="delMulti">
+        delete from t_collection
+        where folder_id = #{folderID} and id in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </delete>
     <!-- 判断是否已添加 -->
     <select id="yiyou" resultType="map">
         select t_folder.`id` FROM t_folder INNER JOIN t_collection WHERE t_folder.`id` = t_collection.`folder_id` and username = #{username} and t_folder.`id` = #{folderID} and
