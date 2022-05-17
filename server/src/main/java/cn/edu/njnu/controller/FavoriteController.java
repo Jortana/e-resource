@@ -49,7 +49,7 @@ public class FavoriteController {
         return favoriteService.delSingle(IDMap);
     }
 
-    @DeleteMapping("/v1.0/public/delMulti")
+    @DeleteMapping("/v1.0/private/delMulti")
     public Result delMulti(@RequestBody Map<String, Object> IDMap){
         return favoriteService.delMulti(IDMap);
     }

@@ -7,6 +7,16 @@ import java.util.List;
 
 public class Resource implements Serializable {
     int id;
+    int collectionId;
+
+    public int getCollectionId() {
+        return collectionId;
+    }
+
+    public void setCollectionId(int collectionId) {
+        this.collectionId = collectionId;
+    }
+
     String resourceName;
     String remark;
 
