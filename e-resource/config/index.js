@@ -13,6 +13,7 @@ module.exports = {
       // 配置跨域
       '/api': {
         // target: 'http://202.102.89.244:9000/e-resource/api',
+        // target: 'http://222.192.6.62:9000/e-resource/api',
         target: 'http://127.0.0.1:9000/e-resource/api',
         changeOrigin: true,
         pathRewrite: {

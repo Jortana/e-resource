@@ -1,30 +1,67 @@
 <template>
-  <div class="flex">
-    <!-- 资源 -->
-    <section class="left flex-1">
-      <div v-if="resources.resources" class="section">
-        <h4>资源列表</h4>
-        <ul>
-          <list-item
-            v-for="resource in resources.resources"
-            :key="resource.id"
-            :resource="resource"
-            :id="folderID"
+  <div class="content-container">
+    <el-tabs v-model="activeTab">
+      <!-- 资源 -->
+      <el-tab-pane label="资源列表" name="list">
+        <div v-if="resources.resources" class="section">
+          <div class="list">
+            <list-item
+              v-for="resource in resources.resources"
+              ref="listItem"
+              :key="resource.id"
+              :resource="resource"
+              :id="folderID"
+              @updateResource="$emit('updateResource')"
+              @addListItem="addListItem"
+              @deleteListItem="deleteListItem"
+            />
+          </div>
+          <div class="batch-operation">
+            <el-checkbox
+              v-model="checkAllResources"
+              @change="changeAllResources"
+            >
+              全选
+            </el-checkbox>
+            <el-button class="x-mini-btn" type="danger" plain size="mini">
+              删除
+            </el-button>
+          </div>
+        </div>
+      </el-tab-pane>
+      <el-tab-pane label="知识点" name="entity">
+        <div
+          v-for="(content, index) in resources.content"
+          :key="index"
+          class="content-row-container"
+        >
+          <resource-content
+            ref="entityItem"
+            :content="content"
+            :folderID="folderID"
+            :type="'content'"
             @updateResource="$emit('updateResource')"
+            @addListItem="addListItem"
+            @deleteListItem="deleteListItem"
           />
-        </ul>
-      </div>
-    </section>
-    <!-- 文字 -->
-    <section class="right flex-1">
-      <div v-if="resources.goal" class="section">
-        <h4>学习目标</h4>
+        </div>
+        <div class="batch-operation">
+          <el-checkbox v-model="checkAllEntities" @change="changeAllEntities">
+            全选
+          </el-checkbox>
+          <el-button class="x-mini-btn" type="danger" plain size="mini">
+            删除
+          </el-button>
+        </div>
+      </el-tab-pane>
+      <el-tab-pane label="学习目标" name="goal">
         <div
           v-for="(goal, index) in resources.goal"
           :key="index"
-          class="content"
+          class="content-row-container"
         >
           <resource-content
+            ref="goalItem"
             :content="goal.text"
             :folderID="folderID"
             :id="goal.id"
@@ -32,11 +69,23 @@
             @updateResource="$emit('updateResource')"
           />
         </div>
-      </div>
-      <div v-if="resources.key" class="section">
-        <h4>学习重难点</h4>
-        <div v-for="(key, index) in resources.key" :key="index" class="content">
+        <div class="batch-operation">
+          <el-checkbox v-model="checkAllGoals" @change="changeAllGoals">
+            全选
+          </el-checkbox>
+          <el-button class="x-mini-btn" type="danger" plain size="mini">
+            删除
+          </el-button>
+        </div>
+      </el-tab-pane>
+      <el-tab-pane label="学习重难点" name="key">
+        <div
+          v-for="(key, index) in resources.key"
+          :key="index"
+          class="content-row-container"
+        >
           <resource-content
+            ref="keyItem"
             :content="key.text"
             :folderID="folderID"
             :id="key.id"
@@ -44,23 +93,16 @@
             @updateResource="$emit('updateResource')"
           />
         </div>
-      </div>
-      <div v-if="resources.content" class="section">
-        <h4>知识点</h4>
-        <div
-          v-for="(content, index) in resources.content"
-          :key="index"
-          class="content"
-        >
-          <resource-content
-            :content="content"
-            :folderID="folderID"
-            :type="'content'"
-            @updateResource="$emit('updateResource')"
-          />
+        <div class="batch-operation">
+          <el-checkbox v-model="checkAllKeys" @change="changeAllKeys">
+            全选
+          </el-checkbox>
+          <el-button class="x-mini-btn" type="danger" plain size="mini">
+            删除
+          </el-button>
         </div>
-      </div>
-    </section>
+      </el-tab-pane>
+    </el-tabs>
 
     <!-- 隐藏的a元素，用来在新窗口打开资源页面 -->
     <a
@@ -89,7 +131,16 @@ export default {
   },
   data() {
     return {
-      resources: null
+      resources: null,
+      activeTab: 'list',
+      checkedResources: [],
+      checkedEntities: [],
+      checkedGoals: [],
+      checkedKeys: [],
+      checkAllResources: false,
+      checkAllEntities: false,
+      checkAllGoals: false,
+      checkAllKeys: false
     }
   },
   watch: {
@@ -108,36 +159,66 @@ export default {
         `${window.location.origin}/e-resource/#/resource/${resourceID}`
       )
       target.click()
+    },
+    addListItem(listName, content) {
+      this[listName].push(content)
+    },
+    deleteListItem(listName, content) {
+      const index = this[listName].indexOf(content)
+      this[listName].splice(index, 1)
+    },
+    changeAllResources() {
+      this.$refs.listItem.forEach((item) => {
+        item.changeCheck()
+      })
+    },
+    changeAllEntities() {
+      this.$refs.entityItem.forEach((item) => {
+        item.changeCheck()
+      })
+    },
+    changeAllGoals() {
+      this.$refs.goalItem.forEach((item) => {
+        item.changeCheck()
+      })
+    },
+    changeAllKeys() {
+      this.$refs.keyItem.forEach((item) => {
+        item.changeCheck()
+      })
     }
   }
 }
 </script>
 
 <style>
+.content-container {
+  margin-top: 0.5rem;
+}
+
+.el-tabs__item {
+  font-size: 1rem;
+}
+
 .section {
   color: #606266;
-  margin-top: 1rem;
 }
 
 .section h4 {
   color: #303133;
 }
 
-.section .content {
-  margin-top: 0.2rem;
+.section .list > div,
+.content-row-container {
+  margin-top: 0.8rem;
 }
 
-.section ul li {
-  margin-top: 0.5rem;
-  display: flex;
-  align-items: center;
+.section .list > div:first-child,
+.content-row-container:first-child {
+  margin-top: 0;
 }
 
-.section ul li div {
-  cursor: pointer;
-}
-
-.section ul li div:hover {
+.section .list li div:hover {
   text-decoration: underline;
   text-underline-offset: 0.2rem;
 }
@@ -146,5 +227,16 @@ export default {
   height: 1.2rem;
   width: 1.2rem;
   margin-right: 0.3rem;
+}
+
+.batch-operation {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.x-mini-btn {
+  margin-left: 1rem;
+  padding: 4px 6px;
 }
 </style>

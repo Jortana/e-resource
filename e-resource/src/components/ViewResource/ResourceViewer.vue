@@ -7,7 +7,7 @@
     </div>
     <div v-else-if="suffix === 'mp4'">
       <video controls="controls" class="videoDemo">
-        <source :src="videoUrl">
+        <source :src="videoUrl" />
       </video>
     </div>
     <iframe
@@ -28,8 +28,8 @@
 
 <script>
 import pdf from 'vue-pdf'
-// const baseUrl = 'http://202.102.89.244:8082'
-const baseUrl = 'http://222.192.6.62:8082'
+const baseUrl = 'http://202.102.89.244:8082'
+// const baseUrl = 'http://222.192.6.62:8082'
 export default {
   name: 'ResourceViewer',
   components: {
@@ -117,7 +117,7 @@ export default {
   width: 100%;
   height: 500px;
 }
-.videoDemo{
+.videoDemo {
   width: 100%;
   height: 500px;
 }

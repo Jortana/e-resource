@@ -24,9 +24,17 @@ export default {
       // ['#d87c7c', '#919e8b', '#d7ab82', '#6e7074', '#61a0a8', '#efa18d', '#787464', '#cc7e63', '#724e58', '#4b565b']
     }
   },
+  watch: {
+    info: {
+      handler(newInfo) {
+        if (newInfo !== {}) {
+          this.resetData()
+          this.formatData(this.info)
+        }
+      }
+    }
+  },
   mounted() {
-    // this.initCharts()
-    this.formatData(this.info)
     // 当 DOM 大小改变的时候 resize 图谱
     setTimeout(() => {
       window.onresize = () => {
@@ -47,6 +55,9 @@ export default {
      * 格式化数据为 echarts 需要的格式
      */
     formatData(info) {
+      if (info === {}) {
+        return
+      }
       const { node: entities } = info
       // 存储节点的 Set
       const nodes = new Set()
@@ -135,7 +146,6 @@ export default {
           return nodeNames.indexOf(node.name) === -1
         })
       }
-      console.log(this.nodes)
 
       const option = this.chart.getOption()
       option.series[0].nodes = [...this.nodes]
@@ -176,7 +186,7 @@ export default {
       // const nodes = JSON.parse(JSON.stringify(this.nodes))
       const nodes = [...this.nodes]
       const links = [...this.links]
-      const { subject: title } = this.info
+      // const { subject: title } = this.info
       // 指定图表的配置项和数据
       const option = {
         animationDelayUpdate: 500,
@@ -188,7 +198,7 @@ export default {
         },
         // 标题
         title: {
-          text: title
+          // text: title
         },
         // 图谱
         series: [
