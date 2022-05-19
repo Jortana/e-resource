@@ -57,18 +57,8 @@ public class ResourceController extends BaseController {
         return resourceService.queryHot();
     }
 
-    @GetMapping("/v1.0/public/queryMoreHot")
-    public Result queryMoreHot(){
-        return resourceService.queryMoreHot();
-    }
-
     @GetMapping("/v1.0/public/queryTime")
     public Result queryTime(){
         return resourceService.queryTime();
-    }
-
-    @GetMapping("/v1.0/public/queryMoreTime")
-    public Result queryMoreTime(){
-        return resourceService.queryMoreTime();
     }
 }

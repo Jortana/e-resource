@@ -35,7 +35,6 @@ public interface FavoriteMapper {
     boolean delFolderContent(String content, String folderID);
     boolean delFolderGoal(int goal, String folderID);
     boolean delFolderKey(int key, String folderID);
-    boolean delMulti(String folderID, List<Integer> list);
 
     ArrayList<Map> queryCurrent(HashMap<String, Object> condition);
     ArrayList<Map> yiyou(HashMap<String, Object> condition);

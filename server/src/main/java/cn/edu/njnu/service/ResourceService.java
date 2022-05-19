@@ -142,7 +142,7 @@ public class ResourceService {
             Record record = result.next();
             int resourceID = record.get( "ID" ).asInt();
             System.out.println(resourceID);
-            if (resourceID < 833562) continue; // 跳过已经计算过的资源
+            if (resourceID < 831546) continue; // 跳过已经计算过的资源
             HashMap<String, Integer> hm1 = new HashMap<String, Integer>();
             StatementResult tfidf = session.run( "MATCH (n:resource)-[r]->(m:concept) where id(n)={id} " +
                         "RETURN m.name, r.num",
@@ -352,10 +352,8 @@ public class ResourceService {
     public Result queryHot(){
         ArrayList<Resource> resourceList = resourceMapper.queryHot();
         JSONArray resArray = new JSONArray();
-        int total = 0;
         for (Resource resource:resourceList){
             resArray.add(resource);
-            if(++total==8) break;
         }
         return ResultFactory.buildSuccessResult("查询成功",resArray);
     }
@@ -363,32 +361,8 @@ public class ResourceService {
     public Result queryTime(){
         ArrayList<Resource> resourceList = resourceMapper.queryTime();
         JSONArray resArray = new JSONArray();
-        int total = 0;
         for (Resource resource:resourceList){
             resArray.add(resource);
-            if(++total==8) break;
-        }
-        return ResultFactory.buildSuccessResult("查询成功",resArray);
-    }
-
-    public Result queryMoreHot() {
-        ArrayList<Resource> resourceList = resourceMapper.queryHot();
-        JSONArray resArray = new JSONArray();
-        int total = 0;
-        for (Resource resource:resourceList){
-            resArray.add(resource);
-            if(++total==20) break;
-        }
-        return ResultFactory.buildSuccessResult("查询成功",resArray);
-    }
-
-    public Result queryMoreTime(){
-        ArrayList<Resource> resourceList = resourceMapper.queryTime();
-        JSONArray resArray = new JSONArray();
-        int total = 0;
-        for (Resource resource:resourceList){
-            resArray.add(resource);
-            if(++total==20) break;
         }
         return ResultFactory.buildSuccessResult("查询成功",resArray);
     }
