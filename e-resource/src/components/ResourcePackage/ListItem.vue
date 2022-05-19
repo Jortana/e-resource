@@ -153,10 +153,19 @@ export default {
       })
     },
     changeHandler(isChecked) {
+      console.log(this.resource)
       if (isChecked === true) {
-        this.$emit('addListItem', 'checkedResources', this.resource.id)
+        this.$emit(
+          'addListItem',
+          'checkedResources',
+          this.resource.collectionId
+        )
       } else {
-        this.$emit('deleteListItem', 'checkedResources', this.resource.id)
+        this.$emit(
+          'deleteListItem',
+          'checkedResources',
+          this.resource.collectionId
+        )
       }
     },
     changeCheck() {

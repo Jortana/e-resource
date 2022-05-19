@@ -96,3 +96,14 @@ export const deleteResource = (resourceInfo) => {
 export const queryDownload = (folderID) => {
   return http.download(`${baseURL}/private/downloadFolder?folderID=${folderID}`)
 }
+
+/**
+ * 批量删除资源包中的资源
+ * @param {Object} resourceInfo
+ * @param {Number} resourceInfo.folderID - 待删除资源所在资源包的 ID
+ * @param {Array} resourceInfo.resourceIDs - 待删除的资源 ID 的数组
+ * @returns {AxiosPromise}
+ */
+export const deleteMulti = (resourceInfo) => {
+  return http.delete(`${baseURL}/private/delMulti`, resourceInfo)
+}

@@ -16,17 +16,27 @@
               @deleteListItem="deleteListItem"
             />
           </div>
-          <div class="batch-operation">
+          <div
+            v-if="resources.resources && resources.resources.length"
+            class="batch-operation"
+          >
             <el-checkbox
               v-model="checkAllResources"
               @change="changeAllResources"
             >
               全选
             </el-checkbox>
-            <el-button class="x-mini-btn" type="danger" plain size="mini">
+            <el-button
+              class="x-mini-btn"
+              type="danger"
+              plain
+              size="mini"
+              @click="deleteMulti(checkedResources)"
+            >
               删除
             </el-button>
           </div>
+          <div v-else class="empty">暂未收藏资源</div>
         </div>
       </el-tab-pane>
       <el-tab-pane label="知识点" name="entity">
@@ -45,7 +55,10 @@
             @deleteListItem="deleteListItem"
           />
         </div>
-        <div class="batch-operation">
+        <div
+          v-if="resources.content && resources.content.length"
+          class="batch-operation"
+        >
           <el-checkbox v-model="checkAllEntities" @change="changeAllEntities">
             全选
           </el-checkbox>
@@ -53,6 +66,7 @@
             删除
           </el-button>
         </div>
+        <div v-else class="empty">暂未收藏知识点</div>
       </el-tab-pane>
       <el-tab-pane label="学习目标" name="goal">
         <div
@@ -69,7 +83,10 @@
             @updateResource="$emit('updateResource')"
           />
         </div>
-        <div class="batch-operation">
+        <div
+          v-if="resources.goal && resources.goal.length"
+          class="batch-operation"
+        >
           <el-checkbox v-model="checkAllGoals" @change="changeAllGoals">
             全选
           </el-checkbox>
@@ -77,6 +94,7 @@
             删除
           </el-button>
         </div>
+        <div v-else class="empty">暂未收藏学习目标</div>
       </el-tab-pane>
       <el-tab-pane label="学习重难点" name="key">
         <div
@@ -93,7 +111,10 @@
             @updateResource="$emit('updateResource')"
           />
         </div>
-        <div class="batch-operation">
+        <div
+          v-if="resources.key && resources.key.length"
+          class="batch-operation"
+        >
           <el-checkbox v-model="checkAllKeys" @change="changeAllKeys">
             全选
           </el-checkbox>
@@ -101,6 +122,7 @@
             删除
           </el-button>
         </div>
+        <div v-else class="empty">暂未收藏学习重难点</div>
       </el-tab-pane>
     </el-tabs>
 
@@ -119,6 +141,7 @@
 <script>
 import ListItem from '@/components/ResourcePackage/ListItem'
 import ResourceContent from '@/components/ResourcePackage/ResourceContent'
+import { deleteMulti } from '@/api/package'
 export default {
   name: 'Resources',
   components: { ListItem, ResourceContent },
@@ -186,6 +209,15 @@ export default {
       this.$refs.keyItem.forEach((item) => {
         item.changeCheck()
       })
+    },
+    deleteMulti(resourceIDs) {
+      console.log(resourceIDs)
+      deleteMulti({
+        folderID: this.folderID,
+        resourceIDs
+      }).then((response) => {
+        console.log(response)
+      })
     }
   }
 }
@@ -200,7 +232,8 @@ export default {
   font-size: 1rem;
 }
 
-.section {
+.section,
+.empty {
   color: #606266;
 }
 
