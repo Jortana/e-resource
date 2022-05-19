@@ -133,21 +133,22 @@ public class FavoriteService {
         if (goalMap.size()>0){
             for (Map singleGoal:goalMap){
                 if (singleGoal!=null){
+                    int collectionId = (int) singleGoal.get("collectionId");
                     int id = (int) singleGoal.get("goal");
-                    StatementResult node = session.run( "MATCH (n:GoalAndKey) where n.id = {id} " +
+                    StatementResult node = session.run( "MATCH (n:GoalAndKey) where id(n) = {id} " +
                                     "RETURN n.goal as goal",
                             parameters( "id", id) );
-                    while ( node.hasNext() )
+                    if ( node.hasNext() )
                     {
                         Record record = node.next();
                         String text = record.get( "goal" ).asString();
                         JSONObject goalObject = new JSONObject();
                         goalObject.put("id", id);
                         goalObject.put("text", text);
+                        goalObject.put("collectionId", collectionId);
                         goal.add(goalObject);
                     }
                 }
-
             }
         }
         folder.put("goal", goal);
@@ -157,17 +158,19 @@ public class FavoriteService {
         if (keyMap.size()>0){
             for (Map singleKey:keyMap){
                 if (singleKey!=null){
+                    int collectionId = (int) singleKey.get("collectionId");
                     int id = (int) singleKey.get("key");
-                    StatementResult node = session.run( "MATCH (n:GoalAndKey) where n.id = {id} " +
+                    StatementResult node = session.run( "MATCH (n:GoalAndKey) where id(n) = {id} " +
                                     "RETURN n.key as key",
                             parameters( "id", id) );
-                    while ( node.hasNext() )
+                    if ( node.hasNext() )
                     {
                         Record record = node.next();
                         String text = record.get( "key" ).asString();
                         JSONObject keyObject = new JSONObject();
                         keyObject.put("id", id);
                         keyObject.put("text", text);
+                        keyObject.put("collectionId", collectionId);
                         key.add(keyObject);
                     }
                 }
