@@ -15,16 +15,12 @@
 }
 
 .lg-container {
-  margin: 0 auto;
-  width: 1200px;
+  width: 100%;
 }
 
 .main-container {
-  margin-left: 0;
-  /*width: 80%;*/
-  margin-top: 1rem;
-  /*空出nav-menu的位置*/
-  height: calc(100vh - 100px);
+  width: 1200px;
+  margin: 0 auto;
 }
 
 .none {
@@ -33,4 +29,12 @@
 
 ul {
   list-style-type: none;
+}
+
+.relative {
+  position: relative;
+}
+
+.common-shadow {
+  box-shadow: 1px 3px 6px rgb(122 122 122 / 0.2);
 }

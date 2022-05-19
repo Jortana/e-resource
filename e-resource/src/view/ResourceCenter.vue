@@ -1,94 +1,98 @@
 <template>
-  <div class="lg-container">
+  <div>
     <nav-menu :searchInfo.sync="searchInfo"></nav-menu>
-    <div class="main-container resource-container">
-      <div class="resources">
-        <div class="flex-1">
-          <!-- 知识卡片 -->
-          <knowledge-card
-            v-if="JSON.stringify(cardInfo) !== '{}'"
-            :entityInfo="cardInfo"
-            class="knowledge-card"
-          ></knowledge-card>
-          <!-- 找到的实体和资源信息 -->
-          <div class="resource">
-            <div>
-              <!-- 这里的v-for的数组实际上是只有一个元素的，后端问题，之前的想法和现在不一样，我发现这个问题的时候已经写了很多了，改起来太麻烦了，懒得改了 -->
-              <div>
-                <!-- 教学目标和教学重难点 -->
-                <div class="flex goal-and-key-container">
-                  <goal-and-key-card
-                    v-if="goal.length > 0"
-                    :list="goal"
-                    :title="'学习目标'"
-                    class="goal-and-key-card"
-                  />
-                  <goal-and-key-card
-                    v-if="key.length > 0"
-                    :list="key"
-                    :title="'学习重难点'"
-                    class="goal-and-key-card"
-                  />
+    <div class="lg-container">
+      <div class="main-container resource-container">
+        <div class="resources">
+          <div class="flex-1">
+            <!-- 知识卡片 -->
+            <knowledge-card
+              v-if="JSON.stringify(cardInfo) !== '{}'"
+              :entityInfo="cardInfo"
+              class="knowledge-card"
+            ></knowledge-card>
+            <!-- 找到的实体和资源信息 -->
+            <div class="resource-content-container common-shadow">
+              <div class="resource">
+                <div>
+                  <!-- 这里的v-for的数组实际上是只有一个元素的，后端问题，之前的想法和现在不一样，我发现这个问题的时候已经写了很多了，改起来太麻烦了，懒得改了 -->
+                  <div>
+                    <!-- 教学目标和教学重难点 -->
+                    <div class="flex goal-and-key-container">
+                      <goal-and-key-card
+                        v-if="goal.length > 0"
+                        :list="goal"
+                        :title="'学习目标'"
+                        class="goal-and-key-card"
+                      />
+                      <goal-and-key-card
+                        v-if="key.length > 0"
+                        :list="key"
+                        :title="'学习重难点'"
+                        class="goal-and-key-card"
+                      />
+                    </div>
+                    <!-- ----------------- -->
+                    <!-- ------------------------------ 筛选 ---------------------------------------- -->
+                    <el-tabs v-model="searchInfo.type" @tab-click="changeType">
+                      <el-tab-pane
+                        v-for="type in resourceTypes"
+                        :key="type.code"
+                        :label="type.label"
+                        :name="String(type.code)"
+                      ></el-tab-pane>
+                    </el-tabs>
+                    <div class="sort">
+                      <el-radio-group
+                        v-model="searchInfo.sort"
+                        size="mini"
+                        @change="changeSort"
+                      >
+                        <el-radio-button label="0">综合</el-radio-button>
+                        <el-radio-button label="1">最热</el-radio-button>
+                        <el-radio-button label="2">最新</el-radio-button>
+                      </el-radio-group>
+                    </div>
+                    <!-- -------------------------------------------------------------------------------- -->
+                    <resource-list-with-info
+                      v-if="resources.resources.length > 0"
+                      :resources="resources.resources"
+                    ></resource-list-with-info>
+                    <div v-else>{{ noResourceHint }}</div>
+                  </div>
                 </div>
-                <!-- ----------------- -->
-                <!-- ------------------------------ 筛选 ---------------------------------------- -->
-                <el-tabs v-model="searchInfo.type" @tab-click="changeType">
-                  <el-tab-pane
-                    v-for="type in resourceTypes"
-                    :key="type.code"
-                    :label="type.label"
-                    :name="String(type.code)"
-                  ></el-tab-pane>
-                </el-tabs>
-                <div class="sort">
-                  <el-radio-group
-                    v-model="searchInfo.sort"
-                    size="mini"
-                    @change="changeSort"
-                  >
-                    <el-radio-button label="0">综合</el-radio-button>
-                    <el-radio-button label="1">最热</el-radio-button>
-                    <el-radio-button label="2">最新</el-radio-button>
-                  </el-radio-group>
-                </div>
-                <!-- -------------------------------------------------------------------------------- -->
-                <resource-list-with-info
-                  v-if="resources.resources.length > 0"
-                  :resources="resources.resources"
-                ></resource-list-with-info>
-                <div v-else>{{ noResourceHint }}</div>
+                <!-- 隐藏的a元素，用来在新窗口打开资源页面 -->
+                <!-- 这个本来应该和资源名称一起封装在ResourceLink里了，但是教学重难点还需要使用，懒得封装了，也包括下面的ViewResource method -->
+                <a
+                  v-show="false"
+                  ref="resourceTarget"
+                  class="resource-target"
+                  href=""
+                  target="_blank"
+                ></a>
+                <!-- 触发下载测试 -->
+                <a
+                  v-show="false"
+                  ref="download"
+                  href=""
+                  target="_blank"
+                  download
+                ></a>
+              </div>
+              <div v-if="resources.total > 10" class="pages">
+                <el-pagination
+                  :total="resources.total"
+                  :current-page="Number(query.page)"
+                  layout="prev, pager, next"
+                  @current-change="changePage"
+                ></el-pagination>
               </div>
             </div>
-            <!-- 隐藏的a元素，用来在新窗口打开资源页面 -->
-            <!-- 这个本来应该和资源名称一起封装在ResourceLink里了，但是教学重难点还需要使用，懒得封装了，也包括下面的ViewResource method -->
-            <a
-              v-show="false"
-              ref="resourceTarget"
-              class="resource-target"
-              href=""
-              target="_blank"
-            ></a>
-            <!-- 触发下载测试 -->
-            <a
-              v-show="false"
-              ref="download"
-              href=""
-              target="_blank"
-              download
-            ></a>
           </div>
-          <div v-if="resources.total > 10" class="pages">
-            <el-pagination
-              :total="resources.total"
-              :current-page="Number(query.page)"
-              layout="prev, pager, next"
-              @current-change="changePage"
-            ></el-pagination>
+          <!-- 知识图谱 -->
+          <div class="graph common-shadow">
+            <k-g-chart ref="chart" :entities="entities.entities"></k-g-chart>
           </div>
-        </div>
-        <!-- 知识图谱 -->
-        <div class="graph">
-          <k-g-chart ref="chart" :entities="entities.entities"></k-g-chart>
         </div>
       </div>
     </div>
@@ -96,7 +100,7 @@
 </template>
 
 <script>
-import NavMenu from '@/components/NavMenu'
+import NavMenu from '@/components/NavMenu/'
 import KnowledgeCard from '@/components/KnowledgeCard'
 import ResourceLink from '@/components/ResourceLink'
 import DownloadButton from '@/components/Buttons/DownloadButton'
@@ -323,6 +327,12 @@ export default {
 </script>
 
 <style scoped>
+.lg-container {
+  background-color: #f7f5f4;
+  min-height: calc(100vh - 130px);
+  padding-bottom: 2rem;
+}
+
 .sort {
   margin-top: -0.5rem;
   margin-bottom: 0.5rem;
@@ -330,7 +340,6 @@ export default {
 
 .resources {
   display: flex;
-  margin-top: 1rem;
   /*justify-content: space-evenly;*/
 }
 
@@ -345,7 +354,6 @@ export default {
 
 .resource .subtitle {
   color: #606266;
-  margin-top: 0.5rem;
 }
 
 .content-link {
@@ -378,6 +386,11 @@ export default {
   background: #fff;
 }
 
+.resource-content-container {
+  background-color: #fff;
+  padding: 0.5rem 1.2rem 1.2rem;
+}
+
 .resource {
   margin-bottom: 1rem;
 }
@@ -385,6 +398,7 @@ export default {
 .knowledge-card {
   margin-top: 1rem;
   margin-bottom: 1rem;
+  box-shadow: 1px 3px 6px rgb(122 122 122 / 0.2);
 }
 
 .entity:first-child {
@@ -402,11 +416,10 @@ export default {
   padding-right: 1rem;
   margin-top: 1rem;
   margin-left: 1rem;
-  border: 1px solid #ebeef5;
-  border-radius: 4px;
   width: 400px;
   height: 420px;
   min-height: 400px;
+  background-color: white;
 }
 
 .graph button {
@@ -415,7 +428,6 @@ export default {
 
 /*教学目标和教学重难点卡片*/
 .goal-and-key-container {
-  margin-bottom: 1rem;
   justify-content: space-between;
 }
 

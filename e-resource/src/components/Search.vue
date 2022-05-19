@@ -1,11 +1,17 @@
 <template>
-  <el-input
-    v-model="searchQ"
-    class="main-search"
-    @change="changeSearchContent">
+  <el-input v-model="searchQ" class="main-search" @change="changeSearchContent">
     <i slot="prefix" class="el-input__icon el-icon-search"></i>
-    <el-button slot="append" class="search-btn phone-btn" icon="el-icon-microphone"></el-button>
-    <el-button slot="append" class="search-btn" icon="el-icon-search" @click="search"></el-button>
+    <el-button
+      slot="append"
+      class="search-btn phone-btn"
+      icon="el-icon-microphone"
+    ></el-button>
+    <el-button
+      slot="append"
+      class="search-btn"
+      icon="el-icon-search"
+      @click="search"
+    ></el-button>
   </el-input>
 </template>
 
@@ -46,10 +52,10 @@ export default {
 </script>
 
 <style scoped>
-.main-search {
-  /*width: 50vw;*/
+/* .main-search {
+  width: 50vw;
   height: 3rem;
-}
+} */
 
 .main-search >>> .el-input-group__append,
 .main-search >>> input {
@@ -57,7 +63,7 @@ export default {
 }
 
 .main-search >>> input {
-  height: 100%;
+  /* height: 100%; */
   border-top-left-radius: 2rem;
   border-bottom-left-radius: 2rem;
   border-right: none;
@@ -65,9 +71,10 @@ export default {
   font-size: 16px;
 }
 
+.main-search >>> input,
 .main-search >>> input:focus,
 .main-search >>> input:hover {
-  border-color: #DCDFE6;
+  border-color: #b92e2e;
 }
 
 .main-search >>> .el-input-group__append {
@@ -75,6 +82,7 @@ export default {
   border-top-right-radius: 2rem;
   border-bottom-right-radius: 2rem;
   background: none;
+  border-color: #b92e2e;
 }
 
 .main-search >>> .el-input__prefix,
@@ -97,11 +105,12 @@ export default {
 }
 
 .search-btn:hover {
-  color: #409EFF;
+  /* color: #409eff; */
+  color: #b92e2e;
 }
 
 .phone-btn::after {
-  content: "";
+  content: '';
   height: 70%;
   position: absolute;
   top: 50%;

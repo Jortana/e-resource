@@ -101,7 +101,7 @@
 </template>
 
 <script>
-import { register, login } from '@/api/auth'
+import { register, login, authentication } from '@/api/auth'
 
 export default {
   name: 'Sign',
@@ -231,6 +231,15 @@ export default {
             type: 'success',
             duration: 1500
           })
+          console.log(response.data)
+          authentication().then((response) => {
+            const {
+              data: { code }
+            } = response
+            console.log(response)
+            console.log(code)
+          })
+
           this.$store.commit('login', response.data.data)
           const path = this.$route.query.redirect
           this.$router.replace({

@@ -7,7 +7,7 @@
     </div>
     <div v-else-if="suffix === 'mp4'">
       <video controls="controls" class="videoDemo">
-        <source :src="videoUrl">
+        <source :src="videoUrl" />
       </video>
     </div>
     <iframe
@@ -117,7 +117,7 @@ export default {
   width: 100%;
   height: 500px;
 }
-.videoDemo{
+.videoDemo {
   width: 100%;
   height: 500px;
 }

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <nav-menu class="lg-container"></nav-menu>
+    <nav-menu></nav-menu>
     <div class="container">
       <div class="package-container flex">
         <!-- 左边栏 -->
@@ -53,8 +53,8 @@
           <!-- 资源包名、简介等基本信息 -->
           <div v-if="curFolderInfo" class="basic-info flex">
             <div>
-              <div>{{ curFolderInfo.folderName }}</div>
-              <div class="intro">{{ curFolderInfo.resourceNum }} 个内容</div>
+              <div class="bold">{{ curFolderInfo.folderName }}</div>
+              <div class="intro">共 {{ curFolderInfo.resourceNum }} 个内容</div>
               <div class="intro">
                 {{ curFolderInfo.introduction }}
               </div>
@@ -145,7 +145,6 @@ export default {
       getResources(id).then((response) => {
         const { code, data } = response.data
         if (code === 200) {
-          console.log(data)
           this.resources = { ...data }
         }
       })
@@ -156,7 +155,6 @@ export default {
       const { id } = this.query
       getFolders().then((response) => {
         const { code, data: folders, message } = response.data
-        console.log(response.data)
         if (code === 200) {
           this.packageFolders = folders
           // 设置当前选中的资源包
@@ -203,7 +201,6 @@ export default {
           this.$message.success('删除成功')
           // 删除的资源包是当前选中的
           if (deleteID === curID) {
-            console.log('aa')
             this.$router.push('/package')
           }
           this.getPackageFolders()
@@ -213,7 +210,6 @@ export default {
     },
     // 接收修改文件夹的信息
     editFolderInfo(folderInfo) {
-      // console.log(folderInfo)
       this.originInfo = folderInfo
       this.infoVisible = true
     },
@@ -233,9 +229,12 @@ export default {
         // }
         console.log(response)
         if (!response) return
-        const blob = new Blob([response.data], { type: 'application/x-zip-compressed' }) // 构造一个blob对象来处理数据，并设置文件类型
+        const blob = new Blob([response.data], {
+          type: 'application/x-zip-compressed'
+        }) // 构造一个blob对象来处理数据，并设置文件类型
 
-        if (window.navigator.msSaveOrOpenBlob) { // 兼容IE10
+        if (window.navigator.msSaveOrOpenBlob) {
+          // 兼容IE10
           navigator.msSaveBlob(blob, this.filename)
         } else {
           const href = URL.createObjectURL(blob) // 创建新的URL表示指定的blob对象
@@ -255,9 +254,8 @@ export default {
 <style scoped>
 .container {
   background-color: #f4f5f7;
-  margin-top: 1rem;
   /*空出nav-menu的位置*/
-  height: calc(100vh - 70px);
+  min-height: calc(100vh - 130px);
   padding-top: 1rem;
 }
 
@@ -267,8 +265,8 @@ export default {
   border-top-right-radius: 0.5rem;
   border: 1px solid #dcdfe6;
   border-bottom: none;
-  width: 1000px;
-  min-height: 100%;
+  width: 1200px;
+  min-height: calc(100vh - 140px);
   background-color: #fff;
 }
 
@@ -280,7 +278,7 @@ export default {
 }
 
 .folder-list h3 {
-  font-weight: 500;
+  font-weight: bold;
   color: #515151;
   font-size: 1rem;
   margin: 1.5rem;

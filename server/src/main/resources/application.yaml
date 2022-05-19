@@ -12,6 +12,7 @@ spring:
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
+<<<<<<< HEAD
   # redis
   redis:
     host: 127.0.0.1
@@ -20,6 +21,16 @@ spring:
       pool:
         max-active: 50
         min-idle: 20
+=======
+  #redis
+#  redis:
+#    host: 222.192.6.62
+#    port: 6379
+#    jedis:
+#      pool:
+#        max-active: 50
+#        min-idle: 20
+>>>>>>> upstream/main
 
 # 整合mybatis
 mybatis:

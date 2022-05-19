@@ -51,7 +51,7 @@ export default {
           icon: 'el-icon-folder-opened'
         },
         { label: '个人中心', index: '/account', icon: 'el-icon-user' },
-        { label: '历史记录', index: '/history', icon: 'el-icon-time' },
+        // { label: '历史记录', index: '/history', icon: 'el-icon-time' },
         { label: '退出', index: 'logout', icon: 'el-icon-switch-button' }
       ],
       cardVisible: false,
@@ -73,9 +73,7 @@ export default {
           type: 'warning'
         })
           .then(() => {
-            console.log('logout')
             logout().then((response) => {
-              console.log(response)
               if (response.data.code === 200) {
                 this.$message({
                   message: response.data.message,

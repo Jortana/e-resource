@@ -1,19 +1,9 @@
 <template>
   <div class="main">
-    <nav-menu class="menu"></nav-menu>
+    <nav-menu></nav-menu>
     <main>
-      <div @keyup.enter="search">
-        <search
-          :searchContent.sync="searchContent"
-          class="search"
-          @search="search"
-        ></search>
-      </div>
-      <div
-        :class="isLogin === true ? 'wide' : 'thin'"
-        class="recommend-container flex"
-      >
-        <div class="card flex-1">
+      <div class="row">
+        <div class="card">
           <h2>热门资源</h2>
           <div class="list-container">
             <resource-list
@@ -23,7 +13,14 @@
             ></resource-list>
           </div>
         </div>
-        <div class="card flex-1">
+        <div class="carousel">
+          <el-carousel :interval="5000" trigger="click" height="400px">
+            <el-carousel-item v-for="item in 3" :key="item">
+              <h3 class="small">{{ item }}</h3>
+            </el-carousel-item>
+          </el-carousel>
+        </div>
+        <div class="card">
           <h2>最新资源</h2>
           <div class="list-container">
             <resource-list
@@ -33,7 +30,13 @@
             ></resource-list>
           </div>
         </div>
-        <div v-if="isLogin === true" class="card flex-1">
+      </div>
+      <div v-if="isLogin === true" class="row">
+        <div class="kg-container">
+          <h2>知识图谱</h2>
+          <k-g-card></k-g-card>
+        </div>
+        <div class="card">
           <h2>推荐资源</h2>
           <div class="list-container">
             <resource-list
@@ -45,13 +48,8 @@
         </div>
       </div>
     </main>
-    <!-- 知识图谱 -->
-    <div v-if="isLogin === true" class="card-container">
-      <k-g-card></k-g-card>
-      <div class="tip"><span>点击节点展开/收起，双击查看详细内容</span></div>
-    </div>
     <!-- 导航目录 -->
-    <div class="menu-container">
+    <div v-show="false" class="menu-container">
       <div class="white-container">
         <!-- 每一个目录 -->
         <div v-for="(menuObj, index) in menus" :key="index" class="flex">
@@ -163,30 +161,22 @@ export default {
 <style scoped>
 .main {
   /*background-image: url('~@/assets/background.jpg');*/
-  background: linear-gradient(
-    180deg,
-    rgb(98, 207, 204) 30%,
-    rgb(219, 229, 198) 70%
-  );
   /*background-size:cover;*/
+  background-color: #fffeff;
   min-height: 100vh;
   padding-bottom: 5rem;
   /*background-repeat:no-repeat;*/
 }
 
 main {
-  height: calc(100vh - 50px);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  align-items: center;
+  width: 1200px;
+  margin: 0 auto;
 }
 
-.search {
-  width: 50vw;
-  height: 3rem;
-  max-width: 580px;
-  /*transform: translateY(20%);*/
+.row {
+  display: flex;
+  margin-top: 0.5rem;
+  justify-content: space-between;
 }
 
 .main-search >>> .el-input__prefix,
@@ -207,27 +197,51 @@ main {
   /*transform: translateY(15%);*/
 }
 
-.wide {
-  width: 1200px;
-}
-
-.thin {
-  width: 800px;
+.card,
+.kg-container {
+  background-color: #fdfbfb;
+  box-shadow: 1px 3px 6px rgb(122 122 122 / 0.3);
+  overflow: hidden;
+  height: 400px;
 }
 
 .card {
-  margin-right: 1.5rem;
-  padding: 1.5rem 1.2rem;
-  background: linear-gradient(
+  /* background: linear-gradient(
     to left top,
     rgba(255, 255, 255, 1),
     rgba(255, 255, 255, 0.8)
-  );
-  border-radius: 0.6rem;
-  box-shadow: 6px 6px 20px rgba(122, 122, 122, 0.1);
+  ); */
+  background-color: #fdfbfb;
+  box-shadow: 1px 3px 6px rgb(122 122 122 / 0.3);
   overflow: hidden;
+  height: 400px;
+  width: 24%;
   /*text-overflow: ellipsis;*/
   /*white-space: nowrap;*/
+}
+
+.kg-container {
+  width: 75%;
+}
+
+.card h2,
+.card > div,
+.kg-container h2,
+.kg-container > div {
+  padding-left: 1.2rem;
+  padding-right: 1.2rem;
+}
+
+.card h2,
+.kg-container h2 {
+  font-size: 1.3rem;
+  margin-top: 1.2rem;
+  padding-bottom: 0.5rem;
+  border-bottom: solid 1px #a5a3a3;
+}
+
+.carousel {
+  width: 50%;
 }
 
 .card:last-child {
@@ -241,28 +255,6 @@ main {
 
 .list-container >>> .resource-name {
   color: #606266;
-}
-
-/*导航栏*/
-.card-container,
-.menu-container {
-  /*display: flex;*/
-  /*justify-content: center;*/
-  width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
-  background: linear-gradient(
-    to right bottom,
-    rgba(255, 255, 255, 0.7),
-    rgba(255, 255, 255, 0.3)
-  );
-  border-radius: 1rem;
-  backdrop-filter: blur(2rem);
-}
-
-.card-container {
-  padding-bottom: 0.8rem;
-  margin-bottom: 2rem;
 }
 
 .menu-condition {
@@ -314,5 +306,22 @@ main {
   font-size: 0.8rem;
   color: #909399;
   margin-top: -0.5rem;
+}
+
+/* 轮播图测试 */
+.el-carousel__item h3 {
+  color: #475669;
+  font-size: 14px;
+  opacity: 0.75;
+  line-height: 150px;
+  margin: 0;
+}
+
+.el-carousel__item:nth-child(2n) {
+  background-color: #99a9bf;
+}
+
+.el-carousel__item:nth-child(2n + 1) {
+  background-color: #d3dce6;
 }
 </style>

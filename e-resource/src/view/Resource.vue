@@ -1,98 +1,97 @@
 <template>
-  <div class="lg-container">
+  <div>
     <nav-menu></nav-menu>
-    <div class="main-container flex">
-      <div class="resource-info left-side flex-1">
-        <div class="flex">
-          <div class="basic-info">
-            <h2 @click="addToCart(resource.id)">
-              {{ resource['resourceName'] }}
-            </h2>
-            <div
-              v-if="resource['url'] !== undefined && resource['url'] !== null"
-              class="resource-name"
-            >
-              {{ resource['url'].split('/').slice(-1)[0] }}
+    <div class="lg-container">
+      <div class="main-container flex">
+        <div class="resource-info left-side flex-1 common-shadow">
+          <div class="flex">
+            <div class="basic-info">
+              <h2 @click="addToCart(resource.id)">
+                {{ resource['resourceName'] }}
+              </h2>
+              <div
+                v-if="resource['url'] !== undefined && resource['url'] !== null"
+                class="resource-name"
+              >
+                {{ resource['url'].split('/').slice(-1)[0] }}
+              </div>
+            </div>
+            <!-- 评分 -->
+            <div class="rate">
+              <el-rate
+                v-model="resource['rate']"
+                :colors="colors"
+                disabled
+                show-score
+                score-template="{value}"
+              ></el-rate>
+            </div>
+            <div class="operation flex flex-1">
+              <div class="operation-button">
+                <download-button
+                  :resourceID="Number(resourceID)"
+                ></download-button>
+              </div>
+              <div class="operation-button">
+                <add-to-package-button
+                  :resourceType="'resource'"
+                  :resourceID="String(resourceID)"
+                ></add-to-package-button>
+              </div>
+              <!--          <div class="operation-button">-->
+              <!--            <el-button class="full-width" size="medium" icon="el-icon-star-off">-->
+              <!--              收藏-->
+              <!--            </el-button>-->
+              <!--          </div>-->
             </div>
           </div>
-          <!-- 评分 -->
-          <div class="rate">
-            <el-rate
-              v-model="resource['rate']"
-              :colors="colors"
-              disabled
-              show-score
-              score-template="{value}"
-            ></el-rate>
+          <!-- 资源展示组件 -->
+          <div class="viewer">
+            <resource-viewer
+              :url="String(resource['viewUrl'])"
+              :bInfo="{
+                aid: resource['aid'],
+                bvid: resource['bvid'],
+                cid: resource['cid'],
+                page: 1
+              }"
+            ></resource-viewer>
           </div>
-          <div class="operation flex flex-1">
-            <div class="operation-button">
-              <download-button
-                :resourceID="Number(resourceID)"
-              ></download-button>
-            </div>
-            <div class="operation-button">
-              <add-to-package-button
-                :resourceType="'resource'"
-                :resourceID="String(resourceID)"
-              ></add-to-package-button>
-            </div>
-            <!--          <div class="operation-button">-->
-            <!--            <el-button class="full-width" size="medium" icon="el-icon-star-off">-->
-            <!--              收藏-->
-            <!--            </el-button>-->
-            <!--          </div>-->
-          </div>
-        </div>
-        <!-- 资源展示组件 -->
-        <div class="viewer">
-          <resource-viewer
-            :url="String(resource['viewUrl'])"
-            :bInfo="{
-              aid: resource['aid'],
-              bvid: resource['bvid'],
-              cid: resource['cid'],
-              page: 1
-            }"
-          ></resource-viewer>
-        </div>
 
-        <div>
-          <comment :id="resource.id" class="comment-container"></comment>
-        </div>
-        <!-- 相关资源 -->
-        <div
-          v-show="false"
-          v-if="relatedResources.length !== 0"
-          class="related-resource flex-1"
-        >
-          <h2>相关资源</h2>
-          <resource-list :resourceList="relatedResources"></resource-list>
-        </div>
-        <!-- ---------- -->
-      </div>
-      <div class="right-side">
-        <div class="graph">
-          <k-g-chart ref="chart" :entities="entities.entities"></k-g-chart>
-        </div>
-        <!-- 推荐资源 -->
-        <div
-          v-if="recommendResources.length !== 0"
-          class="recommend-container flex"
-        >
-          <div class="flex-1">
-            <h2>推荐资源</h2>
-            <resource-list :resourceList="recommendResources"></resource-list>
+          <div>
+            <comment :id="resource.id" class="comment-container"></comment>
           </div>
+          <!-- 相关资源 -->
+          <div
+            v-show="false"
+            v-if="relatedResources.length !== 0"
+            class="related-resource flex-1"
+          >
+            <h2>相关资源</h2>
+            <resource-list :resourceList="relatedResources"></resource-list>
+          </div>
+          <!-- ---------- -->
         </div>
-        <!--不会改 created by 买大米种水稻 2022/04/16-->
-        <div
-          v-else
-          class="recommend-container flex"
-        >
-          <div class="flex-1">
-            <h2>推荐资源</h2>
-            <p>暂无推荐资源</p>
+        <div class="right-side">
+          <div class="graph common-shadow">
+            <k-g-chart ref="chart" :entities="entities.entities"></k-g-chart>
+          </div>
+          <!-- 推荐资源 -->
+          <div
+            v-if="recommendResources.length !== 0"
+            class="recommend-container flex common-shadow"
+          >
+            <div class="flex-1">
+              <h2>推荐资源</h2>
+              <resource-list :resourceList="recommendResources"></resource-list>
+            </div>
+          </div>
+          <!--不会改 created by 买大米种水稻 2022/04/16-->
+          <div v-else class="recommend-container flex common-shadow">
+            <div class="flex-1">
+              <h2>推荐资源</h2>
+              <p>登录后获取推荐资源</p>
+            </div>
           </div>
         </div>
       </div>
@@ -224,12 +223,13 @@ export default {
 </script>
 
 <style scoped>
-.left-side {
-  padding-right: 2rem;
+.lg-container {
+  background-color: #f7f5f4;
 }
 
 .right-side {
   margin-left: 1rem;
+  margin-top: 1rem;
   width: 400px;
 }
 
@@ -243,11 +243,15 @@ export default {
 
 .graph {
   height: 500px;
+  background-color: #fff;
   /*height: 100%;*/
 }
 
 .resource-info {
   position: relative;
+  background-color: #fff;
+  margin-top: 1rem;
+  padding: 1.5rem;
   /*border-right: 1px solid #dcdfe6;*/
 }
 
@@ -270,18 +274,14 @@ export default {
 
 .related-resource,
 .recommend-container {
-  padding-top: 1rem;
-  padding-bottom: 2rem;
+  padding: 1rem;
+  background-color: #fff;
+  margin-top: 1rem;
 }
 
 .related-resource h2,
 .recommend-container h2 {
   margin-bottom: 1rem;
-}
-
-.related-resource,
-.recommend-container {
-  border-top: 1px solid #dcdfe6;
 }
 
 .rate {
