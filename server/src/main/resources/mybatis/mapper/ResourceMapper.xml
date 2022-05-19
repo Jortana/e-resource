@@ -65,14 +65,14 @@
     </update>
     <!-- 查热门资源 -->
     <select id="queryHot" resultType="resource">
-        SELECT id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type FROM t_resource ORDER BY browse DESC LIMIT 8
+        SELECT id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type FROM t_resource ORDER BY browse DESC
     </select>
     <select id="queryHot2" resultType="resource">
         SELECT id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type FROM t_resource ORDER BY browse DESC LIMIT 8,80
     </select>
     <!-- 查最新资源 -->
     <select id="queryTime" resultType="resource">
-        select id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type from t_resource order by updateTime desc limit 8
+        select id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type from t_resource order by updateTime desc
     </select>
 
     <!-- 查文档url -->

@@ -7,10 +7,10 @@
         SELECT `id`, `name`, introduction FROM t_folder WHERE username = #{username} order by `date` desc
     </select>
     <select id="collection" resultType="resource">
-        SELECT t_resource.`id`, resource_name, file_type, `date`  FROM t_collection INNER JOIN t_resource WHERE t_collection.`resource_id` = t_resource.`id` and folder_id = #{folderID} order by `date` desc
+        SELECT t_collection.id as collectionId, t_resource.`id`, resource_name, file_type, `date`  FROM t_collection INNER JOIN t_resource WHERE t_collection.`resource_id` = t_resource.`id` and folder_id = #{folderID} order by `date` desc
     </select>
     <select id="collectionStr" resultType="map">
-        SELECT content, `date` FROM t_collection WHERE folder_id = #{folderID} and content is not null order by `date` desc
+        SELECT id as collectionId, content FROM t_collection WHERE folder_id = #{folderID} and content is not null order by `date` desc
     </select>
     <select id="goal" resultType="map">
         SELECT goal, `date` FROM t_collection WHERE folder_id = #{folderID} and goal is not null order by `date` desc
@@ -77,6 +77,13 @@
     </delete>
     <delete id="delFolderKey">
         delete from t_collection where folder_id = #{folderID} and `key` = #{key}
+    </delete>
+    <delete id="delMulti">
+        delete from t_collection
+        where folder_id = #{folderID} and id in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
     </delete>
     <!-- 判断是否已添加 -->
     <select id="yiyou" resultType="map">

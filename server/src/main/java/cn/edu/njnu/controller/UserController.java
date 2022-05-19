@@ -33,4 +33,9 @@ public class UserController extends BaseController {
         return userService.recommend(userIDMap);
     }
 
+    @GetMapping("/v1.0/public/recommendMoreUser")
+    public Result recommendMore(@RequestParam Map<String, Object> userIDMap){
+        return userService.recommendMore(userIDMap);
+    }
+
 }
