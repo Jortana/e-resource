@@ -13,10 +13,10 @@
         SELECT id as collectionId, content FROM t_collection WHERE folder_id = #{folderID} and content is not null order by `date` desc
     </select>
     <select id="goal" resultType="map">
-        SELECT id as collectionId, goal FROM t_collection WHERE folder_id = #{folderID} and goal is not null order by `date` desc
+        SELECT goal, `date` FROM t_collection WHERE folder_id = #{folderID} and goal is not null order by `date` desc
     </select>
     <select id="key" resultType="map">
-        SELECT id as collectionId, `key` FROM t_collection WHERE folder_id = #{folderID} and `key` is not null order by `date` desc
+        SELECT `key`, `date` FROM t_collection WHERE folder_id = #{folderID} and `key` is not null order by `date` desc
     </select>
     <!-- 根据资源查id -->
     <select id="queryCurrent" resultType="map">
