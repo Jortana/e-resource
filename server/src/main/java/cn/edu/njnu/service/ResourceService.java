@@ -352,10 +352,8 @@ public class ResourceService {
     public Result queryHot(){
         ArrayList<Resource> resourceList = resourceMapper.queryHot();
         JSONArray resArray = new JSONArray();
-        int total = 0;
         for (Resource resource:resourceList){
             resArray.add(resource);
-            if(++total==8) break;
         }
         return ResultFactory.buildSuccessResult("查询成功",resArray);
     }
@@ -363,32 +361,8 @@ public class ResourceService {
     public Result queryTime(){
         ArrayList<Resource> resourceList = resourceMapper.queryTime();
         JSONArray resArray = new JSONArray();
-        int total = 0;
         for (Resource resource:resourceList){
             resArray.add(resource);
-            if(++total==8) break;
-        }
-        return ResultFactory.buildSuccessResult("查询成功",resArray);
-    }
-
-    public Result queryMoreHot() {
-        ArrayList<Resource> resourceList = resourceMapper.queryHot();
-        JSONArray resArray = new JSONArray();
-        int total = 0;
-        for (Resource resource:resourceList){
-            resArray.add(resource);
-            if(++total==20) break;
-        }
-        return ResultFactory.buildSuccessResult("查询成功",resArray);
-    }
-
-    public Result queryMoreTime(){
-        ArrayList<Resource> resourceList = resourceMapper.queryTime();
-        JSONArray resArray = new JSONArray();
-        int total = 0;
-        for (Resource resource:resourceList){
-            resArray.add(resource);
-            if(++total==20) break;
         }
         return ResultFactory.buildSuccessResult("查询成功",resArray);
     }
