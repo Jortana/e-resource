@@ -142,7 +142,7 @@ public class ResourceService {
             Record record = result.next();
             int resourceID = record.get( "ID" ).asInt();
             System.out.println(resourceID);
-            if (resourceID < 831546) continue; // 跳过已经计算过的资源
+            if (resourceID < 846024) continue; // 跳过已经计算过的资源
             HashMap<String, Integer> hm1 = new HashMap<String, Integer>();
             StatementResult tfidf = session.run( "MATCH (n:resource)-[r]->(m:concept) where id(n)={id} " +
                         "RETURN m.name, r.num",
