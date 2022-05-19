@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/e-resource/api")
-public class LoginController {
+public class LoginController extends BaseController {
 
     @Autowired
     private UserService userService;
