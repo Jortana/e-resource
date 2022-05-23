@@ -154,7 +154,7 @@ public class ResourceService {
                 int tf = tfidfRecord.get("r.num").asInt();
                 hm1.put(word, tf);
             }
-            HashMap<Integer, HashMap<String, Integer>> map = new HashMap<Integer, HashMap<String, Integer>>();
+            HashMap<Integer, HashMap<String, Integer>> map = new HashMap<>();
             map.put(resourceID,hm1);
             mapArray.add(map);
         }

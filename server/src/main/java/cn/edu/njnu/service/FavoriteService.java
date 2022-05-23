@@ -125,7 +125,7 @@ public class FavoriteService {
                 }
             }
         }
-        folder.put("content", content);
+        folder.put("content", contentMap);
 
         ArrayList<Map> goalMap = favoriteMapper.goal(folderID);
         JSONArray goal = new JSONArray();
@@ -133,40 +133,24 @@ public class FavoriteService {
         if (goalMap.size()>0){
             for (Map singleGoal:goalMap){
                 if (singleGoal!=null){
+                    int collectionId = (int) singleGoal.get("collectionId");
                     int id = (int) singleGoal.get("goal");
-                    StatementResult node = session.run( "MATCH (n:GoalAndKey) where n.id = {id} " +
+                    StatementResult node = session.run( "MATCH (n:GoalAndKey) where id(n) = {id} " +
                                     "RETURN n.goal as goal",
                             parameters( "id", id) );
-                    while ( node.hasNext() )
+                    if ( node.hasNext() )
                     {
                         Record record = node.next();
                         String text = record.get( "goal" ).asString();
                         JSONObject goalObject = new JSONObject();
                         goalObject.put("id", id);
                         goalObject.put("text", text);
+                        goalObject.put("collectionId", collectionId);
                         goal.add(goalObject);
                     }
                 }
-
             }
         }
-        JSONObject goalObject1 = new JSONObject();
-        goalObject1.put("id", 1);
-        goalObject1.put("text", "教学⽬标：⼀、知识⽬标：1.学⽣认识物理是有趣的、有⽤的。对物理研究及物理应⽤有初步印象，激发学⽣的学习兴趣。\n" +
-                "2.步了解学好物理应注意的事情。\n" +
-                "⼆、能⼒⽬标：1.过观察和实验，学习初步的探究问题的⽅法。\n" +
-                "2.过本节课的学习，培养初步的观察能⼒、分析能⼒。\n" +
-                "三、德育⽬标：发学⽣对物理的学习兴趣，培养学⽣热爱科学的精神，发现科学实验带来的乐趣。\n" );
-        goal.add(goalObject1);
-        JSONObject goalObject2 = new JSONObject();
-        goalObject2.put("id", 2);
-        goalObject2.put("text", "教学目标：\n" +
-                "1、学习并掌握本课的生字新词。\n" +
-                "2、理解课文内容,体会稻草人的善良和尽职。\n" +
-                "3、正确、流利、有感情地朗读课文。\n" +
-                "4、激发学生对穷苦劳动人民的同情。\n" +
-                "5、教育学生有一颗善良的心,关心、体贴、帮助他人。" );
-        goal.add(goalObject2);
         folder.put("goal", goal);
 
         ArrayList<Map> keyMap = favoriteMapper.key(folderID);
@@ -174,34 +158,26 @@ public class FavoriteService {
         if (keyMap.size()>0){
             for (Map singleKey:keyMap){
                 if (singleKey!=null){
+                    int collectionId = (int) singleKey.get("collectionId");
                     int id = (int) singleKey.get("key");
-                    StatementResult node = session.run( "MATCH (n:GoalAndKey) where n.id = {id} " +
+                    StatementResult node = session.run( "MATCH (n:GoalAndKey) where id(n) = {id} " +
                                     "RETURN n.key as key",
                             parameters( "id", id) );
-                    while ( node.hasNext() )
+                    if ( node.hasNext() )
                     {
                         Record record = node.next();
                         String text = record.get( "key" ).asString();
                         JSONObject keyObject = new JSONObject();
                         keyObject.put("id", id);
                         keyObject.put("text", text);
+                        keyObject.put("collectionId", collectionId);
                         key.add(keyObject);
                     }
                 }
 
             }
         }
-        JSONObject keyObject1 = new JSONObject();
-        keyObject1.put("id", 1);
-        keyObject1.put("text", "教学重点：通过观察、讨论、实验，激发学⽣学习物理的兴趣和愿望。\n" +
-                "教学难点：能从看到的现象中提出问题。\n");
-        key.add(keyObject1);
-        JSONObject keyObject2 = new JSONObject();
-        keyObject2.put("id", 2);
-        keyObject2.put("text", "教学重点、难点：\n" +
-                "1、体会稻草人焦急的心理活动。\n" +
-                "2、学习作者通过描写人物内心塑造人物形象。\n");
-        key.add(keyObject2);
+
         folder.put("key", key);
         session.close();
         return ResultFactory.buildSuccessResult("获取资源成功", folder);
@@ -348,5 +324,13 @@ public class FavoriteService {
         else {
             return ResultFactory.buildFailResult("删除失败");
         }
+    }
+
+    public Result delMulti(Map<String, Object> IDMap) {
+        String folderID = (String) IDMap.get("folderID");
+        List<Integer> resourceList = (List<Integer>) IDMap.get("resourceIDs");
+        boolean result = favoriteMapper.delMulti(folderID, resourceList);
+        return result?ResultFactory.buildSuccessResult("删除成功",null):
+                ResultFactory.buildFailResult("删除失败");
     }
 }
