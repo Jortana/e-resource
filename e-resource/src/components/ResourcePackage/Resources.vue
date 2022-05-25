@@ -31,7 +31,7 @@
               type="danger"
               plain
               size="mini"
-              @click="deleteMulti(checkedResources)"
+              @click="deleteConfirm(checkedResources)"
             >
               删除
             </el-button>
@@ -48,6 +48,7 @@
           <resource-content
             ref="entityItem"
             :content="content.content"
+            :collectionId="content.collectionId"
             :folderID="folderID"
             :type="'content'"
             @updateResource="$emit('updateResource')"
@@ -138,6 +139,24 @@
       target="_blank"
     ></a>
     <!-- {{ resources }} -->
+
+    <!-- 确认删除的对话框 -->
+    <el-dialog
+      :visible.sync="deleteVisible"
+      title="确认删除"
+      width="350px"
+      center
+    >
+      <span>确认删除吗？</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button size="medium" @click="deleteVisible = false">
+          取 消
+        </el-button>
+        <el-button size="medium" type="primary" @click="deleteMulti">
+          确 定
+        </el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -166,7 +185,9 @@ export default {
       checkAllResources: false,
       checkAllEntities: false,
       checkAllGoals: false,
-      checkAllKeys: false
+      checkAllKeys: false,
+      deleteVisible: false,
+      deleteName: ''
     }
   },
   watch: {
@@ -213,14 +234,21 @@ export default {
         item.changeCheck(checked)
       })
     },
-    deleteMulti(resourceIDs) {
+    deleteMulti() {
+      console.log(this.deleteName)
+      const resourceIDs = this[this.deleteName]
       console.log(resourceIDs)
+      return
       deleteMulti({
         folderID: this.folderID,
         resourceIDs
       }).then((response) => {
         console.log(response)
       })
+    },
+    deleteConfirm(chechedName) {
+      this.deleteVisible = true
+      this.deleteName = chechedName
     }
   }
 }

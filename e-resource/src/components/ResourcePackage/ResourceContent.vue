@@ -58,7 +58,8 @@ export default {
     type: String,
     content: String,
     id: Number,
-    folderID: String
+    folderID: String,
+    collectionId: Number
   },
   data() {
     return {
@@ -117,8 +118,8 @@ export default {
         case 'content':
           listName = 'checkedEntities'
           isChecked === true
-            ? this.$emit('addListItem', listName, this.content)
-            : this.$emit('deleteListItem', listName, this.content)
+            ? this.$emit('addListItem', listName, this.collectionId)
+            : this.$emit('deleteListItem', listName, this.collectionId)
           break
         default:
           break
