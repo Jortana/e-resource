@@ -1,6 +1,9 @@
 spring:
   datasource:
-    url: jdbc:mysql://s4.z100.vip:8497/resources_class?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8
+    url: jdbc:mysql://192.168.2.10:24478/resources_class?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8
+    username: root
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
   redis:
     password: fzsj@GIS
     database: 3
@@ -11,15 +14,7 @@ registry:
   allowedOrigins: http://202.102.89.244:9311
 
 neo4j:
-  url: bolt://s4.z100.vip:7687
+  url: bolt://127.0.0.1:7687
 
 file:
   root: E:\\e-resource\\TestResource
-
-
-
-#plsql数据库配置
-#  spring.datasource.url=jdbc:db2://10.41.0.51:60010/dcdm
-#  spring.datasource.username=tdm
-#  spring.datasource.password=tdm
-#  spring.datasource.driver-class-name=com.ibm.db2.jcc.DB2Driver
