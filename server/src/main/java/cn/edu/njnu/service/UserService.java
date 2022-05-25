@@ -539,7 +539,7 @@ public class UserService {
                     if (resource == null){
                         resource = resourceMapper.queryResourceByID(userList[i]);
                         redisTemplate.opsForValue().set("resource_"+userList[i], resource);
-                        redisTemplate.expire("resource_"+userList[i], 10, TimeUnit.MINUTES);
+                        redisTemplate.expire("resource_"+userList[i], 100, TimeUnit.MINUTES);
                         resourceArray.add(resource);
                     }
                     resourceIDList.add(userList[i]);
@@ -559,7 +559,7 @@ public class UserService {
                     if (resource == null) {
                         resource = resourceMapper.queryResourceByID(recommendResourceID);
                         redisTemplate.opsForValue().set("resource_"+recommendResourceID, resource);
-                        redisTemplate.expire("resource_"+recommendResourceID, 10, TimeUnit.MINUTES);
+                        redisTemplate.expire("resource_"+recommendResourceID, 100, TimeUnit.MINUTES);
                     }
 
                     if (resourceIDList.contains(recommendResourceID)){

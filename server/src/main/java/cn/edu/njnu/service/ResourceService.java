@@ -123,7 +123,7 @@ public class ResourceService {
         }
         session.close();
         redisTemplate.opsForValue().set("resource_"+resourceID, queryResource);
-        redisTemplate.expire("resource_"+resourceID, 10, TimeUnit.MINUTES);
+        redisTemplate.expire("resource_"+resourceID, 100, TimeUnit.MINUTES);
         return ResultFactory.buildSuccessResult("查询成功",queryResource);
     }
 
@@ -141,8 +141,8 @@ public class ResourceService {
         {
             Record record = result.next();
             int resourceID = record.get( "ID" ).asInt();
+            if (resourceID < 862581) continue; // 跳过已经计算过的资源
             System.out.println(resourceID);
-            if (resourceID < 846076) continue; // 跳过已经计算过的资源
             HashMap<String, Integer> hm1 = new HashMap<String, Integer>();
             StatementResult tfidf = session.run( "MATCH (n:resource)-[r]->(m:concept) where id(n)={id} " +
                         "RETURN m.name, r.num",
@@ -248,7 +248,7 @@ public class ResourceService {
                 if (resource==null){
                     resource = resourceMapper.queryResourceByID(resID);
                     redisTemplate.opsForValue().set("resource_"+resID, resource);
-                    redisTemplate.expire("resource_"+resID, 10, TimeUnit.MINUTES);
+                    redisTemplate.expire("resource_"+resID, 100, TimeUnit.MINUTES);
                 }
                 resArray.add(resource);
                 resNum++;

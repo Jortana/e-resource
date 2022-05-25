@@ -187,7 +187,7 @@ public class EntityService {
 
             resourceNameList = resourceMapper.queryResourceByContent(content, sort, type);
             redisTemplate.opsForValue().set("content_"+sort+"_"+type+"_"+content, resourceNameList);
-            redisTemplate.expire(content+"_"+sort+"_"+type, 5, TimeUnit.MINUTES);
+            redisTemplate.expire(content+"_"+sort+"_"+type, 100, TimeUnit.MINUTES);
         }
 
         ArrayList<Integer> idList = new ArrayList<>();
@@ -326,7 +326,7 @@ public class EntityService {
                         break;
                 }
                 redisTemplate.opsForValue().set("resource_"+resourceID,resource);
-                redisTemplate.expire("resource_"+resourceID, 10, TimeUnit.MINUTES);
+                redisTemplate.expire("resource_"+resourceID, 100, TimeUnit.MINUTES);
             }
             else{
                 BeanUtils.copyProperties(resourceInRedis, resource);

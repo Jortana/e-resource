@@ -7,6 +7,7 @@ import java.util.List;
 
 public class Resource implements Serializable {
     int id;
+    int collectionId;
     String resourceName;
     String remark;
 
@@ -66,6 +67,14 @@ public class Resource implements Serializable {
         this.rate = rate;
         this.fileType = fileType;
         this.content = content;
+    }
+
+    public int getCollectionId() {
+        return collectionId;
+    }
+
+    public void setCollectionId(int collectionId) {
+        this.collectionId = collectionId;
     }
 
     public int getId() {
