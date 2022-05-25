@@ -153,7 +153,6 @@ export default {
       })
     },
     changeHandler(isChecked) {
-      console.log(this.resource)
       if (isChecked === true) {
         this.$emit(
           'addListItem',
@@ -168,8 +167,8 @@ export default {
         )
       }
     },
-    changeCheck() {
-      this.checked = !this.checked
+    changeCheck(checked) {
+      this.checked = checked
     },
     // 请求生成资源包，获取地址
     download() {

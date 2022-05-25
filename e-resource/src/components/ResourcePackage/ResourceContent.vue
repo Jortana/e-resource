@@ -95,8 +95,8 @@ export default {
         }
       })
     },
-    changeCheck() {
-      this.checked = !this.checked
+    changeCheck(checked) {
+      this.checked = checked
     },
     download() {},
     changeHandler(isChecked) {

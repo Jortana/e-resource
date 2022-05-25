@@ -22,7 +22,7 @@
           >
             <el-checkbox
               v-model="checkAllResources"
-              @change="changeAllResources"
+              @change="changeAllResources(checkAllResources)"
             >
               全选
             </el-checkbox>
@@ -47,7 +47,7 @@
         >
           <resource-content
             ref="entityItem"
-            :content="content"
+            :content="content.content"
             :folderID="folderID"
             :type="'content'"
             @updateResource="$emit('updateResource')"
@@ -59,7 +59,10 @@
           v-if="resources.content && resources.content.length"
           class="batch-operation"
         >
-          <el-checkbox v-model="checkAllEntities" @change="changeAllEntities">
+          <el-checkbox
+            v-model="checkAllEntities"
+            @change="changeAllEntities(checkAllEntities)"
+          >
             全选
           </el-checkbox>
           <el-button class="x-mini-btn" type="danger" plain size="mini">
@@ -190,24 +193,24 @@ export default {
       const index = this[listName].indexOf(content)
       this[listName].splice(index, 1)
     },
-    changeAllResources() {
+    changeAllResources(checked) {
       this.$refs.listItem.forEach((item) => {
-        item.changeCheck()
+        item.changeCheck(checked)
       })
     },
-    changeAllEntities() {
+    changeAllEntities(checked) {
       this.$refs.entityItem.forEach((item) => {
-        item.changeCheck()
+        item.changeCheck(checked)
       })
     },
-    changeAllGoals() {
+    changeAllGoals(checked) {
       this.$refs.goalItem.forEach((item) => {
-        item.changeCheck()
+        item.changeCheck(checked)
       })
     },
-    changeAllKeys() {
+    changeAllKeys(checked) {
       this.$refs.keyItem.forEach((item) => {
-        item.changeCheck()
+        item.changeCheck(checked)
       })
     },
     deleteMulti(resourceIDs) {
