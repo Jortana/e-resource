@@ -22,7 +22,8 @@
     </select>
     <!-- 根据ID查资源 -->
     <select id="queryResourceByContent" resultType="resource" >
-        select id, resource_name, download, collection, browse, `period`, grade, subject, updateTime, `table`, tableResourceID, resource_type, rate, file_type from t_resource
+        select id, resource_name, download, collection, browse, `period`, grade, subject, updateTime, `table`, tableResourceID, resource_type, rate, file_type
+        from t_resource
         <where>
             <trim suffixOverrides="and">
                 <if test="content!=null">resource_name like concat('%',#{content},'%') and </if>
@@ -33,6 +34,12 @@
             <if test="sort == 1">order by browse desc</if>
             <if test="sort == 2">order by updateTime desc</if>
         </trim>
+    </select>
+    <!-- 根据内容查ID -->
+    <select id="queryResourceIdByContent" resultType="integer">
+        select id
+        from t_resource
+        where resource_name like concat('%',#{content},'%')
     </select>
     <!-- 获取资源类型 -->
     <select id="queryType" resultType="HashMap">

@@ -239,6 +239,7 @@ export default {
       const resourceIDs = this[this.deleteName]
       console.log(resourceIDs)
       return
+      // eslint-disable-next-line no-unreachable
       deleteMulti({
         folderID: this.folderID,
         resourceIDs

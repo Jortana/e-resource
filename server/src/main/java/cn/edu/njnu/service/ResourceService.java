@@ -70,11 +70,11 @@ public class ResourceService {
 //            resourcesList.add(singleResource);
 //        }
 //        return ResultFactory.buildSuccessResult("查询成功", resourcesList);
-        ArrayList<Integer> idList = new ArrayList<>();
+        Set<Integer> idSet = new HashSet<>();
         for (int i = 1;i<11;i++){
-            idList.add(resourceID+i);
+            idSet.add(resourceID+i);
         }
-        ArrayList<Resource> resList = resourceMapper.queryResourceByIDList(idList,0,0);
+        ArrayList<Resource> resList = resourceMapper.queryResourceByIDList(idSet,0,0);
         return ResultFactory.buildSuccessResult("查询成功",resList);
     }
 

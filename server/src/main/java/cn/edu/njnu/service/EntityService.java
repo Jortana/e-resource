@@ -1,16 +1,21 @@
 package cn.edu.njnu.service;
 
+import cn.edu.njnu.filter.RedisBloomFilter;
 import cn.edu.njnu.mapper.RecordMapper;
 import cn.edu.njnu.mapper.ResourceMapper;
 import cn.edu.njnu.mapper.UserMapper;
 import cn.edu.njnu.pojo.Resource;
 import cn.edu.njnu.pojo.Result;
 import cn.edu.njnu.pojo.ResultFactory;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.sun.jndi.dns.ResourceRecord;
 import org.ansj.domain.Term;
 import org.ansj.splitWord.analysis.ToAnalysis;
 import org.apache.shiro.SecurityUtils;
+import org.checkerframework.checker.units.qual.A;
+import org.neo4j.driver.internal.async.HandshakeHandler;
 import org.neo4j.driver.v1.*;
 
 import static org.neo4j.driver.v1.Values.parameters;
@@ -23,8 +28,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.jar.JarEntry;
 
 @Service
 public class EntityService {
@@ -40,11 +47,29 @@ public class EntityService {
     @Autowired
     private RedisTemplate redisTemplate;
 
+    @Autowired
+    private RedisBloomFilter redisBloomFilter;
+
     private static Driver driver;
 
     @Autowired
     public EntityService(Driver driver) {
         EntityService.driver = driver;
+    }
+
+    @PostConstruct
+    public void initRedisBloomFilter(){
+        Session session = driver.session();
+        //根据用户输入在neo4j中查找对应节点
+        StatementResult result = session.run(
+                "MATCH (a:concept) RETURN a.name as name",
+                parameters( ) );
+        while ( result.hasNext() )
+        {
+            Record record = result.next();
+            redisBloomFilter.put("知识点", record.get("name").asString());
+        }
+        session.close();
     }
 
     public JSONArray getRelatedEntity(String entityName, Session session, String mainEntityName){
@@ -156,7 +181,126 @@ public class EntityService {
         return ResultFactory.buildSuccessResult("查询成功", resArray);
     }
 
+    //新的查寻接口 2022-5-26
+    public Result queryEntityNew(Map<String, Object> keywordMap){
+        //获取用户输入的内容
+        String keyword = (String) keywordMap.get("keyword");
+        Map<String, Object> entityAndResources = filterAndQuery(keyword);
+        JSONArray entityArray = (JSONArray) entityAndResources.get("entity");
+        List<Resource> resourceList = (List<Resource>) entityAndResources.get("resource");;
+        JSONObject result = new JSONObject();
+        result.put("total", resourceList.size());
+        int pages = resourceList.size()%10==0?resourceList.size()/10:resourceList.size()/10+1;
+        result.put("pages", pages);
+        result.put("entity", entityArray);
+        result.put("resources", resourceList);
+        return ResultFactory.buildSuccessResult("查询成功", result);
+    }
+
+    //获取该关键词的知识点列表 2022-5-26
+    public Map filterAndQuery(String keyword){
+
+        Map<String, Object> entityAndResources = new HashMap<>();
+        JSONArray entityArray = new JSONArray();
+        Set<Integer> resourceIdSet = new LinkedHashSet<>(); //保证id有序且不重复
+        if(redisBloomFilter.mightContain("知识点", keyword)){
+            System.out.print(keyword+"未分词");
+            JSONObject entityProperties = getEntityProperties(keyword);
+            if (entityProperties!=null) entityArray.add(entityProperties);
+            resourceIdSet.addAll(getResourceIdByEntityAndContent(keyword));
+        }
+        if (resourceIdSet.size()==0){
+            //terms列表，元素就是拆分出来的词以及词性
+            for(Term term : ToAnalysis.parse(keyword).getTerms()){
+                String word = term.getName();		//分词的内容
+                System.out.print(word+",词性为"+term.getNatureStr()+",");
+                //分词结果跟原词相同就略过
+                if(word.equals(keyword)||!filterPartOfSpeech(term.getNatureStr())){
+                    System.out.println("词性被过滤");
+                    continue;
+                }
+                if (redisBloomFilter.mightContain("知识点", word)){
+                    JSONObject entityProperties = getEntityProperties(word);
+                    if (entityProperties!=null) entityArray.add(entityProperties);
+                    resourceIdSet.addAll(getResourceIdByEntityAndContent(word));
+                }
+            }
+        }
+        List<Resource> resourceList = resourceMapper.queryResourceByIDList(resourceIdSet,0,0);
+        entityAndResources.put("entity", entityArray);
+        entityAndResources.put("resource", resourceList);
+        System.out.println("总资源个数:"+resourceList.size());
+        return entityAndResources;
+    }
+
+    //过滤词性
+    public boolean filterPartOfSpeech(String natureStr){
+        //只关注名词、动词、形容词、副词
+        Set<String> expectedNature = new HashSet<String>() {{
+            add("n");add("q");
+//            add("v");
+            add("vd");add("vn");add("vf");
+            add("vx");add("vi");
+            add("nt");add("nz");add("nw");add("nl");
+            add("ng");add("wh");
+            add("en");
+        }};
+        return expectedNature.contains(natureStr);
+    }
+
+    //获取知识点的属性、重难点 2022-5-26
+    public JSONObject getEntityProperties(String entityName){
+        Session session = driver.session();
+        StatementResult result = session.run(
+                "MATCH (a:concept) where a.name = {name} " +
+                        "RETURN properties(a) AS props",
+                parameters( "name", entityName) );
+        JSONObject entityProperties = new JSONObject();
+        if (result.hasNext()){
+            Record record = result.next();
+            entityProperties.put("goalAndKey", goalAndKey(entityName));
+            entityProperties.put("entityName", entityName);
+            entityProperties.put("properties", record.get( "props" ).asMap());
+            return entityProperties;
+        }else{
+            return null;
+        }
+    }
+
+    public Set<Integer> getResourceIdByEntityAndContent(String word){
+        Set<Integer> idSet = new LinkedHashSet<>();
+        idSet.addAll(getResourceIdByEntity(word));
+        idSet.addAll(getResourceIdByContent(word));
+        System.out.println("资源个数:"+idSet.size());
+        return idSet;
+    }
+
+    //从图谱中获取与知识点节点直接相连的资源节点id
+    public Set<Integer> getResourceIdByEntity(String entity){
+        Session session = driver.session();
+        Set<Integer> idSet = new LinkedHashSet<>();
+        //根据用户输入在neo4j中查找对应节点
+        StatementResult result = session.run(
+                "MATCH (n:resource)-[r]->(a:concept) where a.name = {name} " +
+                        "RETURN n.id as id order by r.weight desc",
+                parameters( "name", entity) );
+        while ( result.hasNext() )
+        {
+            Record idRecord = result.next();
+            idSet.add(idRecord.get("id").asInt());
+        }
+        session.close();
+        return idSet;
+    }
+
+    //从图谱中获取与知识点节点直接相连的资源节点id
+    public Set<Integer> getResourceIdByContent(String content){
+        Set<Integer> idSet = resourceMapper.queryResourceIdByContent(content);
+        return idSet;
+    }
+
     public Result queryEntity(Map<String, Object> keywordMap) {
+
         String browser = (String) keywordMap.get("browser");
         String OS = (String) keywordMap.get("OS");
         String ipAddress = (String) keywordMap.get("ipAddress");
@@ -181,36 +325,29 @@ public class EntityService {
         int page = Integer.parseInt( (String) keywordMap.get("page") );
         int perPage = Integer.parseInt( (String) keywordMap.get("perPage") );
         //根据用户输入与资源名进行匹配
-        ArrayList<Resource> resourceNameList = null;
-        resourceNameList = (ArrayList<Resource>) redisTemplate.opsForValue().get("content_"+sort+"_"+type+"_"+content);
+        ArrayList<Resource> resourceNameList =
+                (ArrayList<Resource>) redisTemplate.opsForValue().get("content_"+sort+"_"+type+"_"+content);
         if (resourceNameList == null){
-
             resourceNameList = resourceMapper.queryResourceByContent(content, sort, type);
             redisTemplate.opsForValue().set("content_"+sort+"_"+type+"_"+content, resourceNameList);
             redisTemplate.expire(content+"_"+sort+"_"+type, 100, TimeUnit.MINUTES);
         }
 
-        ArrayList<Integer> idList = new ArrayList<>();
+        Set<Integer> idSet = new HashSet<>();
         //获取资源id，避免之后在neo4j中重复查找
-        String quchu = "";
         for (Resource single:resourceNameList){
             int id = single.getId();
-            quchu += "and m.id <> " + id + " ";
             //获取到的资源id加入列表，之后获取详细信息用
-            idList.add(id);
+            idSet.add(id);
         }
         //与neo4j建立连接
-//        Driver driver = createDrive();
         Session session = driver.session();
         //根据用户输入在neo4j中查找对应节点
         StatementResult result = session.run( "MATCH (a:concept) where a.name = {name} " +
                         "RETURN properties(a) AS props",
                 parameters( "name", keyword) );
 
-
         Record record = null;
-
-
         if (!result.hasNext()){
             //精确匹配没有查到则进行模糊查找，结果限制个数为1
             String keyword1 = ".*" + keyword + ".*";
@@ -244,7 +381,6 @@ public class EntityService {
             record = result.next();
         }
 
-
         JSONObject similarEntity = new JSONObject();
 
         if (record!=null){
@@ -258,20 +394,17 @@ public class EntityService {
                 ArrayList<Resource> resourceNameList2 = resourceMapper.queryResourceByContent(keyword, sort, type);
                 for (Resource single:resourceNameList2){
                     int id = single.getId();
-                    if (!idList.contains(id)){
-                        quchu += "and m.id <> " + id + " ";
-                        idList.add(id);
-                    }
+                    idSet.add(id);
                 }
                 //根据知识点查找关联资源
-                StatementResult resourceNode = session.run( "MATCH (m:resource)-[r]->(a:concept) where a.name = {name} " + quchu +
+                StatementResult resourceNode = session.run( "MATCH (m:resource)-[r]->(a:concept) where a.name = {name} " +
                                 "RETURN m.id AS id order by r.weight",
                         parameters( "name", keyword) );
                 while ( resourceNode.hasNext() )
                 {
                     Record ResourceRecord = resourceNode.next();
                     int resourceID = ResourceRecord.get( "id" ).asInt();
-                    idList.add(resourceID);
+                    idSet.add(resourceID);
                 }
             }
         }
@@ -283,7 +416,7 @@ public class EntityService {
         }
 
         //根据前面生成的idList从mysql中查资源
-        List<Resource> resourceArrayList = resourceMapper.queryResourceByIDList(idList,sort,type);
+        List<Resource> resourceArrayList = resourceMapper.queryResourceByIDList(idSet,sort,type);
         for (Resource resource:resourceArrayList){
             int resourceID = resource.getId();
             Resource resourceInRedis = (Resource) redisTemplate.opsForValue().get("resource_"+resourceID);
@@ -349,9 +482,9 @@ public class EntityService {
         resObject.put("total", totalEntity);
         resObject.put("pages", (int)Math.ceil(totalEntity * 1.0 / perPage));
         session.close();
-//        driver.close();
         return ResultFactory.buildSuccessResult("查询成功", resObject);
     }
+
     //根据entity查找重难点,从mysql里面查
     public JSONArray goalAndKey(String entityName){
         JSONArray resArray = new JSONArray();
@@ -376,6 +509,7 @@ public class EntityService {
 //        driver.close();
         return resArray;
     }
+
     //根据用户浏览记录生成图谱
     public Result userGraph(int userID){
 //        Driver driver = createDrive();
