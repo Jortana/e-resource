@@ -33,7 +33,11 @@ const routes = [
       {
         path: 'home',
         name: 'UserInfo',
-        component: () => import('@/view/Account/Home')
+        component: () => import('@/view/Account/Home'),
+        meta: {
+          requireAuth: true,
+          title: '个人中心'
+        }
       }
     ]
   },
@@ -43,7 +47,8 @@ const routes = [
     name: 'Package',
     component: () => import('@/view/Package'),
     meta: {
-      requireAuth: true
+      requireAuth: true,
+      title: '资源包'
     }
   },
   // 资源页面
@@ -74,6 +79,11 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
+  if (to.meta.title) {
+    // 判断是否有标题
+    document.title = to.meta.title
+  }
+
   // 如果访问的页面需要登录
   if (to.meta.requireAuth) {
     authentication().then((response) => {

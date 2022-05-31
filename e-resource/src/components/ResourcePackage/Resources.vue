@@ -31,7 +31,7 @@
               type="danger"
               plain
               size="mini"
-              @click="deleteConfirm(checkedResources)"
+              @click="deleteConfirm('checkedResources')"
             >
               删除
             </el-button>
@@ -235,16 +235,25 @@ export default {
       })
     },
     deleteMulti() {
-      console.log(this.deleteName)
       const resourceIDs = this[this.deleteName]
-      console.log(resourceIDs)
-      return
-      // eslint-disable-next-line no-unreachable
       deleteMulti({
         folderID: this.folderID,
         resourceIDs
       }).then((response) => {
-        console.log(response)
+        const { code } = response.data
+        if (code === 200) {
+          this.$message({
+            type: 'success',
+            message: '删除成功'
+          })
+        } else {
+          this.$message({
+            type: 'warning',
+            message: '服务器错误，删除失败'
+          })
+        }
+        this.deleteVisible = false
+        this.$emit('updateResource')
       })
     },
     deleteConfirm(chechedName) {

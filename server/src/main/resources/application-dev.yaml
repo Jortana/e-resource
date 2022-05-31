@@ -5,16 +5,16 @@ spring:
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
   redis:
-    password: fz123456,
+    password: fzsj@GIS
     database: 3
-    host: 127.0.0.1
+    host: 202.102.89.244
 
 # 跨域
 registry:
   allowedOrigins: http://127.0.0.1:8080
 
 neo4j:
-  url: bolt://127.0.0.1:7687
+  url: bolt://222.192.6.62:7687
 
 file:
   root: E:\\TestResource

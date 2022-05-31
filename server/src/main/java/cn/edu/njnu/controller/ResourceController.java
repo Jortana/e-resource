@@ -61,4 +61,9 @@ public class ResourceController extends BaseController {
     public Result queryTime(){
         return resourceService.queryTime();
     }
+
+    @GetMapping("/v1.0/public/getRotationChart")
+    public Result getRotationChart(){
+        return resourceService.getRotationChart();
+    }
 }

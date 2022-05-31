@@ -1,6 +1,6 @@
 <template>
   <div>
-    <nav-menu class="lg-container"></nav-menu>
+    <nav-menu></nav-menu>
     <router-view></router-view>
   </div>
 </template>

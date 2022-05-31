@@ -164,7 +164,7 @@ export default {
   /*background-size:cover;*/
   background-color: #fffeff;
   min-height: 100vh;
-  padding-bottom: 5rem;
+  min-height: calc(100vh - 80px);
   /*background-repeat:no-repeat;*/
 }
 
@@ -175,8 +175,9 @@ main {
 
 .row {
   display: flex;
-  margin-top: 0.5rem;
+  margin-top: 1.5rem;
   justify-content: space-between;
+  margin-bottom: 1.5rem;
 }
 
 .main-search >>> .el-input__prefix,

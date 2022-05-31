@@ -135,7 +135,8 @@ export default {
       },
       relatedResources: [],
       recommendResources: [],
-      colors: ['#99A9BF', '#F7BA2A', '#FF9900']
+      colors: ['#99A9BF', '#F7BA2A', '#FF9900'],
+      title: ''
     }
   },
   computed: {
@@ -150,7 +151,6 @@ export default {
         resourceInfo(resourceID).then((response) => {
           if (response.data.code === 200) {
             this.resource = response.data.data
-            console.log(this.resource)
             // 先处理一下entityList
             const entityList = response.data.data['entityList']
             let keyword = ''
@@ -160,12 +160,12 @@ export default {
             // 获取相关实体
             relatedEntity(keyword).then((entityResponse) => {
               if (entityResponse.data.code === 200) {
-                console.log(entityResponse.data.data)
                 this.entities.entities = entityResponse.data.data
               }
             })
+            this.title = `${this.resource.resourceName} - 智慧学伴`
           } else {
-            console.log('无此资源')
+            // console.log('无此资源')
           }
         })
         // 获取相关资源
@@ -179,6 +179,12 @@ export default {
         this.record()
         // 获取推荐资源
         this.getRecommendResources()
+      },
+      immediate: true
+    },
+    title: {
+      handler(title) {
+        document.title = title
       },
       immediate: true
     }

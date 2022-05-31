@@ -7,7 +7,7 @@ public class BloomFilterProperties {
     /**
      * 预期插入量
      */
-    private Long expectedInsertions = 1000L;
+    private Long expectedInsertions = 50000L;
     /**
      * 误判率（大于0，小于1.0）
      */

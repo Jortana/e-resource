@@ -59,17 +59,17 @@ public class EntityService {
 
     @PostConstruct
     public void initRedisBloomFilter(){
-        Session session = driver.session();
-        //根据用户输入在neo4j中查找对应节点
-        StatementResult result = session.run(
-                "MATCH (a:concept) RETURN a.name as name",
-                parameters( ) );
-        while ( result.hasNext() )
-        {
-            Record record = result.next();
-            redisBloomFilter.put("知识点", record.get("name").asString());
-        }
-        session.close();
+//        Session session = driver.session();
+//        //根据用户输入在neo4j中查找对应节点
+//        StatementResult result = session.run(
+//                "MATCH (a:concept) RETURN a.name as name",
+//                parameters( ) );
+//        while ( result.hasNext() )
+//        {
+//            Record record = result.next();
+//            redisBloomFilter.put("知识点", record.get("name").asString());
+//        }
+//        session.close();
     }
 
     public JSONArray getRelatedEntity(String entityName, Session session, String mainEntityName){
@@ -199,51 +199,52 @@ public class EntityService {
 
     //获取该关键词的知识点列表 2022-5-26
     public Map filterAndQuery(String keyword){
-
+        System.out.println(keyword);
         Map<String, Object> entityAndResources = new HashMap<>();
         JSONArray entityArray = new JSONArray();
         Set<Integer> resourceIdSet = new LinkedHashSet<>(); //保证id有序且不重复
         if(redisBloomFilter.mightContain("知识点", keyword)){
-            System.out.print(keyword+"未分词");
+            System.out.print("未分词");
             JSONObject entityProperties = getEntityProperties(keyword);
             if (entityProperties!=null) entityArray.add(entityProperties);
             resourceIdSet.addAll(getResourceIdByEntityAndContent(keyword));
         }
-        if (resourceIdSet.size()==0){
-            //terms列表，元素就是拆分出来的词以及词性
-            for(Term term : ToAnalysis.parse(keyword).getTerms()){
-                String word = term.getName();		//分词的内容
-                System.out.print(word+",词性为"+term.getNatureStr()+",");
-                //分词结果跟原词相同就略过
-                if(word.equals(keyword)||!filterPartOfSpeech(term.getNatureStr())){
-                    System.out.println("词性被过滤");
-                    continue;
-                }
-                if (redisBloomFilter.mightContain("知识点", word)){
-                    JSONObject entityProperties = getEntityProperties(word);
-                    if (entityProperties!=null) entityArray.add(entityProperties);
-                    resourceIdSet.addAll(getResourceIdByEntityAndContent(word));
-                }
+        //terms列表，元素就是拆分出来的词以及词性
+        for(Term term : ToAnalysis.parse(keyword).getTerms()){
+            String word = term.getName();		//分词的内容
+            System.out.print(word+",词性为"+term.getNatureStr()+",");
+            //分词结果跟原词相同或者布隆过滤器不包含的就略过
+            if(word.equals(keyword)||!redisBloomFilter.mightContain("知识点", word)){
+                System.out.println("被过滤");
+            }
+            else {
+                JSONObject entityProperties = getEntityProperties(word);
+                if (entityProperties!=null) entityArray.add(entityProperties);
+                resourceIdSet.addAll(getResourceIdByEntityAndContent(word));
             }
         }
-        List<Resource> resourceList = resourceMapper.queryResourceByIDList(resourceIdSet,0,0);
+        List<Resource> resourceList = new ArrayList<>();
+        // 这一步是为了保证查出来的资源顺序跟前面id一样，放弃了时间效率
+        for (Integer integer : resourceIdSet) {
+            resourceList.add(resourceMapper.queryResourceByID(integer));
+        }
         entityAndResources.put("entity", entityArray);
         entityAndResources.put("resource", resourceList);
         System.out.println("总资源个数:"+resourceList.size());
+        System.out.println("--------------------------------");
         return entityAndResources;
     }
 
-    //过滤词性
+    //过滤词性 暂时用不到
     public boolean filterPartOfSpeech(String natureStr){
         //只关注名词、动词、形容词、副词
         Set<String> expectedNature = new HashSet<String>() {{
-            add("n");add("q");
-//            add("v");
+            add("n");add("q");add("v");
             add("vd");add("vn");add("vf");
             add("vx");add("vi");
             add("nt");add("nz");add("nw");add("nl");
             add("ng");add("wh");
-            add("en");
+            add("en");add("l");
         }};
         return expectedNature.contains(natureStr);
     }
