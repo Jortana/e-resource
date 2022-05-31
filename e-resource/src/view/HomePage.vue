@@ -15,9 +15,23 @@
         </div>
         <div class="carousel">
           <el-carousel :interval="5000" trigger="click" height="400px">
-            <el-carousel-item v-for="item in 3" :key="item">
-              <h3 class="small">{{ item }}</h3>
+            <el-carousel-item v-for="item in carouselData" :key="item.id">
+              <div class="carousel-container">
+                <el-image
+                  :src="'http://222.192.6.62:8082' + item.cover"
+                  fit="cover"
+                  @click="viewResource(item.id)"
+                ></el-image>
+              </div>
             </el-carousel-item>
+            <!-- 隐藏的a元素，用来在新窗口打开资源页面 -->
+            <a
+              v-show="false"
+              ref="resourceTarget"
+              class="resource-target"
+              href=""
+              target="_blank"
+            ></a>
           </el-carousel>
         </div>
         <div class="card">
@@ -84,6 +98,7 @@ import ResourceList from '@/components/ResourceList'
 import KGCard from '@/components/Chart/KGCard'
 import { authentication } from '@/api/auth'
 import { menus } from '@/api/menu'
+import { carousel } from '@/api/recommend'
 import {
   hotResource,
   newResource,
@@ -100,7 +115,8 @@ export default {
       hotResources: [],
       newResources: [],
       recommendResources: [],
-      menus: []
+      menus: [],
+      carouselData: []
     }
   },
   watch: {},
@@ -114,6 +130,7 @@ export default {
   },
   mounted() {
     this.getMenus()
+    this.getCarousel()
   },
   methods: {
     search() {
@@ -153,6 +170,23 @@ export default {
           this.menus = data
         }
       })
+    },
+    getCarousel() {
+      carousel().then((response) => {
+        const { code, data } = response.data
+        if (code === 200) {
+          this.carouselData = data
+        }
+      })
+    },
+    viewResource(resourceID) {
+      console.log(resourceID)
+      const target = this.$refs.resourceTarget
+      target.setAttribute(
+        'href',
+        `${window.location.origin}/e-resource/#/resource/${resourceID}`
+      )
+      target.click()
     }
   }
 }
@@ -324,5 +358,14 @@ main {
 
 .el-carousel__item:nth-child(2n + 1) {
   background-color: #d3dce6;
+}
+
+.carousel-container {
+  height: 100%;
+  cursor: pointer;
+}
+
+.carousel-container div {
+  height: 100%;
 }
 </style>

@@ -50,3 +50,11 @@ export const userRecommendResource = () => {
   const userId = store.state.user !== '' ? store.state.user['userId'] : ''
   return http.get(`${baseURL}/public/recommendUser?userId=${userId}`)
 }
+
+/**
+ * 获取轮播图数据
+ * @returns {AxiosPromise}
+ */
+export const carousel = () => {
+  return http.get(`${baseURL}/public/getRotationChart`)
+}
