@@ -134,9 +134,8 @@ export default {
 
 <style scoped>
 .backgroud {
-  padding-top: 1rem;
+  padding-top: 1.5rem;
   background-color: #f4f5f7;
-  margin-top: 1rem;
   /*空出nav-menu的位置*/
   min-height: calc(100vh - 70px);
 }

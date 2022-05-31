@@ -231,7 +231,6 @@ export default {
             type: 'success',
             duration: 1500
           })
-          console.log(response.data)
           authentication().then((response) => {
             const {
               data: { code }

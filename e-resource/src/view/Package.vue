@@ -257,6 +257,7 @@ export default {
   /*空出nav-menu的位置*/
   min-height: calc(100vh - 130px);
   padding-top: 1rem;
+  padding-bottom: 1.5rem;
 }
 
 .package-container {

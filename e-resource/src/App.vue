@@ -1,12 +1,15 @@
 <template>
   <div id="app">
     <router-view />
+    <footer-main />
   </div>
 </template>
 
 <script>
+import FooterMain from '@/components/FooterMain'
 export default {
-  name: 'App'
+  name: 'App',
+  components: { FooterMain }
 }
 </script>
 
@@ -19,6 +22,8 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   /*text-align: center;*/
   /*color: #2c3e50;*/
+  display: flex;
+  flex-direction: column;
 }
 
 textarea {

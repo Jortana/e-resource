@@ -176,7 +176,8 @@ export default {
       cardInfo: {},
       goal: [],
       key: [],
-      activeEntity: ''
+      activeEntity: '',
+      title: ''
     }
   },
   computed: {
@@ -204,6 +205,7 @@ export default {
           this.resetGoalAndKey()
           this.getRelatedEntity(newQuery.q)
         }
+        this.title = `${newQuery.q} - 智慧学伴`
       },
       immediate: true
     },
@@ -211,6 +213,12 @@ export default {
       handler() {
         // this.$refs.chart.initCharts()
       }
+    },
+    title: {
+      handler(title) {
+        document.title = title
+      },
+      immediate: true
     }
   },
   mounted() {
@@ -388,6 +396,7 @@ export default {
 
 .resource-content-container {
   background-color: #fff;
+  margin-top: 1rem;
   padding: 0.5rem 1.2rem 1.2rem;
 }
 
@@ -397,7 +406,6 @@ export default {
 
 .knowledge-card {
   margin-top: 1rem;
-  margin-bottom: 1rem;
   box-shadow: 1px 3px 6px rgb(122 122 122 / 0.2);
 }
 
