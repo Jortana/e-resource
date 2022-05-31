@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class Resource implements Serializable {
     int id;
@@ -67,6 +68,20 @@ public class Resource implements Serializable {
         this.rate = rate;
         this.fileType = fileType;
         this.content = content;
+    }
+
+    //重写equals和hashCode，只要两个resource对象id属性相等则表示为两个同样的资源
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Resource resource = (Resource) o;
+        return id == resource.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     public int getCollectionId() {
@@ -277,34 +292,4 @@ public class Resource implements Serializable {
         this.content = content;
     }
 
-    @Override
-    public String toString() {
-        return "Resource{" +
-                "id=" + id +
-                ", resourceName='" + resourceName + '\'' +
-                ", remark='" + remark + '\'' +
-                ", url='" + url + '\'' +
-                ", viewUrl='" + viewUrl + '\'' +
-                ", cover='" + cover + '\'' +
-                ", aid='" + aid + '\'' +
-                ", bvid='" + bvid + '\'' +
-                ", cid='" + cid + '\'' +
-                ", page=" + page +
-                ", keywords='" + keywords + '\'' +
-                ", entityList=" + entityList +
-                ", updateTime='" + updateTime + '\'' +
-                ", download=" + download +
-                ", collection=" + collection +
-                ", browse=" + browse +
-                ", resourceType=" + resourceType +
-                ", period='" + period + '\'' +
-                ", grade='" + grade + '\'' +
-                ", subject=" + subject +
-                ", table=" + table +
-                ", tableResourceID=" + tableResourceID +
-                ", rate=" + rate +
-                ", fileType='" + fileType + '\'' +
-                ", content='" + content + '\'' +
-                '}';
-    }
 }

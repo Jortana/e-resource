@@ -70,11 +70,11 @@ public class ResourceService {
 //            resourcesList.add(singleResource);
 //        }
 //        return ResultFactory.buildSuccessResult("查询成功", resourcesList);
-        ArrayList<Integer> idList = new ArrayList<>();
+        Set<Integer> idSet = new HashSet<>();
         for (int i = 1;i<11;i++){
-            idList.add(resourceID+i);
+            idSet.add(resourceID+i);
         }
-        ArrayList<Resource> resList = resourceMapper.queryResourceByIDList(idList,0,0);
+        ArrayList<Resource> resList = resourceMapper.queryResourceByIDList(idSet,0,0);
         return ResultFactory.buildSuccessResult("查询成功",resList);
     }
 
@@ -365,5 +365,25 @@ public class ResourceService {
             resArray.add(resource);
         }
         return ResultFactory.buildSuccessResult("查询成功",resArray);
+    }
+
+    public Result getRotationChart() {
+        JSONArray jsonArray = new JSONArray();
+        JSONObject chart1 = new JSONObject();
+        JSONObject chart2 = new JSONObject();
+        JSONObject chart3 = new JSONObject();
+        chart1.put("id", 56432);
+        chart1.put("cover", "/cover/56432.png");
+        chart1.put("resourceName", "氧气 (1)");
+        chart2.put("id", 87491);
+        chart2.put("cover", "/cover/87491.png");
+        chart2.put("resourceName", "第十五章_第1节_两种电荷(人教013版)");
+        chart3.put("id", 91597);
+        chart3.put("cover", "/cover/91597.png");
+        chart3.put("resourceName", "荷塘月色");
+        jsonArray.add(chart1);
+        jsonArray.add(chart2);
+        jsonArray.add(chart3);
+        return ResultFactory.buildSuccessResult("success", jsonArray);
     }
 }
