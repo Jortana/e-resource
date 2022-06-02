@@ -1,7 +1,7 @@
 export default {
   login(state, user) {
     user['avatar'] =
-      'http://222.192.6.62:9000/e-resource/api/file/avatar/' + user['avatar']
+      'http://223.2.55.39:9000/e-resource/api/file/avatar/' + user['avatar']
     state.user = user
     window.localStorage.setItem('user', JSON.stringify(user))
   },

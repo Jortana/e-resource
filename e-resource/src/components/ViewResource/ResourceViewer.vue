@@ -29,7 +29,7 @@
 <script>
 import pdf from 'vue-pdf'
 // const baseUrl = 'http://202.102.89.244:8082'
-const baseUrl = 'http://222.192.6.62:8082'
+const baseUrl = 'http://223.2.55.39:8082'
 export default {
   name: 'ResourceViewer',
   components: {
