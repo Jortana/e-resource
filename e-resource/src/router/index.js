@@ -57,6 +57,12 @@ const routes = [
     name: 'Resource',
     component: () => import('@/view/Resource')
   },
+  // 排行页面
+  {
+    path: '/rate',
+    name: 'Rate',
+    component: () => import('@/view/Rate')
+  },
   // 知识页面
   {
     path: '/knowledge/:entityName',

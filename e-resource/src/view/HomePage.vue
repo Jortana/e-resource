@@ -197,7 +197,6 @@ export default {
   /*background-image: url('~@/assets/background.jpg');*/
   /*background-size:cover;*/
   background-color: #fffeff;
-  min-height: 100vh;
   min-height: calc(100vh - 80px);
   /*background-repeat:no-repeat;*/
 }
