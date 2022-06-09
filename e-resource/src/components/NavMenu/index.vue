@@ -47,7 +47,7 @@
           </svg>
           学科分类
         </a>
-        <a class="menu-item" href="">排行</a>
+        <a class="menu-item" href="/#/rate">排行</a>
         <a class="menu-item" href="">小学资源库</a>
         <a class="menu-item" href="">初中资源库</a>
         <a class="menu-item" href="">高中资源库</a>
@@ -129,6 +129,8 @@ export default {
       if (this.searchInfo.content === '') {
         return
       }
+      // 清空知识图谱记录
+      this.$store.commit('clearHistorty')
       this.$router
         .push({
           path: '/search',

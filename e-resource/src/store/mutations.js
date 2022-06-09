@@ -35,5 +35,34 @@ export default {
     }
     window.localStorage.setItem('cart', JSON.stringify(state.cart))
     console.log(state.cart.resources)
+  },
+  /**
+   * 将当前节点记录进节点浏览记录
+   * @param state
+   * @param {Array} nodes - 需要放进浏览记录的节点数组
+   */
+  pushHistory(state, nodes) {
+    nodes.forEach((node) => {
+      state.graphHistory.push(node)
+    })
+  },
+  /**
+   * 将当前点击节点之后的节点删除
+   * @param state
+   * @param {String} node - 当前点击的节点
+   */
+  backHistory(state, node) {
+    for (let i = 0; i < state.graphHistory.length; i++) {
+      if (state.graphHistory[i] === node) {
+        state.graphHistory.length = i + 1
+      }
+    }
+  },
+  /**
+   * 清空历史记录
+   * @param state
+   */
+  clearHistorty(state) {
+    state.graphHistory = []
   }
 }

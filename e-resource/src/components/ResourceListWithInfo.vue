@@ -20,7 +20,10 @@
               </span>
             </div>
             <div v-if="resource['entityList'] !== null" class="entity-list">
-              <div v-for="entity in resource['entityList']" :key="entity">
+              <div
+                v-for="(entity, entityIndex) in resource['entityList']"
+                :key="entityIndex"
+              >
                 <el-button
                   class="entity-btn"
                   type="text"
