@@ -23,6 +23,7 @@
                         v-if="goal.length > 0"
                         :list="goal"
                         :title="'学习目标'"
+                        resourceTypes
                         class="goal-and-key-card"
                       />
                       <goal-and-key-card
@@ -90,8 +91,14 @@
             </div>
           </div>
           <!-- 知识图谱 -->
-          <div class="graph common-shadow">
-            <k-g-chart ref="chart" :entities="entities.entities"></k-g-chart>
+          <div>
+            <history
+              class="history-container common-shadow"
+              @changeNode="changeNode"
+            />
+            <div class="graph common-shadow">
+              <k-g-chart ref="chart" :entities="entities.entities"></k-g-chart>
+            </div>
           </div>
         </div>
       </div>
@@ -112,6 +119,7 @@ import { record } from '@/api/record'
 import { searchEntity, relatedEntity } from '@/api/entity'
 import merge from 'webpack-merge'
 import KGChart from '@/components/Chart/KGChart'
+import History from '@/components/Chart/History'
 export default {
   name: 'ResourceCenter',
   components: {
@@ -121,7 +129,8 @@ export default {
     ResourceLink,
     DownloadButton,
     ResourceListWithInfo,
-    GoalAndKeyCard
+    GoalAndKeyCard,
+    History
   },
   data() {
     return {
@@ -193,7 +202,7 @@ export default {
       handler(newQuery, oldQuery) {
         // console.log(this.searchInfo)
         this.resetResource()
-        this.searchInfo.type = newQuery.type === undefined ? 0 : newQuery.type
+        this.searchInfo.type = newQuery.type === undefined ? '0' : newQuery.type
         this.searchInfo.sort = newQuery.sort === undefined ? 0 : newQuery.sort
         this.searchInfo.content = newQuery.q === undefined ? 0 : newQuery.q
         this.pageInfo.page = newQuery.page === undefined ? 1 : newQuery.page
@@ -329,7 +338,9 @@ export default {
         `${window.location.origin}/e-resource/#/resource/${resourceID}`
       )
       target.click()
-    }
+    },
+    //
+    changeNode() {}
   }
 }
 </script>
@@ -427,6 +438,14 @@ export default {
   width: 400px;
   height: 420px;
   min-height: 400px;
+  background-color: white;
+}
+
+.history-container {
+  padding: 0.5rem 1rem;
+  margin-top: 1rem;
+  margin-left: 1rem;
+  width: 400px;
   background-color: white;
 }
 

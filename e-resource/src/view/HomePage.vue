@@ -18,7 +18,7 @@
             <el-carousel-item v-for="item in carouselData" :key="item.id">
               <div class="carousel-container">
                 <el-image
-                  :src="'http://223.2.55.39:8082' + item.cover"
+                  :src="'http://202.102.89.244:8082' + item.cover"
                   fit="cover"
                   @click="viewResource(item.id)"
                 ></el-image>
@@ -197,7 +197,6 @@ export default {
   /*background-image: url('~@/assets/background.jpg');*/
   /*background-size:cover;*/
   background-color: #fffeff;
-  min-height: 100vh;
   min-height: calc(100vh - 80px);
   /*background-repeat:no-repeat;*/
 }

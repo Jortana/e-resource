@@ -25,6 +25,12 @@ export default {
   watch: {
     entities: {
       handler(entities) {
+        // 如果浏览记录为空，则记录当前节点
+        if (this.$store.state.graphHistory.length === 0) {
+          this.$store.commit('pushHistory', [
+            entities[entities.length - 1].entityName
+          ])
+        }
         this.resetData()
         this.formatData(entities)
       }
@@ -60,6 +66,8 @@ export default {
           q: node.data.name
         }
       })
+      // 记录浏览记录
+      this.$store.commit('pushHistory', [node.data.name])
     },
     /**
      * 格式化数据为 echarts 需要的格式

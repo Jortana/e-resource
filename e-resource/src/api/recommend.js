@@ -58,3 +58,28 @@ export const userRecommendResource = () => {
 export const carousel = () => {
   return http.get(`${baseURL}/public/getRotationChart`)
 }
+
+/**
+ * 获取热门资源 条数多的版本
+ * @returns {AxiosPromise}
+ */
+export const hotResourceMore = () => {
+  return http.get(`${baseURL}/public/queryMoreHot`)
+}
+
+/**
+ * 获取最新资源 条数多的版本
+ * @returns {AxiosPromise}
+ */
+export const newResourceMore = () => {
+  return http.get(`${baseURL}/public/queryMoreTime`)
+}
+
+/**
+ * 根据用户获取推荐资源 条数多的版本
+ * @returns {AxiosPromise}
+ */
+export const userRecommendResourceMore = () => {
+  const userId = store.state.user !== '' ? store.state.user['userId'] : ''
+  return http.get(`${baseURL}/public/recommendMoreUser?userId=${userId}`)
+}

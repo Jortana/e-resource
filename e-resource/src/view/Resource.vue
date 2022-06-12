@@ -16,16 +16,7 @@
                 {{ resource['url'].split('/').slice(-1)[0] }}
               </div>
             </div>
-            <!-- 评分 -->
-            <div class="rate">
-              <el-rate
-                v-model="resource['rate']"
-                :colors="colors"
-                disabled
-                show-score
-                score-template="{value}"
-              ></el-rate>
-            </div>
+
             <div class="operation flex flex-1">
               <div class="operation-button">
                 <download-button
@@ -44,6 +35,16 @@
               <!--            </el-button>-->
               <!--          </div>-->
             </div>
+          </div>
+          <!-- 评分 -->
+          <div class="rate">
+            <el-rate
+              v-model="resource['rate']"
+              :colors="colors"
+              disabled
+              show-score
+              score-template="{value}"
+            ></el-rate>
           </div>
           <!-- 资源展示组件 -->
           <div class="viewer">
@@ -87,12 +88,12 @@
             </div>
           </div>
           <!--不会改 created by 买大米种水稻 2022/04/16-->
-          <div v-else class="recommend-container flex common-shadow">
+          <!-- <div v-else class="recommend-container flex common-shadow">
             <div class="flex-1">
               <h2>推荐资源</h2>
               <p>登录后获取推荐资源</p>
             </div>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -292,8 +293,7 @@ export default {
 
 .rate {
   /*border-top: 1px solid #e4e7ed;*/
-  padding-top: 1rem;
-  margin-top: 1rem;
+  padding-top: 0.5rem;
 }
 
 .comment-container {

@@ -4,7 +4,7 @@
       <div class="resource-info">
         <div class="thumbnail-container flex">
           <el-image
-            :src="'http://223.2.55.39:8082' + resource.cover"
+            :src="'http://202.102.89.244:8082' + resource.cover"
             fit="contain"
             class="thumbnail"
           ></el-image>
@@ -20,7 +20,10 @@
               </span>
             </div>
             <div v-if="resource['entityList'] !== null" class="entity-list">
-              <div v-for="entity in resource['entityList']" :key="entity">
+              <div
+                v-for="(entity, entityIndex) in resource['entityList']"
+                :key="entityIndex"
+              >
                 <el-button
                   class="entity-btn"
                   type="text"
