@@ -423,17 +423,17 @@ public class EntityService {
             Resource resourceInRedis = (Resource) redisTemplate.opsForValue().get("resource_"+resourceID);
             if (resourceInRedis == null){
             //在neo4j中获取资源包含的知识点，生成list
-                StatementResult conceptNode = session.run( "MATCH (m:resource)-[r]->(a:concept) where m.id = {id} " +
-                                "RETURN a.name AS name order by r.tfidf",
-                        parameters( "id", resourceID) );
-                ArrayList<String> entityList = new ArrayList<>();
-                while ( conceptNode.hasNext() )
-                {
-                    Record entityRecord = conceptNode.next();
-                    String name = entityRecord.get( "name" ).asString();
-                    entityList.add(name);
-                }
-                resource.setEntityList(entityList);
+//                StatementResult conceptNode = session.run( "MATCH (m:resource)-[r]->(a:concept) where m.id = {id} " +
+//                                "RETURN a.name AS name order by r.tfidf",
+//                        parameters( "id", resourceID) );
+//                ArrayList<String> entityList = new ArrayList<>();
+//                while ( conceptNode.hasNext() )
+//                {
+//                    Record entityRecord = conceptNode.next();
+//                    String name = entityRecord.get( "name" ).asString();
+//                    entityList.add(name);
+//                }
+                resource.setEntityList(null);
                 //设置资源封面路径
                 resource.setCover("/cover/" + resource.getId() + ".png");
 
