@@ -66,4 +66,14 @@ public class ResourceController extends BaseController {
     public Result getRotationChart(){
         return resourceService.getRotationChart();
     }
+
+    @GetMapping("/v1.0/public/queryMoreHot")
+    public Result queryHotNew(){
+        return resourceService.queryMoreHot();
+    }
+
+    @GetMapping("/v1.0/public/queryMoreTime")
+    public Result queryTimeNew(){
+        return resourceService.queryMoreTime();
+    }
 }

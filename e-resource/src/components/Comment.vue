@@ -69,7 +69,8 @@ import { getComment } from '@/api/resource'
 import { addComment } from '@/api/resource'
 import { authentication } from '@/api/auth'
 
-const fileBaseURL = 'http://127.0.0.1:9000/e-resource/api/file/avatar/'
+// const fileBaseURL = 'http://127.0.0.1:9000/e-resource/api/file/avatar/'
+const fileBaseURL = 'http://202.102.89.244:9000/e-resource/api/file/avatar/'
 
 export default {
   name: 'Comment',

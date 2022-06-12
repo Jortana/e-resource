@@ -11,7 +11,7 @@ spring:
 
 # 跨域
 registry:
-  allowedOrigins: http://202.102.89.244:9311
+  allowedOrigins: http://202.102.89.244:88
 
 neo4j:
   url: bolt://127.0.0.1:7687

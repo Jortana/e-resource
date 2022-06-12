@@ -92,7 +92,21 @@ public class ResourceService {
         Resource queryResource = (Resource) redisTemplate.opsForValue().get("resource_"+resourceID);
         if (queryResource != null){
             queryResource.setRate(resourceRate(queryResource.getId()));
+            if (queryResource.getEntityList()==null){
+                StatementResult conceptNode = session.run( "MATCH (m:resource)-[r]->(a:concept) where m.id = {id} " +
+                                "RETURN a.name as concept",
+                        parameters( "id", resourceID) );
+                ArrayList<String> entityList = new ArrayList<>();
+                while ( conceptNode.hasNext() ) {
+                    Record conceptRecord = conceptNode.next();
+                    String entityName = conceptRecord.get("concept").asString();
+                    entityList.add(entityName);
+                }
+                queryResource.setEntityList(entityList);
+            }
             session.close();
+            redisTemplate.opsForValue().set("resource_"+resourceID, queryResource);
+            redisTemplate.expire("resource_"+resourceID, 100, TimeUnit.MINUTES);
             return ResultFactory.buildSuccessResult("查询成功",queryResource);
         }
         queryResource = resourceMapper.queryResourceByID(resourceID);
@@ -366,6 +380,25 @@ public class ResourceService {
         }
         return ResultFactory.buildSuccessResult("查询成功",resArray);
     }
+
+    public Result queryMoreHot(){
+        ArrayList<Resource> resourceList = resourceMapper.queryMoreHot();
+        JSONArray resArray = new JSONArray();
+        for (Resource resource:resourceList){
+            resArray.add(resource);
+        }
+        return ResultFactory.buildSuccessResult("查询成功",resArray);
+    }
+
+    public Result queryMoreTime(){
+        ArrayList<Resource> resourceList = resourceMapper.queryMoreTime();
+        JSONArray resArray = new JSONArray();
+        for (Resource resource:resourceList){
+            resArray.add(resource);
+        }
+        return ResultFactory.buildSuccessResult("查询成功",resArray);
+    }
+
 
     public Result getRotationChart() {
         JSONArray jsonArray = new JSONArray();

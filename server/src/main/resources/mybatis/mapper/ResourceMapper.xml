@@ -75,11 +75,18 @@
         SELECT id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type FROM t_resource ORDER BY browse DESC LIMIT 8
     </select>
     <select id="queryHot2" resultType="resource">
-        SELECT id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type FROM t_resource ORDER BY browse DESC LIMIT 8,80
+        SELECT id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type FROM t_resource ORDER BY browse DESC LIMIT 20,40
     </select>
     <!-- 查最新资源 -->
     <select id="queryTime" resultType="resource">
         select id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type from t_resource order by updateTime desc limit 8
+    </select>
+
+    <select id="queryMoreTime" resultType="resource">
+        select id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type from t_resource order by updateTime desc limit 20
+    </select>
+    <select id="queryMoreHot" resultType="resource">
+        SELECT id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type FROM t_resource ORDER BY browse DESC LIMIT 20
     </select>
 
     <!-- 查文档url -->

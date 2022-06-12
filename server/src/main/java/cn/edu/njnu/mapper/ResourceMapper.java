@@ -28,6 +28,10 @@ public interface ResourceMapper {
     //根据条件查询资源
     ArrayList<Resource> queryTime();
 
+    ArrayList<Resource> queryMoreHot();
+    //根据条件查询资源
+    ArrayList<Resource> queryMoreTime();
+
     Map queryDocument(int id);
     Map queryBvideo(int id);
     Map queryVideo(int id);
