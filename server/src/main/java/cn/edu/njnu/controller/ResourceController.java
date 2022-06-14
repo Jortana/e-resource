@@ -76,4 +76,14 @@ public class ResourceController extends BaseController {
     public Result queryTimeNew(){
         return resourceService.queryMoreTime();
     }
+
+    @GetMapping("/v1.0/public/queryMoreDownload")
+    public Result queryDownload(){
+        return resourceService.queryDownload();
+    }
+
+    @GetMapping("/v1.0/public/queryBoutique")
+    public Result queryBoutique(){
+        return resourceService.queryBoutique();
+    }
 }

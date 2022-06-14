@@ -53,6 +53,9 @@ public class DownloadService {
     public void getFile(@RequestParam Map<String, Object> resourceIDMap, final HttpServletResponse response, final HttpServletRequest request) throws IOException {
         //读取路径下面的文件
         int resourceID = Integer.parseInt((String)resourceIDMap.get("resourceID"));
+        System.out.println(resourceID);
+        int res = resourceMapper.updateDownload(resourceID);
+        System.out.println(res);
         Resource resource = resourceMapper.queryResourceByID(resourceID);
         String resultWordPath="";
         String url="";
@@ -109,11 +112,13 @@ public class DownloadService {
         if (resource.getTable()==2){
             String url = resourceMapper.queryUrl(resourceID);
             String resultWordPath = encode(rootPath + url);
+            resourceMapper.updateDownload(resourceID);
             return ResultFactory.buildSuccessResult("下载成功",resultWordPath);
         }
         else if (resource.getTable()==3){
             String url = resourceMapper.queryVideoUrl(resourceID);
             String resultWordPath = encode(rootPath + url);
+            resourceMapper.updateDownload(resourceID);
             return ResultFactory.buildSuccessResult("下载成功",resultWordPath);
         }
         else{
@@ -331,6 +336,7 @@ public class DownloadService {
         for (Resource resource:collection){
             int id = resource.getId();
             String url = resourceMapper.queryUrl(id);
+            resourceMapper.updateDownload(id);
             copyFile(root + url, path);
         }
     }

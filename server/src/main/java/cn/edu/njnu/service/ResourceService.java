@@ -12,6 +12,7 @@ import org.neo4j.driver.v1.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import sun.net.www.content.image.png;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -440,8 +441,8 @@ public class ResourceService {
         }
         JSONObject resObject = new JSONObject();
         resObject.put("total", total);
-        int pages = total/10;
-        if (total%10!=0){
+        int pages = total/perPage;
+        if (total%perPage!=0){
             pages++;
         }
         resObject.put("pages", pages);
@@ -454,5 +455,28 @@ public class ResourceService {
         entityArray.add(resources);
         resObject.put("resources", entityArray);
         return ResultFactory.buildSuccessResult("查询成功", resObject);
+    }
+
+    public Result queryDownload() {
+        ArrayList<Resource> resourceList = resourceMapper.queryDownload();
+        JSONArray resArray = new JSONArray();
+        for (Resource resource:resourceList){
+            resArray.add(resource);
+        }
+        return ResultFactory.buildSuccessResult("查询成功",resArray);
+    }
+
+    public Result queryBoutique() {
+        JSONArray jsonArray = new JSONArray();
+        int[] arr = new int[]{
+                61358, 62541, 68816, 60945, 56577, 69872, 71626, 87761, 87651, 83914};
+        for (int i : arr) {
+            JSONObject object = new JSONObject();
+            object.put("id", i);
+            object.put("cover", "/cover/" + i + ".png ");
+            object.put("resourceName", resourceMapper.queryResourceByID(i).getResourceName());
+            jsonArray.add(object);
+        }
+        return ResultFactory.buildSuccessResult("success", jsonArray);
     }
 }
