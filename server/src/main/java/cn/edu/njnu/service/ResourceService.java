@@ -419,4 +419,40 @@ public class ResourceService {
         jsonArray.add(chart3);
         return ResultFactory.buildSuccessResult("success", jsonArray);
     }
+
+    public Result getResourcesByGrade(String grade, int sort, int type, int page, int perPage){
+        List<Resource> resourceArrayList;
+        int total;
+        if ("小学".equals(grade)){
+            resourceArrayList =
+                    resourceMapper.queryByGradeSmall(sort, type, (page-1)*perPage, perPage);
+            total = resourceMapper.countSmall(type);
+        }else if ("初中".equals(grade)){
+            resourceArrayList =
+                    resourceMapper.queryByGradeMiddle(sort, type, (page-1)*perPage, perPage);
+            total = resourceMapper.countMiddle(type);
+        }else if ("高中".equals(grade)){
+            resourceArrayList =
+                    resourceMapper.queryByGradeHigh(sort, type, (page-1)*perPage, perPage);
+            total = resourceMapper.countHigh(type);
+        }else {
+            return ResultFactory.buildFailResult("请查询正确的学段");
+        }
+        JSONObject resObject = new JSONObject();
+        resObject.put("total", total);
+        int pages = total/10;
+        if (total%10!=0){
+            pages++;
+        }
+        resObject.put("pages", pages);
+        JSONObject resources = new JSONObject();
+        resources.put("resources", resourceArrayList);
+        resources.put("entityName", grade);
+        resources.put("goalAndKey", new JSONArray());
+        resources.put("properties", new JSONObject());
+        JSONArray entityArray = new JSONArray();
+        entityArray.add(resources);
+        resObject.put("resources", entityArray);
+        return ResultFactory.buildSuccessResult("查询成功", resObject);
+    }
 }

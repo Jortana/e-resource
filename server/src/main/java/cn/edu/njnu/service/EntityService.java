@@ -50,6 +50,9 @@ public class EntityService {
     @Autowired
     private RedisBloomFilter redisBloomFilter;
 
+    @Autowired
+    private ResourceService resourceService;
+
     private static Driver driver;
 
     @Autowired
@@ -325,6 +328,9 @@ public class EntityService {
         }
         int page = Integer.parseInt( (String) keywordMap.get("page") );
         int perPage = Integer.parseInt( (String) keywordMap.get("perPage") );
+        if (keyword.equals("小学") || keyword.equals("小学") || keyword.equals("小学")){
+            return resourceService.getResourcesByGrade(keyword, sort, type, page, perPage);
+        }
         //根据用户输入与资源名进行匹配
         ArrayList<Resource> resourceNameList =
                 (ArrayList<Resource>) redisTemplate.opsForValue().get("content_"+sort+"_"+type+"_"+content);
