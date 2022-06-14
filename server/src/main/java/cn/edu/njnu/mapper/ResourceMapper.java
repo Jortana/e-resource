@@ -2,6 +2,7 @@ package cn.edu.njnu.mapper;
 
 import cn.edu.njnu.pojo.Resource;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
@@ -40,4 +41,12 @@ public interface ResourceMapper {
     String queryVideoUrl(int resourceID);
 
     Double resourceRate(int resource);
+
+    List<Resource> queryByGrade(String grade, int sort, int type);
+    List<Resource> queryByGradeSmall(int sort, int type, int page, int pages);
+    List<Resource> queryByGradeMiddle(int sort, int type, int page, int pages);
+    List<Resource> queryByGradeHigh(int sort, int type, int page, int pages);
+    int countSmall(int type);
+    int countMiddle(int type);
+    int countHigh(int type);
 }

@@ -110,6 +110,95 @@
     <select id="resourceRate" resultType="java.lang.Double">
         SELECT AVG(rate) FROM t_comment where resource_id = #{resourceID};
     </select>
+    <select id="queryByGrade" resultType="cn.edu.njnu.pojo.Resource">
+        SELECT id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type
+        FROM t_resource
+        <where>
+            <trim suffixOverrides="and">
+                <if test="grade!=null">grade like concat('%',#{grade},'%') and </if>
+                <if test="type!=0">resource_type =#{type} and </if>
+            </trim>
+        </where>
+        <trim>
+            <if test="sort == 1">order by browse desc</if>
+            <if test="sort == 2">order by updateTime desc</if>
+        </trim>
+    </select>
+    <select id="queryByGradeSmall" resultType="cn.edu.njnu.pojo.Resource">
+        SELECT id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type
+        FROM t_resource
+        <where>
+            <trim suffixOverrides="and">
+                (grade like '%21%' or grade like '%22%' or grade like '%23%'
+                    or grade like '%24%' or grade like '%25%' or grade like '%26%') and
+                <if test="type!=0">resource_type =#{type} and </if>
+            </trim>
+        </where>
+        <trim>
+            <if test="sort == 1">order by browse desc</if>
+            <if test="sort == 2">order by updateTime desc</if>
+        </trim>
+        limit #{page}, #{pages}
+    </select>
+    <select id="queryByGradeMiddle" resultType="cn.edu.njnu.pojo.Resource">
+        SELECT id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type
+        FROM t_resource
+        <where>
+            <trim suffixOverrides="and">
+                (grade like '%31%' or grade like '%32%' or grade like '%33%') and
+                <if test="type!=0">resource_type =#{type} and </if>
+            </trim>
+        </where>
+        <trim>
+            <if test="sort == 1">order by browse desc</if>
+            <if test="sort == 2">order by updateTime desc</if>
+        </trim>
+    </select>
+    <select id="queryByGradeHigh" resultType="cn.edu.njnu.pojo.Resource">
+        SELECT id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type
+        FROM t_resource
+        <where>
+            <trim suffixOverrides="and">
+                (grade like '%41%' or grade like '%42%' or grade like '%43%') and
+                <if test="type!=0">resource_type =#{type} and </if>
+            </trim>
+        </where>
+        <trim>
+            <if test="sort == 1">order by browse desc</if>
+            <if test="sort == 2">order by updateTime desc</if>
+        </trim>
+    </select>
+    <select id="countSmall" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM t_resource
+        <where>
+            <trim suffixOverrides="and">
+                (grade like '%21%' or grade like '%22%' or grade like '%23%'
+                or grade like '%24%' or grade like '%25%' or grade like '%26%') and
+                <if test="value!=0">resource_type = #{type} and </if>
+            </trim>
+        </where>
+    </select>
+    <select id="countMiddle" resultType="java.lang.Integer">
+        SELECT count (1)
+        FROM t_resource
+        <where>
+            <trim suffixOverrides="and">
+                (grade like '%31%' or grade like '%32%' or grade like '%33%') and
+                <if test="value!=0">resource_type =#{type} and </if>
+            </trim>
+        </where>
+    </select>
+    <select id="countHigh" resultType="java.lang.Integer">
+        SELECT count (1)
+        FROM t_resource
+        <where>
+            <trim suffixOverrides="and">
+                (grade like '%41%' or grade like '%42%' or grade like '%43%') and
+                <if test="value!=0">resource_type =#{type} and </if>
+            </trim>
+        </where>
+    </select>
 </mapper>
 
 
