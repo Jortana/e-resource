@@ -61,7 +61,22 @@
           </div>
         </div>
       </div>
+      <div class="row">
+        <div class="boutique-container">
+          <h2>精选资源</h2>
+          <div class="boutique-resource">
+            <div
+              v-for="(resource, index) in Array(10)"
+              :key="index"
+              class="resource-info"
+            >
+              {{ index }}
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
+
     <!-- 导航目录 -->
     <div v-show="false" class="menu-container">
       <div class="white-container">
@@ -254,6 +269,13 @@ main {
   /*white-space: nowrap;*/
 }
 
+.boutique-container {
+  background-color: #fdfbfb;
+  box-shadow: 1px 3px 6px rgb(122 122 122 / 0.3);
+  overflow: hidden;
+  width: 100%;
+}
+
 .kg-container {
   width: 75%;
 }
@@ -261,15 +283,17 @@ main {
 .card h2,
 .card > div,
 .kg-container h2,
-.kg-container > div {
+.kg-container > div,
+.boutique-container h2 {
   padding-left: 1.2rem;
   padding-right: 1.2rem;
 }
 
 .card h2,
-.kg-container h2 {
+.kg-container h2,
+.boutique-container h2 {
   font-size: 1.3rem;
-  margin-top: 1.2rem;
+  margin-top: 0.8rem;
   padding-bottom: 0.5rem;
   border-bottom: solid 1px #a5a3a3;
 }
@@ -366,5 +390,16 @@ main {
 
 .carousel-container div {
   height: 100%;
+}
+
+/* 精选资源的样式 */
+.boutique-resource {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 1rem;
+}
+
+.boutique-resource .resource-info {
+  width: 20%;
 }
 </style>

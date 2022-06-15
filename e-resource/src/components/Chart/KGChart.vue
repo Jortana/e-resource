@@ -26,7 +26,10 @@ export default {
     entities: {
       handler(entities) {
         // 如果浏览记录为空，则记录当前节点
-        if (this.$store.state.graphHistory.length === 0) {
+        if (
+          this.$store.state.graphHistory.length === 0 &&
+          entities[entities.length - 1]
+        ) {
           this.$store.commit('pushHistory', [
             entities[entities.length - 1].entityName
           ])

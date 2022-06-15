@@ -48,9 +48,9 @@
           学科分类
         </a>
         <a class="menu-item" href="/#/rate">排行</a>
-        <a class="menu-item" href="">小学资源库</a>
-        <a class="menu-item" href="">初中资源库</a>
-        <a class="menu-item" href="">高中资源库</a>
+        <a class="menu-item" href="/#/search?q=小学">小学资源库</a>
+        <a class="menu-item" href="/#/search?q=初中">初中资源库</a>
+        <a class="menu-item" href="/#/search?q=高中">高中资源库</a>
       </div>
       <div class="catogory-wrap">
         <div

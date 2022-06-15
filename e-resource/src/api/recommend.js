@@ -76,10 +76,26 @@ export const newResourceMore = () => {
 }
 
 /**
+ * 获取下载量排行 条数多的版本
+ * @returns {AxiosPromise}
+ */
+export const downloadResourceMore = () => {
+  return http.get(`${baseURL}/public/queryMoreDownload`)
+}
+
+/**
  * 根据用户获取推荐资源 条数多的版本
  * @returns {AxiosPromise}
  */
 export const userRecommendResourceMore = () => {
   const userId = store.state.user !== '' ? store.state.user['userId'] : ''
   return http.get(`${baseURL}/public/recommendMoreUser?userId=${userId}`)
+}
+
+/**
+ * 根据学段搜索精品资源
+ * @returns {AxiosPromise}
+ */
+export const boutiqueResource = () => {
+  return http.get(`${baseURL}/public/queryBoutique`)
 }

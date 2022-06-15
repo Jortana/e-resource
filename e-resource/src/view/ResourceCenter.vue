@@ -90,14 +90,27 @@
               </div>
             </div>
           </div>
-          <!-- 知识图谱 -->
           <div>
+            <!-- 知识图谱 -->
             <history
+              v-if="!isGrade"
               class="history-container common-shadow"
               @changeNode="changeNode"
             />
-            <div class="graph common-shadow">
+            <div v-if="!isGrade" class="graph common-shadow">
               <k-g-chart ref="chart" :entities="entities.entities"></k-g-chart>
+            </div>
+
+            <!-- 推荐资源 -->
+            <div v-if="isGrade" class="boutique-resource common-shadow">
+              <h2>精选资源</h2>
+              <div class="list-container">
+                <resource-list
+                  :resourceList="boutiqueResources"
+                  :browseTime="true"
+                  :isHidden="true"
+                ></resource-list>
+              </div>
             </div>
           </div>
         </div>
@@ -113,13 +126,17 @@ import ResourceLink from '@/components/ResourceLink'
 import DownloadButton from '@/components/Buttons/DownloadButton'
 import ResourceListWithInfo from '@/components/ResourceListWithInfo'
 import GoalAndKeyCard from '@/components/GoalAndKeyCard'
+import merge from 'webpack-merge'
+import KGChart from '@/components/Chart/KGChart'
+import History from '@/components/Chart/History'
+import ResourceList from '@/components/ResourceList'
+
 import { record } from '@/api/record'
 // import { recommendByUserEntity } from '@/api/recommend'
 // import { download } from '@/api/resource'
 import { searchEntity, relatedEntity } from '@/api/entity'
-import merge from 'webpack-merge'
-import KGChart from '@/components/Chart/KGChart'
-import History from '@/components/Chart/History'
+import { boutiqueResource } from '@/api/recommend'
+
 export default {
   name: 'ResourceCenter',
   components: {
@@ -130,7 +147,8 @@ export default {
     DownloadButton,
     ResourceListWithInfo,
     GoalAndKeyCard,
-    History
+    History,
+    ResourceList
   },
   data() {
     return {
@@ -186,7 +204,8 @@ export default {
       goal: [],
       key: [],
       activeEntity: '',
-      title: ''
+      title: '',
+      boutiqueResources: []
     }
   },
   computed: {
@@ -195,12 +214,15 @@ export default {
     },
     graphEntity() {
       return this.entities.entities
+    },
+    // 控制显示正常搜索页还是学段搜索页
+    isGrade() {
+      return this.checkIsGrade()
     }
   },
   watch: {
     query: {
       handler(newQuery, oldQuery) {
-        // console.log(this.searchInfo)
         this.resetResource()
         this.searchInfo.type = newQuery.type === undefined ? '0' : newQuery.type
         this.searchInfo.sort = newQuery.sort === undefined ? 0 : newQuery.sort
@@ -226,6 +248,14 @@ export default {
     title: {
       handler(title) {
         document.title = title
+      },
+      immediate: true
+    },
+    isGrade: {
+      handler(isGrade) {
+        if (isGrade) {
+          this.getBoutique()
+        }
       },
       immediate: true
     }
@@ -254,7 +284,6 @@ export default {
         perPage: this.pageInfo.perPage
       }).then((response) => {
         this.resetResource()
-        console.log(response)
         if (response.data.code === 200) {
           const resource = response.data.data.resources[0]
           this.resources.total = response.data.data.total
@@ -262,22 +291,25 @@ export default {
           // 提取出教学目标和重难点以数组的形式存储
           const goal = []
           const key = []
-          resource['goalAndKey'].forEach((goalAndKey) => {
-            if (goalAndKey['objectives'] !== null) {
-              goal.push({
-                content: goalAndKey['objectives'],
-                resourceID: goalAndKey['resourceID']
-              })
-            }
-            if (goalAndKey['keyPoint'] !== null) {
-              key.push({
-                content: goalAndKey['objectives'],
-                resourceID: goalAndKey['resourceID']
-              })
-            }
-          })
-          this.goal = goal
-          this.key = key
+          if (resource['goalAndKey']) {
+            resource['goalAndKey'].forEach((goalAndKey) => {
+              if (goalAndKey['objectives'] !== null) {
+                goal.push({
+                  content: goalAndKey['objectives'],
+                  resourceID: goalAndKey['resourceID']
+                })
+              }
+              if (goalAndKey['keyPoint'] !== null) {
+                key.push({
+                  content: goalAndKey['objectives'],
+                  resourceID: goalAndKey['resourceID']
+                })
+              }
+            })
+            this.goal = goal
+            this.key = key
+          }
+
           // 找到和关键词一致的知识点
           if (resource.entityName === this.searchInfo.content) {
             this.cardInfo = resource.properties
@@ -340,7 +372,26 @@ export default {
       target.click()
     },
     //
-    changeNode() {}
+    changeNode() {},
+    checkIsGrade() {
+      const keyWords = ['小学', '初中', '高中']
+      for (let i = 0; i < keyWords.length; i++) {
+        if (this.searchInfo.content === keyWords[i]) {
+          return true
+        }
+      }
+      return false
+    },
+    getBoutique() {
+      boutiqueResource().then((response) => {
+        const { code, data } = response.data
+        if (code === 200) {
+          this.boutiqueResources = data
+        } else {
+          this.$message.warning('服务器错误，请稍后刷新重试')
+        }
+      })
+    }
   }
 }
 </script>
@@ -439,6 +490,20 @@ export default {
   height: 420px;
   min-height: 400px;
   background-color: white;
+}
+
+.boutique-resource {
+  padding: 1rem 1rem 0.5rem;
+  width: 400px;
+  margin-top: 1rem;
+  margin-left: 1rem;
+  background-color: white;
+}
+
+.boutique-resource h2 {
+  padding-bottom: 8px;
+  margin-bottom: 1rem;
+  border-bottom: solid 1px #a5a3a3;
 }
 
 .history-container {

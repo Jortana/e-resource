@@ -28,7 +28,7 @@
           <h2>最多下载</h2>
           <div class="list-container">
             <resource-list
-              :resourceList="[]"
+              :resourceList="downloadResources.slice(0, 13)"
               :browseTime="true"
               :isHidden="true"
             ></resource-list>
@@ -45,7 +45,8 @@ import ResourceList from '@/components/ResourceList'
 import {
   hotResourceMore,
   newResourceMore,
-  userRecommendResourceMore
+  downloadResourceMore
+  // userRecommendResourceMore
 } from '@/api/recommend'
 
 export default {
@@ -58,6 +59,7 @@ export default {
     return {
       hotResources: [],
       newResources: [],
+      downloadResources: [],
       userRecommendResources: []
     }
   },
@@ -82,8 +84,13 @@ export default {
           this.$message.warning('服务器错误，请稍后刷新重试')
         }
       })
-      userRecommendResourceMore().then((response) => {
-        console.log(response)
+      downloadResourceMore().then((response) => {
+        const { code, data } = response.data
+        if (code === 200) {
+          this.downloadResources = data
+        } else {
+          this.$message.warning('服务器错误，请稍后刷新重试')
+        }
       })
     }
   }

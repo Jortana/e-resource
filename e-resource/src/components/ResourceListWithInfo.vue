@@ -19,19 +19,22 @@
                 <span>{{ `.${resource['url'].split('.').slice(-1)}` }}</span>
               </span>
             </div>
-            <div v-if="resource['entityList'] !== null" class="entity-list">
-              <div
-                v-for="(entity, entityIndex) in resource['entityList']"
-                :key="entityIndex"
-              >
-                <el-button
-                  class="entity-btn"
-                  type="text"
-                  size="mini"
-                  @click="searchEntity(entity)"
+            <!-- 资源包含的知识点暂不显示 -->
+            <div v-if="false">
+              <div v-if="resource['entityList'] !== null" class="entity-list">
+                <div
+                  v-for="(entity, entityIndex) in resource['entityList']"
+                  :key="entityIndex"
                 >
-                  {{ entity }}
-                </el-button>
+                  <el-button
+                    class="entity-btn"
+                    type="text"
+                    size="mini"
+                    @click="searchEntity(entity)"
+                  >
+                    {{ entity }}
+                  </el-button>
+                </div>
               </div>
             </div>
             <div class="extra">
