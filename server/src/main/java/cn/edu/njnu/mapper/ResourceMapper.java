@@ -21,13 +21,16 @@ public interface ResourceMapper {
     List<Map> queryGoalAndKey(String entity);
     //更新资源浏览次数
     boolean updateBrowse(int browse, int resourceID);
-    //更新资源浏览次数
-    boolean updateDownload(int download, int resourceID);
+
     //根据条件查询资源
     ArrayList<Resource> queryHot();
     ArrayList<Resource> queryHot2();
     //根据条件查询资源
     ArrayList<Resource> queryTime();
+
+    //更新下载次数和获取下载次数排行
+    int updateDownload(int resourceID);
+    ArrayList<Resource> queryDownload();
 
     ArrayList<Resource> queryMoreHot();
     //根据条件查询资源
@@ -49,4 +52,6 @@ public interface ResourceMapper {
     int countSmall(int type);
     int countMiddle(int type);
     int countHigh(int type);
+
+
 }

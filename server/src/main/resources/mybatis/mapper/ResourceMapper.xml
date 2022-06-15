@@ -68,7 +68,7 @@
     </update>
     <!-- 更新资源下载次数 -->
     <update id="updateDownload">
-        update t_resource set download = #{download} where id = #{resourceID}
+        update t_resource set download = download+1 where id = #{resourceID}
     </update>
     <!-- 查热门资源 -->
     <select id="queryHot" resultType="resource">
@@ -198,6 +198,12 @@
                 <if test="value!=0">resource_type =#{type} and </if>
             </trim>
         </where>
+    </select>
+    <select id="queryDownload" resultType="cn.edu.njnu.pojo.Resource">
+        select id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type
+        from t_resource
+        order by download desc
+        limit 20
     </select>
 </mapper>
 
