@@ -83,7 +83,8 @@ public class ResourceController extends BaseController {
     }
 
     @GetMapping("/v1.0/public/queryBoutique")
-    public Result queryBoutique(){
-        return resourceService.queryBoutique();
+    public Result queryBoutique(@RequestParam Map<String, Object> gradeMap){
+        String grade = (String) gradeMap.getOrDefault("grade", "");
+        return resourceService.queryBoutique(grade);
     }
 }
