@@ -66,11 +66,24 @@
           <h2>精选资源</h2>
           <div class="boutique-resource">
             <div
-              v-for="(resource, index) in Array(10)"
-              :key="index"
+              v-for="resource in boutiqueResources"
+              :key="resource.id"
               class="resource-info"
             >
-              {{ index }}
+              <el-image
+                :src="'http://202.102.89.244:8082' + resource.cover"
+                fit="cover"
+                class="thumbnail"
+                lazy
+                @click="viewResource(resource.id)"
+              ></el-image>
+              <router-link
+                :to="`/resource/${resource.id}`"
+                target="_blank"
+                class="resource-name"
+              >
+                {{ resource.resourceName }}
+              </router-link>
             </div>
           </div>
         </div>
@@ -117,7 +130,8 @@ import { carousel } from '@/api/recommend'
 import {
   hotResource,
   newResource,
-  userRecommendResource
+  userRecommendResource,
+  boutiqueResource
 } from '@/api/recommend'
 
 export default {
@@ -131,7 +145,8 @@ export default {
       newResources: [],
       recommendResources: [],
       menus: [],
-      carouselData: []
+      carouselData: [],
+      boutiqueResources: []
     }
   },
   watch: {},
@@ -146,6 +161,7 @@ export default {
   mounted() {
     this.getMenus()
     this.getCarousel()
+    this.getBoutique()
   },
   methods: {
     search() {
@@ -195,13 +211,22 @@ export default {
       })
     },
     viewResource(resourceID) {
-      console.log(resourceID)
       const target = this.$refs.resourceTarget
       target.setAttribute(
         'href',
         `${window.location.origin}/e-resource/#/resource/${resourceID}`
       )
       target.click()
+    },
+    getBoutique() {
+      boutiqueResource().then((response) => {
+        const { code, data } = response.data
+        if (code === 200) {
+          this.boutiqueResources = data
+        } else {
+          this.$message.warning('服务器错误，请稍后刷新重试')
+        }
+      })
     }
   }
 }
@@ -396,10 +421,34 @@ main {
 .boutique-resource {
   display: flex;
   flex-wrap: wrap;
-  padding: 1rem;
+  padding: 1rem 1rem 0;
+  justify-content: space-between;
 }
 
 .boutique-resource .resource-info {
-  width: 20%;
+  display: flex;
+  flex-direction: column;
+  width: 19%;
+  margin-bottom: 1.5rem;
+}
+
+.boutique-resource .resource-info .thumbnail {
+  height: 120px;
+  box-shadow: 1px 3px 6px rgb(122 122 122 / 0.2);
+  cursor: pointer;
+}
+
+.boutique-resource .resource-info .resource-name {
+  margin-top: 0.5rem;
+  text-decoration: none;
+  color: #606266;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.boutique-resource .resource-info .resource-name:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 </style>

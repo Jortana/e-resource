@@ -383,7 +383,7 @@ export default {
       return false
     },
     getBoutique() {
-      boutiqueResource().then((response) => {
+      boutiqueResource(this.searchInfo.content).then((response) => {
         const { code, data } = response.data
         if (code === 200) {
           this.boutiqueResources = data

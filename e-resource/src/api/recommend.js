@@ -15,8 +15,8 @@ export const recommendByUserEntity = (entity) => {
 }
 
 /**
- * 用户点进某一个资源后，根据资源ID和用户ID推荐资源
- * @param {Number} resourceID - 资源ID
+ * 用户点进某一个资源后，根据资源 ID 和用户 ID 推荐资源
+ * @param {Number} resourceID - 资源 ID
  * @returns {AxiosPromise}
  */
 export const recommendByResourceUser = (resourceID) => {
@@ -94,8 +94,12 @@ export const userRecommendResourceMore = () => {
 
 /**
  * 根据学段搜索精品资源
+ * @param {String} [grade] - 学段
  * @returns {AxiosPromise}
  */
-export const boutiqueResource = () => {
+export const boutiqueResource = (grade) => {
+  if (grade) {
+    return http.get(`${baseURL}/public/queryBoutique?grade=${grade}`)
+  }
   return http.get(`${baseURL}/public/queryBoutique`)
 }

@@ -7,6 +7,7 @@
             :src="'http://202.102.89.244:8082' + resource.cover"
             fit="contain"
             class="thumbnail"
+            lazy
           ></el-image>
         </div>
         <div class="right-side flex">
