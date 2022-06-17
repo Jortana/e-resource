@@ -481,7 +481,7 @@ public class ResourceService {
             }
         }else if ("初中".equals(grade)){
             int[] arr = new int[]{
-                    56167, 56767, 56754, 56749, 84395
+                    56167, 56767, 56754, 56749, 84395, 56697, 58769
             };
             for (int i : arr) {
                 JSONObject object = new JSONObject();
@@ -492,7 +492,7 @@ public class ResourceService {
             }
         }else if ("高中".equals(grade)){
             int[] arr = new int[]{
-                    61358, 56599, 70518, 99682, 70499};
+                    61358, 56599, 70518, 99682, 70499, 66566, 86097};
             for (int i : arr) {
                 JSONObject object = new JSONObject();
                 object.put("id", i);
