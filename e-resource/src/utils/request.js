@@ -108,5 +108,5 @@ service.interceptors.response.use(
   }
 )
 
-// 4.导入文件
+// 4.导出文件
 export default service
