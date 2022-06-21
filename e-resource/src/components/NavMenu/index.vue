@@ -47,10 +47,16 @@
           </svg>
           学科分类
         </a>
-        <a class="menu-item" href="/#/rate">排行</a>
-        <a class="menu-item" href="/#/search?q=小学">小学资源库</a>
-        <a class="menu-item" href="/#/search?q=初中">初中资源库</a>
-        <a class="menu-item" href="/#/search?q=高中">高中资源库</a>
+        <router-link :to="'rate'" class="menu-item">排行</router-link>
+        <router-link :to="'/search?q=小学'" class="menu-item">
+          小学资源库
+        </router-link>
+        <router-link :to="'/search?q=初中'" class="menu-item">
+          初中资源库
+        </router-link>
+        <router-link :to="'/search?q=高中'" class="menu-item">
+          高中资源库
+        </router-link>
       </div>
       <div class="catogory-wrap">
         <div
