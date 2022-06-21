@@ -468,48 +468,29 @@ public class ResourceService {
 
     public Result queryBoutique(String grade) {
         JSONArray jsonArray = new JSONArray();
+        int[] arr;
         if ("小学".equals(grade)){
-            int[] arr = new int[]{
+            arr = new int[]{
                     91606, 75526, 96108, 70343, 70329
             };
-            for (int i : arr) {
-                JSONObject object = new JSONObject();
-                object.put("id", i);
-                object.put("cover", "/cover/" + i + ".png ");
-                object.put("resourceName", resourceMapper.queryResourceByID(i).getResourceName());
-                jsonArray.add(object);
-            }
         }else if ("初中".equals(grade)){
-            int[] arr = new int[]{
+            arr = new int[]{
                     56167, 56767, 56754, 56749, 84395, 56697, 58769
             };
-            for (int i : arr) {
-                JSONObject object = new JSONObject();
-                object.put("id", i);
-                object.put("cover", "/cover/" + i + ".png ");
-                object.put("resourceName", resourceMapper.queryResourceByID(i).getResourceName());
-                jsonArray.add(object);
-            }
         }else if ("高中".equals(grade)){
-            int[] arr = new int[]{
+            arr = new int[]{
                     61358, 56599, 70518, 99682, 70499, 66566, 86097};
-            for (int i : arr) {
-                JSONObject object = new JSONObject();
-                object.put("id", i);
-                object.put("cover", "/cover/" + i + ".png ");
-                object.put("resourceName", resourceMapper.queryResourceByID(i).getResourceName());
-                jsonArray.add(object);
-            }
         }else {
-            int[] arr = new int[]{
+            arr = new int[]{
                     61358, 62541, 68816, 60945, 56577, 69872, 71626, 87761, 87651, 83914};
-            for (int i : arr) {
-                JSONObject object = new JSONObject();
-                object.put("id", i);
-                object.put("cover", "/cover/" + i + ".png ");
-                object.put("resourceName", resourceMapper.queryResourceByID(i).getResourceName());
-                jsonArray.add(object);
-            }
+        }
+        for (int i : arr) {
+            JSONObject object = new JSONObject();
+            object.put("id", i);
+            object.put("cover", "/cover/" + i + ".png ");
+            object.put("resourceName", resourceMapper.queryResourceByID(i).getResourceName());
+            object.put("fileType", "ppt");
+            jsonArray.add(object);
         }
         return ResultFactory.buildSuccessResult("success", jsonArray);
     }

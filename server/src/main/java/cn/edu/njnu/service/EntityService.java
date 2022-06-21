@@ -181,6 +181,7 @@ public class EntityService {
             resArray.add(mainEntity);
         }
 //        driver.close();
+        session.close();
         return ResultFactory.buildSuccessResult("查询成功", resArray);
     }
 
