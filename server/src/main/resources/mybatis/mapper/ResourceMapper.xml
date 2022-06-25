@@ -153,6 +153,7 @@
             <if test="sort == 1">order by browse desc</if>
             <if test="sort == 2">order by updateTime desc</if>
         </trim>
+        limit #{page}, #{pages}
     </select>
     <select id="queryByGradeHigh" resultType="cn.edu.njnu.pojo.Resource">
         SELECT id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type
@@ -167,6 +168,7 @@
             <if test="sort == 1">order by browse desc</if>
             <if test="sort == 2">order by updateTime desc</if>
         </trim>
+        limit #{page}, #{pages}
     </select>
     <select id="countSmall" resultType="java.lang.Integer">
         SELECT count(1)
@@ -204,6 +206,31 @@
         from t_resource
         order by download desc
         limit 20
+    </select>
+    <select id="queryByPeriodSubject" resultType="cn.edu.njnu.pojo.Resource">
+        SELECT id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type
+        FROM t_resource
+        <where>
+            <trim suffixOverrides="and">
+                <if test="period!=0">period = #{period} and </if>
+                <if test="subject!=0">`subject` =#{subject} and </if>
+            </trim>
+        </where>
+        <trim>
+            <if test="sort == 1">order by browse desc</if>
+            <if test="sort == 2">order by updateTime desc</if>
+        </trim>
+        limit #{page}, #{pages}
+    </select>
+    <select id="countPeriodSubject" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM t_resource
+        <where>
+            <trim suffixOverrides="and">
+                <if test="period!=0">period = #{period} and </if>
+                <if test="subject!=0">`subject` =#{subject} and </if>
+            </trim>
+        </where>
     </select>
 </mapper>
 

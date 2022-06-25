@@ -494,4 +494,29 @@ public class ResourceService {
         }
         return ResultFactory.buildSuccessResult("success", jsonArray);
     }
+
+    public Result getResourcesByPeriodSubject(int subject, int period, int sort, int type, int page, int perPage) {
+        List<Resource> resourceArrayList;
+        int total;
+        resourceArrayList =
+                    resourceMapper.queryByPeriodSubject(period, subject, sort, type, (page-1)*perPage, perPage);
+        total = resourceMapper.countPeriodSubject(period, subject);
+
+        JSONObject resObject = new JSONObject();
+        resObject.put("total", total);
+        int pages = total/perPage;
+        if (total%perPage!=0){
+            pages++;
+        }
+        resObject.put("pages", pages);
+        JSONObject resources = new JSONObject();
+        resources.put("resources", resourceArrayList);
+        resources.put("entityName", new String());
+        resources.put("goalAndKey", new JSONArray());
+        resources.put("properties", new JSONObject());
+        JSONArray entityArray = new JSONArray();
+        entityArray.add(resources);
+        resObject.put("resources", entityArray);
+        return ResultFactory.buildSuccessResult("查询成功", resObject);
+    }
 }

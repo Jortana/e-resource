@@ -319,6 +319,9 @@ public class EntityService {
             int userId = userMapper.queryUserByName(username).getUserId();
             recordMapper.addEntityRecord(userId,browseDate,keyword, browser, OS, ipAddress);
         }
+        int period = Integer.parseInt((String) keywordMap.getOrDefault("period", "0"));
+        int subject = Integer.parseInt((String) keywordMap.getOrDefault("subject", "0"));
+
         int sort = 0;  //0默认，1最热，2最新
         int type = 0;  //0全部
         if (keywordMap.containsKey("sort")){
@@ -329,7 +332,10 @@ public class EntityService {
         }
         int page = Integer.parseInt( (String) keywordMap.get("page") );
         int perPage = Integer.parseInt( (String) keywordMap.get("perPage") );
-        if (keyword.equals("小学") || keyword.equals("小学") || keyword.equals("小学")){
+        if (keyword==null){
+            return resourceService.getResourcesByPeriodSubject(subject, period, sort, type, page, perPage);
+        }
+        if (keyword.equals("小学") || keyword.equals("初中") || keyword.equals("高中")){
             return resourceService.getResourcesByGrade(keyword, sort, type, page, perPage);
         }
         //根据用户输入与资源名进行匹配
@@ -340,7 +346,6 @@ public class EntityService {
             redisTemplate.opsForValue().set("content_"+sort+"_"+type+"_"+content, resourceNameList);
             redisTemplate.expire(content+"_"+sort+"_"+type, 100, TimeUnit.MINUTES);
         }
-
         Set<Integer> idSet = new HashSet<>();
         //获取资源id，避免之后在neo4j中重复查找
         for (Resource single:resourceNameList){
@@ -425,7 +430,15 @@ public class EntityService {
 
         //根据前面生成的idList从mysql中查资源
         List<Resource> resourceArrayList = resourceMapper.queryResourceByIDList(idSet,sort,type);
+        List<Resource> resourceArrayListTmp = new ArrayList<>();
         for (Resource resource:resourceArrayList){
+            System.out.println(resource.getPeriod());
+            if (period!=0 && !resource.getPeriod().equals(String.valueOf(period))){
+                continue;
+            }
+            if (subject!=0&&resource.getSubject()!=subject){
+                continue;
+            }
             int resourceID = resource.getId();
             Resource resourceInRedis = (Resource) redisTemplate.opsForValue().get("resource_"+resourceID);
             if (resourceInRedis == null){
@@ -472,9 +485,11 @@ public class EntityService {
             else{
                 BeanUtils.copyProperties(resourceInRedis, resource);
             }
+            resourceArrayListTmp.add(resource);
         }
 
         //根据页码与每页个数获取资源
+        resourceArrayList = resourceArrayListTmp;
         int totalEntity = resourceArrayList.size();
         int skip = (page-1)*perPage;
         JSONArray resourceTotal = new JSONArray();

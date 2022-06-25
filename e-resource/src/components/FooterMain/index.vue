@@ -1,10 +1,10 @@
 <template>
   <div class="footer-container">
     <p>
-      Copyright © 2010-2022 All rights reserved. 南京师范大学教育科学学院
+      Copyright © 2021-2022 All rights reserved. 南京师范大学教育科学学院
       版权所有
     </p>
-    <p>联系方式：025-83598571（随园） 025-85891035（仙林）</p>
+    <p>联系方式：18362971103</p>
   </div>
 </template>
 

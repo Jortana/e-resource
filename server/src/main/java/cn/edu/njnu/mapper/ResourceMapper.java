@@ -53,5 +53,6 @@ public interface ResourceMapper {
     int countMiddle(int type);
     int countHigh(int type);
 
-
+    List<Resource> queryByPeriodSubject(int period, int subject, int sort, int type, int page, int pages);
+    int countPeriodSubject(int period, int subject);
 }
