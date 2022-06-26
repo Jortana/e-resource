@@ -93,7 +93,7 @@
         SELECT id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type
         FROM t_resource
         <if test="subject!=0">where `subject` =#{subject}</if>
-        order by download desc
+        order by browse desc
         limit 20
     </select>
 
@@ -137,9 +137,9 @@
         FROM t_resource
         <where>
             <trim suffixOverrides="and">
-                (grade like '%21%' or grade like '%22%' or grade like '%23%'
-                    or grade like '%24%' or grade like '%25%' or grade like '%26%') and
+                period=2 and
                 <if test="type!=0">resource_type =#{type} and </if>
+                <if test="subject!=0">`subject` =#{subject} and </if>
             </trim>
         </where>
         <trim>
@@ -153,8 +153,9 @@
         FROM t_resource
         <where>
             <trim suffixOverrides="and">
-                (grade like '%31%' or grade like '%32%' or grade like '%33%') and
+                period=3 and
                 <if test="type!=0">resource_type =#{type} and </if>
+                <if test="subject!=0">`subject` =#{subject} and </if>
             </trim>
         </where>
         <trim>
@@ -168,8 +169,9 @@
         FROM t_resource
         <where>
             <trim suffixOverrides="and">
-                (grade like '%41%' or grade like '%42%' or grade like '%43%') and
+                period=4 and
                 <if test="type!=0">resource_type =#{type} and </if>
+                <if test="subject!=0">`subject` =#{subject} and </if>
             </trim>
         </where>
         <trim>
@@ -183,29 +185,31 @@
         FROM t_resource
         <where>
             <trim suffixOverrides="and">
-                (grade like '%21%' or grade like '%22%' or grade like '%23%'
-                or grade like '%24%' or grade like '%25%' or grade like '%26%') and
-                <if test="value!=0">resource_type = #{type} and </if>
+                period=2 and
+                <if test="type!=0">resource_type = #{type} and </if>
+                <if test="subject!=0">`subject` =#{subject} and </if>
             </trim>
         </where>
     </select>
     <select id="countMiddle" resultType="java.lang.Integer">
-        SELECT count (1)
+        SELECT count(1)
         FROM t_resource
         <where>
             <trim suffixOverrides="and">
-                (grade like '%31%' or grade like '%32%' or grade like '%33%') and
-                <if test="value!=0">resource_type =#{type} and </if>
+                period=3 and
+                <if test="type!=0">resource_type =#{type} and </if>
+                <if test="subject!=0">`subject` =#{subject} and </if>
             </trim>
         </where>
     </select>
     <select id="countHigh" resultType="java.lang.Integer">
-        SELECT count (1)
+        SELECT count(1)
         FROM t_resource
         <where>
             <trim suffixOverrides="and">
-                (grade like '%41%' or grade like '%42%' or grade like '%43%') and
-                <if test="value!=0">resource_type =#{type} and </if>
+                period=4 and
+                <if test="type!=0">resource_type =#{type} and </if>
+                <if test="subject!=0">`subject` =#{subject} and </if>
             </trim>
         </where>
     </select>

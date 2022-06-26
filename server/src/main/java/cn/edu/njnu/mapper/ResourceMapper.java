@@ -46,12 +46,12 @@ public interface ResourceMapper {
     Double resourceRate(int resource);
 
     List<Resource> queryByGrade(String grade, int sort, int type);
-    List<Resource> queryByGradeSmall(int sort, int type, int page, int pages);
-    List<Resource> queryByGradeMiddle(int sort, int type, int page, int pages);
-    List<Resource> queryByGradeHigh(int sort, int type, int page, int pages);
-    int countSmall(int type);
-    int countMiddle(int type);
-    int countHigh(int type);
+    List<Resource> queryByGradeSmall(int subject, int sort, int type, int page, int pages);
+    List<Resource> queryByGradeMiddle(int subject, int sort, int type, int page, int pages);
+    List<Resource> queryByGradeHigh(int subject, int sort, int type, int page, int pages);
+    int countSmall(@Param("subject")int subject, @Param("type")int type);
+    int countMiddle(@Param("subject")int subject, @Param("type")int type);
+    int countHigh(@Param("subject")int subject, @Param("type")int type);
 
     List<Resource> queryByPeriodSubject(int period, int subject, int sort, int type, int page, int pages);
     int countPeriodSubject(int period, int subject);
