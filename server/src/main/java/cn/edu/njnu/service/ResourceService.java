@@ -424,21 +424,21 @@ public class ResourceService {
         return ResultFactory.buildSuccessResult("success", jsonArray);
     }
 
-    public Result getResourcesByGrade(String grade, int sort, int type, int page, int perPage){
+    public Result getResourcesByGrade(int subject, String grade, int sort, int type, int page, int perPage){
         List<Resource> resourceArrayList;
         int total;
         if ("小学".equals(grade)){
             resourceArrayList =
-                    resourceMapper.queryByGradeSmall(sort, type, (page-1)*perPage, perPage);
-            total = resourceMapper.countSmall(type);
+                    resourceMapper.queryByGradeSmall(subject, sort, type, (page-1)*perPage, perPage);
+            total = resourceMapper.countSmall(subject, type);
         }else if ("初中".equals(grade)){
             resourceArrayList =
-                    resourceMapper.queryByGradeMiddle(sort, type, (page-1)*perPage, perPage);
-            total = resourceMapper.countMiddle(type);
+                    resourceMapper.queryByGradeMiddle(subject, sort, type, (page-1)*perPage, perPage);
+            total = resourceMapper.countMiddle(subject, type);
         }else if ("高中".equals(grade)){
             resourceArrayList =
-                    resourceMapper.queryByGradeHigh(sort, type, (page-1)*perPage, perPage);
-            total = resourceMapper.countHigh(type);
+                    resourceMapper.queryByGradeHigh(subject, sort, type, (page-1)*perPage, perPage);
+            total = resourceMapper.countHigh(subject, type);
         }else {
             return ResultFactory.buildFailResult("请查询正确的学段");
         }
