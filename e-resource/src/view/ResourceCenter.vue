@@ -280,14 +280,14 @@ export default {
         this.searchInfo.type = newQuery.type === undefined ? '0' : newQuery.type
         this.searchInfo.sort = newQuery.sort === undefined ? 0 : newQuery.sort
         this.searchInfo.content = newQuery.q === undefined ? 0 : newQuery.q
-        // this.searchInfo.period =
-        //   this.$route.query.period === undefined
-        //     ? 0
-        //     : Number(this.$route.query.period)
-        // this.searchInfo.subject =
-        //   this.$route.query.subject === undefined
-        //     ? 0
-        //     : Number(this.$route.query.subject)
+        this.searchInfo.period =
+          this.$route.query.period === undefined
+            ? 0
+            : Number(this.$route.query.period)
+        this.searchInfo.subject =
+          this.$route.query.subject === undefined
+            ? 0
+            : Number(this.$route.query.subject)
         this.pageInfo.page = newQuery.page === undefined ? 1 : newQuery.page
         // console.log(this.searchInfo)
 
@@ -332,14 +332,15 @@ export default {
           }
         }
         // 这一段放在这里就不会有学科 id 跳出来，只是会有所有学科这几个字跳出来，稍微正常一点
-        this.searchInfo.period =
-          this.$route.query.period === undefined
-            ? 0
-            : Number(this.$route.query.period)
-        this.searchInfo.subject =
-          this.$route.query.subject === undefined
-            ? 0
-            : Number(this.$route.query.subject)
+        // 但是放在这里会出现跳转之后请求出 bug
+        // this.searchInfo.period =
+        //   this.$route.query.period === undefined
+        //     ? 0
+        //     : Number(this.$route.query.period)
+        // this.searchInfo.subject =
+        //   this.$route.query.subject === undefined
+        //     ? 0
+        //     : Number(this.$route.query.subject)
       }
     }
   },
