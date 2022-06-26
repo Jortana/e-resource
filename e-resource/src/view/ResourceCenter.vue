@@ -14,9 +14,50 @@
             <!-- 找到的实体和资源信息 -->
             <div class="resource-content-container common-shadow">
               <div class="resource">
-                <div></div>
+                <!-- 学段选择 -->
+                <div class="search-tab">
+                  <div class="subtitle">分类搜索</div>
+                  <el-select
+                    v-show="!isGrade"
+                    v-model="searchInfo.period"
+                    class="classification-select"
+                    placeholder="请选择学段"
+                    size="mini"
+                    @change="changePeriod"
+                  >
+                    <el-option
+                      v-for="menu in menus"
+                      :key="menu.ID"
+                      :label="menu.name"
+                      :value="menu.ID"
+                    ></el-option>
+                  </el-select>
+                  <el-select
+                    v-model="searchInfo.subject"
+                    :disabled="searchInfo.period || isGrade ? false : true"
+                    :placeholder="
+                      searchInfo.period ? '请选择学科' : '请先选择学段'
+                    "
+                    class="classification-select"
+                    size="mini"
+                  >
+                    <el-option
+                      v-for="subject in curSubjects"
+                      :key="subject.menuID"
+                      :label="subject.menuName"
+                      :value="subject.menuID"
+                    ></el-option>
+                  </el-select>
+                  <el-button
+                    type="primary"
+                    size="mini"
+                    @click="classificationSearch"
+                  >
+                    搜索
+                  </el-button>
+                </div>
                 <div>
-                  <!-- 这里的v-for的数组实际上是只有一个元素的，后端问题，之前的想法和现在不一样，我发现这个问题的时候已经写了很多了，改起来太麻烦了，懒得改了 -->
+                  <!-- 这里的v-for的数组实际上是只有一个元素的，后端接口一开始没有搞好，之前的想法和现在不一样，我发现这个问题的时候已经写了很多了，改起来太麻烦了，懒得改了 -->
                   <div>
                     <!-- 教学目标和教学重难点 -->
                     <div class="flex goal-and-key-container">
@@ -138,6 +179,7 @@ import History from '@/components/Chart/History'
 import ResourceList from '@/components/ResourceList'
 
 import { record } from '@/api/record'
+import { menus } from '@/api/menu'
 // import { recommendByUserEntity } from '@/api/recommend'
 // import { download } from '@/api/resource'
 import { searchEntity, relatedEntity } from '@/api/entity'
@@ -161,7 +203,11 @@ export default {
       searchInfo: {
         type: this.$route.query.type === undefined ? 0 : this.$route.query.type,
         content: this.$route.query.q,
-        sort: this.$route.query.sort === undefined ? 0 : this.$route.query.sort
+        sort: this.$route.query.sort === undefined ? 0 : this.$route.query.sort,
+        period:
+          this.$route.query.sort === undefined ? 0 : this.$route.query.period,
+        subject:
+          this.$route.query.sort === undefined ? 0 : this.$route.query.subject
       },
       pageInfo: {
         page: this.$route.query.page === undefined ? 1 : this.$route.query.page,
@@ -211,7 +257,10 @@ export default {
       key: [],
       activeEntity: '',
       title: '',
-      boutiqueResources: []
+      boutiqueResources: [],
+      menus: [],
+      // 当前学段学科列表
+      curSubjects: [{ menuID: 0, menuName: '所有学科' }]
     }
   },
   computed: {
@@ -230,11 +279,17 @@ export default {
     query: {
       handler(newQuery, oldQuery) {
         this.resetResource()
+        this.getMenus()
         this.searchInfo.type = newQuery.type === undefined ? '0' : newQuery.type
         this.searchInfo.sort = newQuery.sort === undefined ? 0 : newQuery.sort
         this.searchInfo.content = newQuery.q === undefined ? 0 : newQuery.q
+        // this.searchInfo.period =
+        //   newQuery.period === undefined ? 0 : Number(newQuery.period)
+        // this.searchInfo.subject =
+        //   newQuery.subject === undefined ? 0 : Number(newQuery.subject)
         this.pageInfo.page = newQuery.page === undefined ? 1 : newQuery.page
         // console.log(this.searchInfo)
+
         this.goSearch()
         if (oldQuery === undefined || newQuery.q !== oldQuery.q) {
           this.resetCardInfo()
@@ -264,11 +319,21 @@ export default {
         }
       },
       immediate: true
+    },
+    menus: {
+      handler() {
+        if (this.isGrade) {
+          const keyWords = ['小学', '初中', '高中']
+          for (let i = 0; i < keyWords.length; i++) {
+            if (this.searchInfo.content === keyWords[i]) {
+              this.changePeriod(i + 2)
+            }
+          }
+        }
+      }
     }
   },
-  mounted() {
-    // this.goSearch()
-  },
+  mounted() {},
   methods: {
     changeType(tab) {
       this.searchInfo.type = tab.name
@@ -286,6 +351,8 @@ export default {
         keyword: this.searchInfo.content,
         type: this.searchInfo.type,
         sort: this.searchInfo.sort,
+        period: this.searchInfo.period,
+        subject: this.searchInfo.subject,
         page: this.pageInfo.page,
         perPage: this.pageInfo.perPage
       }).then((response) => {
@@ -397,6 +464,51 @@ export default {
           this.$message.warning('服务器错误，请稍后刷新重试')
         }
       })
+    },
+    getMenus() {
+      if (this.$store.state.menus.length === 0) {
+        menus().then((response) => {
+          const {
+            data: { code, data }
+          } = response
+          if (code === 200) {
+            this.menus = [
+              { ID: 0, name: '所有学段' },
+              ...data[0].classification
+            ]
+            this.$store.commit('initMenus', data)
+          }
+        })
+      } else {
+        this.menus = [
+          { ID: 0, name: '所有学段' },
+          ...this.$store.state.menus[0].classification
+        ]
+      }
+    },
+    changePeriod(id) {
+      const subjects = this.menus.find((menu) => menu.ID === id).menu
+      if (subjects) {
+        this.curSubjects = [{ menuID: 0, menuName: '所有学科' }, ...subjects]
+      } else {
+        this.curSubjects = [{ menuID: 0, menuName: '所有学科' }]
+      }
+    },
+    classificationSearch() {
+      const curPeriod = Number(this.$route.query.period)
+      const curSubject = Number(this.$route.query.subject)
+      if (
+        curPeriod !== this.searchInfo.period ||
+        curSubject !== this.searchInfo.subject
+      ) {
+        this.$router.push({
+          query: merge(this.$route.query, {
+            period: this.searchInfo.period,
+            subject: this.searchInfo.subject,
+            page: 1
+          })
+        })
+      }
     }
   }
 }
@@ -533,4 +645,22 @@ export default {
   width: calc(50% - 10px);
   height: 190px;
 }
+
+/* 分类搜索 */
+.search-tab {
+  display: flex;
+  align-items: center;
+  margin: 0.5rem 0;
+}
+
+.search-tab .subtitle {
+  font-weight: bold;
+  margin-right: 1rem;
+}
+
+.classification-select {
+  width: 120px;
+  margin-right: 1rem;
+}
+/* ***** */
 </style>

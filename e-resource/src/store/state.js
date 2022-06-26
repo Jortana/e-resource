@@ -10,5 +10,6 @@ export default {
   // 知识图谱路径
   graphHistory: [],
   // 学科表
-  subjects: []
+  subjects: [],
+  menus: []
 }

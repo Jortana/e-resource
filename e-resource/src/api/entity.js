@@ -6,12 +6,16 @@ const baseURL = '/v1.0'
 /**
  * 根据关键词查找对应的知识点
  * - keyword: 查找的关键词
+ * - period: 查找的学段
+ * - subject: 查找的学科
  * - page: 第几页
  * - perPage: 每页多少个
  * - type: 筛选资源类型
  * - sort: 根据什么排序（0: 默认, 1: 最热 , 2: 最新）
  * @param {Object} params
  * @param {String} params.keyword
+ * @param {String} params.period
+ * @param {String} params.subject
  * @param {String} params.page
  * @param {String} params.perPage
  * @param {Number} [params.type]

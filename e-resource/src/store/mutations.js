@@ -72,5 +72,13 @@ export default {
    */
   initSubjects(state, subjects) {
     state.subjects = [{ ID: '', name: '全部' }, ...subjects]
+  },
+  /**
+   * 初始化学段和学科列表
+   * @param state
+   * @param {Array} subjects
+   */
+  initMenus(state, menus) {
+    state.menus = [...menus]
   }
 }

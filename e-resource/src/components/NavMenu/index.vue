@@ -47,7 +47,8 @@
           </svg>
           学科分类
         </a>
-        <router-link :to="'rate'" class="menu-item">排行</router-link>
+        <router-link :to="'/'" class="menu-item">首页</router-link>
+        <router-link :to="'/rate'" class="menu-item">排行</router-link>
         <router-link :to="'/search?q=小学'" class="menu-item">
           小学资源库
         </router-link>
@@ -163,14 +164,19 @@ export default {
       })
     },
     getMenus() {
-      menus().then((response) => {
-        const {
-          data: { code, data }
-        } = response
-        if (code === 200) {
-          this.menus = data
-        }
-      })
+      if (this.$store.state.menus.length === 0) {
+        menus().then((response) => {
+          const {
+            data: { code, data }
+          } = response
+          if (code === 200) {
+            this.menus = data
+            this.$store.commit('initMenus', data)
+          }
+        })
+      } else {
+        this.menus = this.$store.state.menus
+      }
     }
   }
 }
