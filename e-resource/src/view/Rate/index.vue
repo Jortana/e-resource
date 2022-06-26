@@ -5,7 +5,25 @@
       <h1>人气排行</h1>
       <div class="rate-container">
         <div class="card">
-          <h2>热门资源</h2>
+          <div class="title-container">
+            <h2>热门资源</h2>
+            <el-select
+              v-show="subjectReady"
+              v-model="hotCurSubject"
+              size="mini"
+              class="subject-select"
+              @change="getHot"
+            >
+              <el-option
+                v-for="subject in $store.state.subjects"
+                :key="subject.ID"
+                :label="subject.name"
+                :value="subject.ID"
+                :size="'mini'"
+              ></el-option>
+            </el-select>
+          </div>
+
           <div class="list-container">
             <resource-list
               :resourceList="hotResources.slice(0, 13)"
@@ -15,7 +33,24 @@
           </div>
         </div>
         <div class="card">
-          <h2>最新资源</h2>
+          <div class="title-container">
+            <h2>最新资源</h2>
+            <el-select
+              v-show="subjectReady"
+              v-model="newCurSubject"
+              size="mini"
+              class="subject-select"
+              @change="getNew"
+            >
+              <el-option
+                v-for="subject in $store.state.subjects"
+                :key="subject.ID"
+                :label="subject.name"
+                :value="subject.ID"
+                :size="'mini'"
+              ></el-option>
+            </el-select>
+          </div>
           <div class="list-container">
             <resource-list
               :resourceList="newResources.slice(0, 13)"
@@ -25,7 +60,24 @@
           </div>
         </div>
         <div class="card">
-          <h2>最多下载</h2>
+          <div class="title-container">
+            <h2>最多下载</h2>
+            <el-select
+              v-show="subjectReady"
+              v-model="downloadCurSubject"
+              size="mini"
+              class="subject-select"
+              @change="getDownload"
+            >
+              <el-option
+                v-for="subject in $store.state.subjects"
+                :key="subject.ID"
+                :label="subject.name"
+                :value="subject.ID"
+                :size="'mini'"
+              ></el-option>
+            </el-select>
+          </div>
           <div class="list-container">
             <resource-list
               :resourceList="downloadResources.slice(0, 13)"
@@ -48,6 +100,7 @@ import {
   downloadResourceMore
   // userRecommendResourceMore
 } from '@/api/recommend'
+import { getSubjects } from '@/api/menu'
 
 export default {
   name: 'Rate',
@@ -60,7 +113,12 @@ export default {
       hotResources: [],
       newResources: [],
       downloadResources: [],
-      userRecommendResources: []
+      userRecommendResources: [],
+      subjectReady: false,
+      hotCurSubject: '',
+      newCurSubject: '',
+      downloadCurSubject: '',
+      subjects: []
     }
   },
   created() {
@@ -68,7 +126,13 @@ export default {
   },
   methods: {
     initData() {
-      hotResourceMore().then((response) => {
+      this.getHot()
+      this.getNew()
+      this.getDownload()
+      this.getSubjects()
+    },
+    getHot() {
+      hotResourceMore(this.hotCurSubject).then((response) => {
         const { code, data } = response.data
         if (code === 200) {
           this.hotResources = data
@@ -76,7 +140,9 @@ export default {
           this.$message.warning('服务器错误，请稍后刷新重试')
         }
       })
-      newResourceMore().then((response) => {
+    },
+    getNew() {
+      newResourceMore(this.newCurSubject).then((response) => {
         const { code, data } = response.data
         if (code === 200) {
           this.newResources = data
@@ -84,7 +150,9 @@ export default {
           this.$message.warning('服务器错误，请稍后刷新重试')
         }
       })
-      downloadResourceMore().then((response) => {
+    },
+    getDownload() {
+      downloadResourceMore(this.downloadCurSubject).then((response) => {
         const { code, data } = response.data
         if (code === 200) {
           this.downloadResources = data
@@ -92,6 +160,20 @@ export default {
           this.$message.warning('服务器错误，请稍后刷新重试')
         }
       })
+    },
+    getSubjects() {
+      if (this.$store.state.subjects.length === 0) {
+        getSubjects().then((response) => {
+          const { code, data } = response.data
+          if (code === 200) {
+            this.$store.commit('initSubjects', data)
+            this.subjects = data
+            this.subjectReady = true
+          }
+        })
+      } else {
+        this.subjectReady = true
+      }
     }
   }
 }
@@ -134,8 +216,18 @@ export default {
 
 .card h2 {
   font-size: 1.5rem;
+}
+
+.card .title-container {
   padding: 0.8rem;
+  display: flex;
+  align-items: center;
   border-bottom: solid 1px #a5a3a3;
+  justify-content: space-between;
+}
+
+.card .title-container .subject-select {
+  width: 80px;
 }
 
 .list-container {

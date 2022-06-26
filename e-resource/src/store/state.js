@@ -8,5 +8,7 @@ export default {
       ? {}
       : JSON.parse(window.localStorage.getItem('cart' || '[]')),
   // 知识图谱路径
-  graphHistory: []
+  graphHistory: [],
+  // 学科表
+  subjects: []
 }

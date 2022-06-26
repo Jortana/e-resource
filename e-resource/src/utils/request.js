@@ -8,8 +8,8 @@ axios.defaults.withCredentials = true
 const service = axios.create({
   // 公共接口
   // baseURL: process.env.BASE_API,
-  // baseURL: 'http://127.0.0.1:9000/e-resource/api', //
-  baseURL: 'http://202.102.89.244:9000/e-resource/api',
+  baseURL: 'http://127.0.0.1:9000/e-resource/api', //
+  // baseURL: 'http://202.102.89.244:9000/e-resource/api',
   // 超时时间 单位是ms，这里设置了5s的超时时间
   // timeout: 3 * 1000,
   // timeout: 10 * 1000,

@@ -64,5 +64,13 @@ export default {
    */
   clearHistorty(state) {
     state.graphHistory = []
+  },
+  /**
+   * 初始化学科列表
+   * @param state
+   * @param {Array} subjects
+   */
+  initSubjects(state, subjects) {
+    state.subjects = [{ ID: '', name: '全部' }, ...subjects]
   }
 }

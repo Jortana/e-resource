@@ -14,6 +14,7 @@
             <!-- 找到的实体和资源信息 -->
             <div class="resource-content-container common-shadow">
               <div class="resource">
+                <div></div>
                 <div>
                   <!-- 这里的v-for的数组实际上是只有一个元素的，后端问题，之前的想法和现在不一样，我发现这个问题的时候已经写了很多了，改起来太麻烦了，懒得改了 -->
                   <div>
@@ -92,13 +93,18 @@
           </div>
           <div>
             <!-- 知识图谱 -->
-            <history
-              v-if="!isGrade"
-              class="history-container common-shadow"
-              @changeNode="changeNode"
-            />
-            <div v-if="!isGrade" class="graph common-shadow">
-              <k-g-chart ref="chart" :entities="entities.entities"></k-g-chart>
+            <div class="test">
+              <history
+                v-if="!isGrade"
+                class="history-container common-shadow"
+                @changeNode="changeNode"
+              />
+              <div v-if="!isGrade" class="graph common-shadow">
+                <k-g-chart
+                  ref="chart"
+                  :entities="entities.entities"
+                ></k-g-chart>
+              </div>
             </div>
 
             <!-- 推荐资源 -->

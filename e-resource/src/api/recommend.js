@@ -63,24 +63,36 @@ export const carousel = () => {
  * 获取热门资源 条数多的版本
  * @returns {AxiosPromise}
  */
-export const hotResourceMore = () => {
-  return http.get(`${baseURL}/public/queryMoreHot`)
+export const hotResourceMore = (subject = '') => {
+  if (subject === '') {
+    return http.get(`${baseURL}/public/queryMoreHot`)
+  } else {
+    return http.get(`${baseURL}/public/queryMoreHot?subject=${subject}`)
+  }
 }
 
 /**
  * 获取最新资源 条数多的版本
  * @returns {AxiosPromise}
  */
-export const newResourceMore = () => {
-  return http.get(`${baseURL}/public/queryMoreTime`)
+export const newResourceMore = (subject = '') => {
+  if (subject === '') {
+    return http.get(`${baseURL}/public/queryMoreTime`)
+  } else {
+    return http.get(`${baseURL}/public/queryMoreTime?subject=${subject}`)
+  }
 }
 
 /**
  * 获取下载量排行 条数多的版本
  * @returns {AxiosPromise}
  */
-export const downloadResourceMore = () => {
-  return http.get(`${baseURL}/public/queryMoreDownload`)
+export const downloadResourceMore = (subject = '') => {
+  if (subject === '') {
+    return http.get(`${baseURL}/public/queryMoreDownload`)
+  } else {
+    return http.get(`${baseURL}/public/queryMoreDownload?subject=${subject}`)
+  }
 }
 
 /**
