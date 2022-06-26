@@ -204,10 +204,8 @@ export default {
         type: this.$route.query.type === undefined ? 0 : this.$route.query.type,
         content: this.$route.query.q,
         sort: this.$route.query.sort === undefined ? 0 : this.$route.query.sort,
-        period:
-          this.$route.query.sort === undefined ? 0 : this.$route.query.period,
-        subject:
-          this.$route.query.sort === undefined ? 0 : this.$route.query.subject
+        period: 0,
+        subject: 0
       },
       pageInfo: {
         page: this.$route.query.page === undefined ? 1 : this.$route.query.page,
@@ -279,14 +277,17 @@ export default {
     query: {
       handler(newQuery, oldQuery) {
         this.resetResource()
-        this.getMenus()
         this.searchInfo.type = newQuery.type === undefined ? '0' : newQuery.type
         this.searchInfo.sort = newQuery.sort === undefined ? 0 : newQuery.sort
         this.searchInfo.content = newQuery.q === undefined ? 0 : newQuery.q
         // this.searchInfo.period =
-        //   newQuery.period === undefined ? 0 : Number(newQuery.period)
+        //   this.$route.query.period === undefined
+        //     ? 0
+        //     : Number(this.$route.query.period)
         // this.searchInfo.subject =
-        //   newQuery.subject === undefined ? 0 : Number(newQuery.subject)
+        //   this.$route.query.subject === undefined
+        //     ? 0
+        //     : Number(this.$route.query.subject)
         this.pageInfo.page = newQuery.page === undefined ? 1 : newQuery.page
         // console.log(this.searchInfo)
 
@@ -330,8 +331,20 @@ export default {
             }
           }
         }
+        // 这一段放在这里就不会有学科 id 跳出来，只是会有所有学科这几个字跳出来，稍微正常一点
+        this.searchInfo.period =
+          this.$route.query.period === undefined
+            ? 0
+            : Number(this.$route.query.period)
+        this.searchInfo.subject =
+          this.$route.query.subject === undefined
+            ? 0
+            : Number(this.$route.query.subject)
       }
     }
+  },
+  created() {
+    this.getMenus()
   },
   mounted() {},
   methods: {

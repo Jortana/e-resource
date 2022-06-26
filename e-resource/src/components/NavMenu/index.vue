@@ -68,7 +68,7 @@
         >
           <div v-for="(menuObj, index) in menus" :key="index">
             <div
-              v-for="classification in menuObj['classification']"
+              v-for="(classification, periodIndex) in menuObj['classification']"
               :key="classification.ID"
               class="menu-row"
             >
@@ -76,7 +76,15 @@
               <div class="link-container">
                 <!-- 每一个可选项 -->
                 <div v-for="menu in classification.menu" :key="menu.menuID">
-                  <a class="link" href="">{{ menu.menuName }}</a>
+                  <router-link
+                    :to="
+                      `search?q=${classification.name}&period=${periodIndex +
+                      2}&subject=${menu.menuID}`
+                    "
+                    class="link"
+                  >
+                    {{ menu.menuName }}
+                  </router-link>
                 </div>
               </div>
             </div>
