@@ -49,4 +49,18 @@ public class TypeService {
         resObject.put("classification", resArray);
         return resObject;
     }
+
+    public Result getSubject() {
+        List<Map> periodList = typeMapper.simpleSubject();
+        JSONArray resArray = new JSONArray();
+        for (Map period:periodList){
+            JSONObject periodOb = new JSONObject();
+            String periodID = Integer.toString((Integer) period.get("subject_id"));
+            String periodName = (String) period.get("subject_name");
+            periodOb.put("ID", Integer.parseInt(periodID));
+            periodOb.put("name", periodName);
+            resArray.add(periodOb);
+        }
+        return ResultFactory.buildSuccessResult("success",resArray);
+    }
 }

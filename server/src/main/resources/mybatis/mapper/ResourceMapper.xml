@@ -83,10 +83,18 @@
     </select>
 
     <select id="queryMoreTime" resultType="resource">
-        select id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type from t_resource order by updateTime desc limit 20
+        select id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type
+        from t_resource
+        <if test="subject!=0">where `subject` =#{subject}</if>
+        order by updateTime desc
+        limit 20
     </select>
     <select id="queryMoreHot" resultType="resource">
-        SELECT id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type FROM t_resource ORDER BY browse DESC LIMIT 20
+        SELECT id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type
+        FROM t_resource
+        <if test="subject!=0">where `subject` =#{subject}</if>
+        order by download desc
+        limit 20
     </select>
 
     <!-- 查文档url -->
@@ -204,6 +212,7 @@
     <select id="queryDownload" resultType="cn.edu.njnu.pojo.Resource">
         select id, resource_name, download, collection, `period`, grade, browse, `subject`, updateTime, file_type
         from t_resource
+        <if test="subject!=0">where `subject` =#{subject}</if>
         order by download desc
         limit 20
     </select>

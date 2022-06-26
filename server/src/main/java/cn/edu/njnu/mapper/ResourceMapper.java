@@ -30,11 +30,11 @@ public interface ResourceMapper {
 
     //更新下载次数和获取下载次数排行
     int updateDownload(int resourceID);
-    ArrayList<Resource> queryDownload();
+    ArrayList<Resource> queryDownload(@Param("subject")int subject);
 
-    ArrayList<Resource> queryMoreHot();
+    ArrayList<Resource> queryMoreHot(@Param("subject")int subject);
     //根据条件查询资源
-    ArrayList<Resource> queryMoreTime();
+    ArrayList<Resource> queryMoreTime(@Param("subject")int subject);
 
     Map queryDocument(int id);
     Map queryBvideo(int id);

@@ -18,4 +18,9 @@ public class TypeController extends BaseController {
     public Result classification(){
         return typeService.classification();
     }
+
+    @GetMapping("/v1.0/public/subject")
+    public Result getSubject(){
+        return typeService.getSubject();
+    }
 }

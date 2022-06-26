@@ -68,18 +68,18 @@ public class ResourceController extends BaseController {
     }
 
     @GetMapping("/v1.0/public/queryMoreHot")
-    public Result queryHotNew(){
-        return resourceService.queryMoreHot();
+    public Result queryHotNew(@RequestParam Map<String, Object> subjectMap){
+        return resourceService.queryMoreHot(subjectMap);
     }
 
     @GetMapping("/v1.0/public/queryMoreTime")
-    public Result queryTimeNew(){
-        return resourceService.queryMoreTime();
+    public Result queryTimeNew(@RequestParam Map<String, Object> subjectMap){
+        return resourceService.queryMoreTime(subjectMap);
     }
 
     @GetMapping("/v1.0/public/queryMoreDownload")
-    public Result queryDownload(){
-        return resourceService.queryDownload();
+    public Result queryDownload(@RequestParam Map<String, Object> subjectMap){
+        return resourceService.queryDownload(subjectMap);
     }
 
     @GetMapping("/v1.0/public/queryBoutique")

@@ -12,6 +12,7 @@ import org.neo4j.driver.v1.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import sun.net.www.content.image.png;
 
 import java.util.*;
@@ -382,8 +383,9 @@ public class ResourceService {
         return ResultFactory.buildSuccessResult("查询成功",resArray);
     }
 
-    public Result queryMoreHot(){
-        ArrayList<Resource> resourceList = resourceMapper.queryMoreHot();
+    public Result queryMoreHot(Map<String, Object> subjectMap){
+        int subject = Integer.parseInt((String)subjectMap.getOrDefault("subject", "0"));
+        ArrayList<Resource> resourceList = resourceMapper.queryMoreHot(subject);
         JSONArray resArray = new JSONArray();
         for (Resource resource:resourceList){
             resArray.add(resource);
@@ -391,8 +393,9 @@ public class ResourceService {
         return ResultFactory.buildSuccessResult("查询成功",resArray);
     }
 
-    public Result queryMoreTime(){
-        ArrayList<Resource> resourceList = resourceMapper.queryMoreTime();
+    public Result queryMoreTime(Map<String, Object> subjectMap){
+        int subject = Integer.parseInt((String)subjectMap.getOrDefault("subject", "0"));
+        ArrayList<Resource> resourceList = resourceMapper.queryMoreTime(subject);
         JSONArray resArray = new JSONArray();
         for (Resource resource:resourceList){
             resArray.add(resource);
@@ -457,8 +460,9 @@ public class ResourceService {
         return ResultFactory.buildSuccessResult("查询成功", resObject);
     }
 
-    public Result queryDownload() {
-        ArrayList<Resource> resourceList = resourceMapper.queryDownload();
+    public Result queryDownload(Map<String, Object> subjectMap) {
+        int subject = Integer.parseInt((String)subjectMap.getOrDefault("subject", "0"));
+        ArrayList<Resource> resourceList = resourceMapper.queryDownload(subject);
         JSONArray resArray = new JSONArray();
         for (Resource resource:resourceList){
             resArray.add(resource);
