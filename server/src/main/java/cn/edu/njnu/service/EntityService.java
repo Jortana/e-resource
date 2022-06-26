@@ -336,7 +336,7 @@ public class EntityService {
             return resourceService.getResourcesByPeriodSubject(subject, period, sort, type, page, perPage);
         }
         if (keyword.equals("小学") || keyword.equals("初中") || keyword.equals("高中")){
-            return resourceService.getResourcesByGrade(keyword, sort, type, page, perPage);
+            return resourceService.getResourcesByGrade(subject, keyword, sort, type, page, perPage);
         }
         //根据用户输入与资源名进行匹配
         ArrayList<Resource> resourceNameList =
