@@ -247,6 +247,7 @@ public class DownloadService {
 
             }
         }
+        session.close();
         return text;
     }
     public static void createWord(String path, String fileName) {

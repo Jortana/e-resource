@@ -9,4 +9,9 @@
     <select id="subject" resultType="map">
         select subject_id, subject_name from t_subject where `period` like concat('%',#{period},'%')
     </select>
+    <select id="simpleSubject" resultType="java.util.Map">
+        select subject_id, subject_name
+        from t_subject
+        where subject_id in (13,14,16,17,18,12,20,21)
+    </select>
 </mapper>

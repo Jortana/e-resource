@@ -12,6 +12,7 @@ import org.neo4j.driver.v1.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import sun.net.www.content.image.png;
 
 import java.util.*;
@@ -382,8 +383,9 @@ public class ResourceService {
         return ResultFactory.buildSuccessResult("查询成功",resArray);
     }
 
-    public Result queryMoreHot(){
-        ArrayList<Resource> resourceList = resourceMapper.queryMoreHot();
+    public Result queryMoreHot(Map<String, Object> subjectMap){
+        int subject = Integer.parseInt((String)subjectMap.getOrDefault("subject", "0"));
+        ArrayList<Resource> resourceList = resourceMapper.queryMoreHot(subject);
         JSONArray resArray = new JSONArray();
         for (Resource resource:resourceList){
             resArray.add(resource);
@@ -391,8 +393,9 @@ public class ResourceService {
         return ResultFactory.buildSuccessResult("查询成功",resArray);
     }
 
-    public Result queryMoreTime(){
-        ArrayList<Resource> resourceList = resourceMapper.queryMoreTime();
+    public Result queryMoreTime(Map<String, Object> subjectMap){
+        int subject = Integer.parseInt((String)subjectMap.getOrDefault("subject", "0"));
+        ArrayList<Resource> resourceList = resourceMapper.queryMoreTime(subject);
         JSONArray resArray = new JSONArray();
         for (Resource resource:resourceList){
             resArray.add(resource);
@@ -457,8 +460,9 @@ public class ResourceService {
         return ResultFactory.buildSuccessResult("查询成功", resObject);
     }
 
-    public Result queryDownload() {
-        ArrayList<Resource> resourceList = resourceMapper.queryDownload();
+    public Result queryDownload(Map<String, Object> subjectMap) {
+        int subject = Integer.parseInt((String)subjectMap.getOrDefault("subject", "0"));
+        ArrayList<Resource> resourceList = resourceMapper.queryDownload(subject);
         JSONArray resArray = new JSONArray();
         for (Resource resource:resourceList){
             resArray.add(resource);
@@ -468,49 +472,55 @@ public class ResourceService {
 
     public Result queryBoutique(String grade) {
         JSONArray jsonArray = new JSONArray();
+        int[] arr;
         if ("小学".equals(grade)){
-            int[] arr = new int[]{
+            arr = new int[]{
                     91606, 75526, 96108, 70343, 70329
             };
-            for (int i : arr) {
-                JSONObject object = new JSONObject();
-                object.put("id", i);
-                object.put("cover", "/cover/" + i + ".png ");
-                object.put("resourceName", resourceMapper.queryResourceByID(i).getResourceName());
-                jsonArray.add(object);
-            }
         }else if ("初中".equals(grade)){
-            int[] arr = new int[]{
-                    56167, 56767, 56754, 56749, 84395
+            arr = new int[]{
+                    56167, 56767, 56754, 56749, 84395, 56697, 58769
             };
-            for (int i : arr) {
-                JSONObject object = new JSONObject();
-                object.put("id", i);
-                object.put("cover", "/cover/" + i + ".png ");
-                object.put("resourceName", resourceMapper.queryResourceByID(i).getResourceName());
-                jsonArray.add(object);
-            }
         }else if ("高中".equals(grade)){
-            int[] arr = new int[]{
-                    61358, 56599, 70518, 99682, 70499};
-            for (int i : arr) {
-                JSONObject object = new JSONObject();
-                object.put("id", i);
-                object.put("cover", "/cover/" + i + ".png ");
-                object.put("resourceName", resourceMapper.queryResourceByID(i).getResourceName());
-                jsonArray.add(object);
-            }
+            arr = new int[]{
+                    61358, 56599, 70518, 99682, 70499, 66566, 86097};
         }else {
-            int[] arr = new int[]{
+            arr = new int[]{
                     61358, 62541, 68816, 60945, 56577, 69872, 71626, 87761, 87651, 83914};
-            for (int i : arr) {
-                JSONObject object = new JSONObject();
-                object.put("id", i);
-                object.put("cover", "/cover/" + i + ".png ");
-                object.put("resourceName", resourceMapper.queryResourceByID(i).getResourceName());
-                jsonArray.add(object);
-            }
+        }
+        for (int i : arr) {
+            JSONObject object = new JSONObject();
+            object.put("id", i);
+            object.put("cover", "/cover/" + i + ".png ");
+            object.put("resourceName", resourceMapper.queryResourceByID(i).getResourceName());
+            object.put("fileType", "ppt");
+            jsonArray.add(object);
         }
         return ResultFactory.buildSuccessResult("success", jsonArray);
+    }
+
+    public Result getResourcesByPeriodSubject(int subject, int period, int sort, int type, int page, int perPage) {
+        List<Resource> resourceArrayList;
+        int total;
+        resourceArrayList =
+                    resourceMapper.queryByPeriodSubject(period, subject, sort, type, (page-1)*perPage, perPage);
+        total = resourceMapper.countPeriodSubject(period, subject);
+
+        JSONObject resObject = new JSONObject();
+        resObject.put("total", total);
+        int pages = total/perPage;
+        if (total%perPage!=0){
+            pages++;
+        }
+        resObject.put("pages", pages);
+        JSONObject resources = new JSONObject();
+        resources.put("resources", resourceArrayList);
+        resources.put("entityName", new String());
+        resources.put("goalAndKey", new JSONArray());
+        resources.put("properties", new JSONObject());
+        JSONArray entityArray = new JSONArray();
+        entityArray.add(resources);
+        resObject.put("resources", entityArray);
+        return ResultFactory.buildSuccessResult("查询成功", resObject);
     }
 }

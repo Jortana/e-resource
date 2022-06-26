@@ -11,4 +11,6 @@ import java.util.Map;
 public interface TypeMapper {
     List<Map> period();
     List<Map> subject(String period);
+
+    List<Map> simpleSubject();
 }
