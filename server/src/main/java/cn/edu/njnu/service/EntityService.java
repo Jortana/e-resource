@@ -203,7 +203,7 @@ public class EntityService {
 
     //获取该关键词的知识点列表 2022-5-26
     public Map filterAndQuery(String keyword){
-        System.out.println(keyword);
+//        System.out.println(keyword);
         Map<String, Object> entityAndResources = new HashMap<>();
         JSONArray entityArray = new JSONArray();
         Set<Integer> resourceIdSet = new LinkedHashSet<>(); //保证id有序且不重复
@@ -305,7 +305,7 @@ public class EntityService {
     }
 
     public Result queryEntity(Map<String, Object> keywordMap) {
-
+        System.out.println(keywordMap);
         String browser = (String) keywordMap.get("browser");
         String OS = (String) keywordMap.get("OS");
         String ipAddress = (String) keywordMap.get("ipAddress");
@@ -338,6 +338,7 @@ public class EntityService {
         if (keyword.equals("小学") || keyword.equals("初中") || keyword.equals("高中")){
             return resourceService.getResourcesByGrade(subject, keyword, sort, type, page, perPage);
         }
+
         //根据用户输入与资源名进行匹配
         ArrayList<Resource> resourceNameList =
                 (ArrayList<Resource>) redisTemplate.opsForValue().get("content_"+sort+"_"+type+"_"+content);
@@ -346,7 +347,11 @@ public class EntityService {
             redisTemplate.opsForValue().set("content_"+sort+"_"+type+"_"+content, resourceNameList);
             redisTemplate.expire(content+"_"+sort+"_"+type, 100, TimeUnit.MINUTES);
         }
-        Set<Integer> idSet = new HashSet<>();
+        Set<Integer> idSet = new HashSet<Integer>(){
+            {
+                add(-1);//避免空列表导致报错
+            }
+        };
         //获取资源id，避免之后在neo4j中重复查找
         for (Resource single:resourceNameList){
             int id = single.getId();
@@ -432,7 +437,7 @@ public class EntityService {
         List<Resource> resourceArrayList = resourceMapper.queryResourceByIDList(idSet,sort,type);
         List<Resource> resourceArrayListTmp = new ArrayList<>();
         for (Resource resource:resourceArrayList){
-            System.out.println(resource.getPeriod());
+//            System.out.println(resource.getPeriod());
             if (period!=0 && !resource.getPeriod().equals(String.valueOf(period))){
                 continue;
             }

@@ -48,8 +48,8 @@ export const related = (resourceID) => {
  * @param {Number} resourceID
  */
 export const download = (resourceID) => {
-  return http.download(`http://202.102.89.244:9000/e-resource/api${baseURL}/public/downloadnew?resourceID=${resourceID}`)
-  // return http.download(`http://127.0.0.1:9000/e-resource/api${baseURL}/public/downloadnew?resourceID=${resourceID}`)
+  // return http.download(`http://202.102.89.244:9000/e-resource/api${baseURL}/public/downloadnew?resourceID=${resourceID}`)
+  return http.download(`http://127.0.0.1:9000/e-resource/api${baseURL}/public/downloadnew?resourceID=${resourceID}`)
 }
 
 /**

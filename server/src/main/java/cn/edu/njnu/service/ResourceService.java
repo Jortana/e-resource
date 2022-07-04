@@ -92,7 +92,7 @@ public class ResourceService {
         Session session = driver.session();
         int resourceID = Integer.parseInt ((String) ResourceIDMap.get("resourceID"));
         Resource queryResource = (Resource) redisTemplate.opsForValue().get("resource_"+resourceID);
-        if (queryResource != null){
+        if (queryResource != null&&queryResource.getViewUrl()!=null){
             queryResource.setRate(resourceRate(queryResource.getId()));
             if (queryResource.getEntityList()==null){
                 StatementResult conceptNode = session.run( "MATCH (m:resource)-[r]->(a:concept) where m.id = {id} " +
