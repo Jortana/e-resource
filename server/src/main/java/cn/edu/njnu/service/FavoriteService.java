@@ -113,7 +113,7 @@ public class FavoriteService {
 
     //根据收藏夹ID获取资源
     public Result folderResource(String folderID){
-        Session session = driver.session();
+        Session session = driver.session();//已关
         JSONObject folder = new JSONObject();
         folder.put("resources", favoriteMapper.collection(folderID));
         ArrayList<Map> contentMap = favoriteMapper.collectionStr(folderID);

@@ -200,7 +200,7 @@ public class DownloadService {
     }
     //获取收藏的文本
     public ArrayList<String> getStr(String folderID){
-        Session session = driver.session();
+        Session session = driver.session();//已关
         ArrayList<String> text = new ArrayList<>();
         ArrayList<Map> contentList = favoriteMapper.collectionStr(folderID);
         text.add("知识点");

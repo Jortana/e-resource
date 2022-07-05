@@ -86,7 +86,7 @@ public class UserService {
         user.setAvatar("default-avatar.jpg");
         addUser(user);
         int userID = userMapper.queryUserByName(user.getUsername()).getUserId();
-        Session session = driver.session();
+        Session session = driver.session();//已关
         session.run( "create (n:user { id: {userID} }) return n;",
                 parameters( "userID", userID) );
         session.close();
@@ -138,7 +138,7 @@ public class UserService {
                 continue;
             }
             JSONArray resourceList = new JSONArray();
-            Session session = driver.session();
+            Session session = driver.session();//已关
             for (Map singleRecord : record){
                 int resourceID = (int) singleRecord.get("resource_id");
                 resourceList.add(resourceID);
@@ -232,7 +232,7 @@ public class UserService {
                 }
             }
         }
-        Session session = driver.session();
+        Session session = driver.session();//已关
         session.run("MATCH (a:user)-[r]->(b:user) delete r ");
         session.run("MATCH (a:user) delete a ");
         for (int k = 0; k <userItemLength.size() ; k++) { //1-3
@@ -306,7 +306,7 @@ public class UserService {
         ArrayList<Integer> userList = new ArrayList<Integer>();
         userList.add(recommendUserID);
         JSONArray resArray = new JSONArray();
-        Session session = driver.session();
+        Session session = driver.session();//已关
         StatementResult userResult = session.run( "MATCH (n:user)-[r]->(m:user) where n.id={userID} and r.weight <> 0 " +
                         "RETURN m.id as ID order by r.weight desc LIMIT 10",
                 parameters( "userID", recommendUserID) );
@@ -546,7 +546,7 @@ public class UserService {
                 }
             }
             ArrayList<Map<String, Object>> resourceRecord = recordMapper.resourceRecord(recommendUserId);
-            Session session = driver.session();
+            Session session = driver.session();//已关
             for (Map<String, Object> resourceMap : resourceRecord){
                 int resourceID = (int) resourceMap.get("resource_id");
                 StatementResult resourceResult = session.run( "MATCH (n:resource)-[r]->(m:resource) where n.id = {resourceID} and r.weight > 0.5" +
@@ -602,7 +602,7 @@ public class UserService {
         ArrayList<Integer> userList = new ArrayList<Integer>();
         userList.add(recommendUserID);
         JSONArray resArray = new JSONArray();
-        Session session = driver.session();
+        Session session = driver.session();//已关
         StatementResult userResult = session.run( "MATCH (n:user)-[r]->(m:user) where n.id={userID} and r.weight <> 0 " +
                         "RETURN m.id as ID order by r.weight desc LIMIT 10",
                 parameters( "userID", recommendUserID) );
@@ -842,7 +842,7 @@ public class UserService {
                 }
             }
             ArrayList<Map<String, Object>> resourceRecord = recordMapper.resourceRecord(recommendUserId);
-            Session session = driver.session();
+            Session session = driver.session();//已关
             for (Map<String, Object> resourceMap : resourceRecord){
                 int resourceID = (int) resourceMap.get("resource_id");
                 StatementResult resourceResult = session.run( "MATCH (n:resource)-[r]->(m:resource) where n.id = {resourceID} and r.weight > 0.5" +

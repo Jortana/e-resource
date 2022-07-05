@@ -18,7 +18,7 @@
             <el-carousel-item v-for="item in carouselData" :key="item.id">
               <div class="carousel-container">
                 <el-image
-                  :src="'http://127.0.0.1:8082' + item.cover"
+                  :src="'http://202.102.89.244:8082' + item.cover"
                   fit="cover"
                   @click="viewResource(item.id)"
                 ></el-image>
@@ -71,7 +71,7 @@
               class="resource-info"
             >
               <el-image
-                :src="'http://127.0.0.1:8082' + resource.cover"
+                :src="'http://202.102.89.244:8082' + resource.cover"
                 fit="cover"
                 class="thumbnail"
                 lazy
