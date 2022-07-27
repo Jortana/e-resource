@@ -61,6 +61,12 @@
                 placeholder="确认密码"
               ></el-input>
             </el-form-item>
+            <el-form-item prop="school">
+              <el-input
+                v-model="signUp.school"
+                placeholder="学校"
+              ></el-input>
+            </el-form-item>
             <el-form-item prop="grade">
               <el-select
                 v-model="signUp.grade"
@@ -139,6 +145,7 @@ export default {
       signUp: {
         username: '',
         email: '',
+        school: '',
         grade: '',
         password: '',
         confirmPassword: ''
@@ -176,6 +183,7 @@ export default {
         ],
         password: [{ validator: validatePassword, trigger: 'blur' }],
         confirmPassword: [{ validator: validatePassword2, trigger: 'blur' }],
+        school: [{ required: true, message: '请填写学校', trigger: 'blur' }],
         grade: [{ required: true, message: '请选择年级', trigger: 'change' }]
       }
     }
@@ -192,6 +200,7 @@ export default {
           register({
             username: signUp.username,
             email: signUp.email,
+            school: signUp.school,
             password: signUp.password,
             period: Number(signUp.grade[0]),
             grade: Number(signUp.grade[1])
