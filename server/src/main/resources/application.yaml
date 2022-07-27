@@ -5,8 +5,8 @@ server:
 # 配置文件
 spring:
   profiles:
-    active: dev
-#    active: prod
+#    active: dev
+    active: prod
 
 # 整合mybatis
 mybatis:

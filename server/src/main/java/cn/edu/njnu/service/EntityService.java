@@ -92,7 +92,7 @@ public class EntityService {
     public Result getRelatedEntity(Map<String, Object> keywordMap){
         String[] keyword = ((String) keywordMap.get("keyword")).split("#");
 //        Driver driver = createDrive();
-        Session session = driver.session();
+        Session session = driver.session();//已关
         JSONArray resArray = new JSONArray();
         if (keyword.length > 1) {
             String Cypher = "with [";
@@ -203,7 +203,7 @@ public class EntityService {
 
     //获取该关键词的知识点列表 2022-5-26
     public Map filterAndQuery(String keyword){
-        System.out.println(keyword);
+//        System.out.println(keyword);
         Map<String, Object> entityAndResources = new HashMap<>();
         JSONArray entityArray = new JSONArray();
         Set<Integer> resourceIdSet = new LinkedHashSet<>(); //保证id有序且不重复
@@ -255,11 +255,12 @@ public class EntityService {
 
     //获取知识点的属性、重难点 2022-5-26
     public JSONObject getEntityProperties(String entityName){
-        Session session = driver.session();
+        Session session = driver.session();//已关
         StatementResult result = session.run(
                 "MATCH (a:concept) where a.name = {name} " +
                         "RETURN properties(a) AS props",
                 parameters( "name", entityName) );
+        session.close();
         JSONObject entityProperties = new JSONObject();
         if (result.hasNext()){
             Record record = result.next();
@@ -282,7 +283,7 @@ public class EntityService {
 
     //从图谱中获取与知识点节点直接相连的资源节点id
     public Set<Integer> getResourceIdByEntity(String entity){
-        Session session = driver.session();
+        Session session = driver.session();//已关
         Set<Integer> idSet = new LinkedHashSet<>();
         //根据用户输入在neo4j中查找对应节点
         StatementResult result = session.run(
@@ -305,7 +306,7 @@ public class EntityService {
     }
 
     public Result queryEntity(Map<String, Object> keywordMap) {
-
+        System.out.println(keywordMap);
         String browser = (String) keywordMap.get("browser");
         String OS = (String) keywordMap.get("OS");
         String ipAddress = (String) keywordMap.get("ipAddress");
@@ -338,6 +339,7 @@ public class EntityService {
         if (keyword.equals("小学") || keyword.equals("初中") || keyword.equals("高中")){
             return resourceService.getResourcesByGrade(subject, keyword, sort, type, page, perPage);
         }
+
         //根据用户输入与资源名进行匹配
         ArrayList<Resource> resourceNameList =
                 (ArrayList<Resource>) redisTemplate.opsForValue().get("content_"+sort+"_"+type+"_"+content);
@@ -346,7 +348,11 @@ public class EntityService {
             redisTemplate.opsForValue().set("content_"+sort+"_"+type+"_"+content, resourceNameList);
             redisTemplate.expire(content+"_"+sort+"_"+type, 100, TimeUnit.MINUTES);
         }
-        Set<Integer> idSet = new HashSet<>();
+        Set<Integer> idSet = new HashSet<Integer>(){
+            {
+                add(-1);//避免空列表导致报错
+            }
+        };
         //获取资源id，避免之后在neo4j中重复查找
         for (Resource single:resourceNameList){
             int id = single.getId();
@@ -354,7 +360,7 @@ public class EntityService {
             idSet.add(id);
         }
         //与neo4j建立连接
-        Session session = driver.session();
+        Session session = driver.session();//已关
         //根据用户输入在neo4j中查找对应节点
         StatementResult result = session.run( "MATCH (a:concept) where a.name = {name} " +
                         "RETURN properties(a) AS props",
@@ -386,6 +392,7 @@ public class EntityService {
                     }
                 }
                 if (record == null && resourceNameList.isEmpty()){  //分词后也未查到，并且根据资源名也没查到，则返回未查找到的结果
+                    session.close();
                     return ResultFactory.buildFailResult("未查询到相关知识点");
                 }
             }
@@ -432,7 +439,7 @@ public class EntityService {
         List<Resource> resourceArrayList = resourceMapper.queryResourceByIDList(idSet,sort,type);
         List<Resource> resourceArrayListTmp = new ArrayList<>();
         for (Resource resource:resourceArrayList){
-            System.out.println(resource.getPeriod());
+//            System.out.println(resource.getPeriod());
             if (period!=0 && !resource.getPeriod().equals(String.valueOf(period))){
                 continue;
             }
@@ -512,7 +519,7 @@ public class EntityService {
     public JSONArray goalAndKey(String entityName){
         JSONArray resArray = new JSONArray();
 //        Driver driver = createDrive();
-        Session session = driver.session();
+        Session session = driver.session();//已关
         StatementResult goalNode = session.run( "MATCH (m:GoalAndKey)-[r]->(a:concept) where a.name = {name} " +
                         "RETURN m.key, m.goal, m.id",
                 parameters( "name", entityName) );
@@ -536,7 +543,7 @@ public class EntityService {
     //根据用户浏览记录生成图谱
     public Result userGraph(int userID){
 //        Driver driver = createDrive();
-        Session session = driver.session();
+        Session session = driver.session();//已关
         HashMap<String, Integer> entityNumMap = new HashMap<>();
         HashMap<String, Integer> subjectMap = new HashMap<>();
         ArrayList<Map<String, Object>> recordMap = recordMapper.record(userID);

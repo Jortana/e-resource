@@ -89,10 +89,10 @@ public class ResourceService {
 
     //根据ID查资源属性
     public Result queryResource(Map<String, Object> ResourceIDMap){
-        Session session = driver.session();
+        Session session = driver.session();//已关
         int resourceID = Integer.parseInt ((String) ResourceIDMap.get("resourceID"));
         Resource queryResource = (Resource) redisTemplate.opsForValue().get("resource_"+resourceID);
-        if (queryResource != null){
+        if (queryResource != null&&queryResource.getViewUrl()!=null){
             queryResource.setRate(resourceRate(queryResource.getId()));
             if (queryResource.getEntityList()==null){
                 StatementResult conceptNode = session.run( "MATCH (m:resource)-[r]->(a:concept) where m.id = {id} " +
@@ -146,7 +146,7 @@ public class ResourceService {
 
     //更新资源相似度
     public Result updateRelatedResource(){
-        Session session = driver.session();
+        Session session = driver.session();//已关
         System.out.println("in");
         StatementResult result = session.run(
                 "MATCH (n:resource) RETURN id(n) AS ID order by ID",
@@ -187,7 +187,7 @@ public class ResourceService {
     }
 
     public static void resxsd(HashMap<Integer, HashMap<String, Integer>> keywords, HashMap<Integer, HashMap<String, Integer>> keywords1) {  //读取与Resid在同一个知识点下面的资源以及与该知识点直接相连的知识下的资源
-        Session session = driver.session();
+        Session session = driver.session();//已关
         for (Map.Entry<Integer, HashMap<String, Integer>> entry : keywords1.entrySet()) {//遍历每一个相关资源
             int num=entry.getKey();
             int nu=0;
@@ -228,7 +228,7 @@ public class ResourceService {
     }
 
     public Result recommendResource(Map<String, Object> IDMap){
-        Session session = driver.session();
+        Session session = driver.session();//已关
         int userID = Integer.parseInt((String) IDMap.get("userId"));
         if (IDMap.containsKey("entity")){
             String entity = (String) IDMap.get("entity");
@@ -244,6 +244,7 @@ public class ResourceService {
                 resArray.add(resource);
                 resNum++;
             }
+            session.close();
             if (resNum!=0){
                 return ResultFactory.buildSuccessResult("查询成功",resArray);
             }
@@ -333,7 +334,7 @@ public class ResourceService {
     //获取相似资源
     public Result relatedResource(Map<String, Object> resourceIDMap){
         int resourceID = Integer.parseInt((String)resourceIDMap.get("resourceID"));
-        Session session = driver.session();
+        Session session = driver.session();//已关
         StatementResult resourceNode = session.run( "MATCH (n:resource)-[r]->(m:resource) where r.weight>0.5 and n.id = {resourceID} " +
                         "RETURN m.id AS id order by r.weight desc",
                 parameters("resourceID", resourceID) );

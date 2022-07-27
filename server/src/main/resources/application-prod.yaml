@@ -6,7 +6,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   redis:
     password: fzsj@GIS
-    database: 3
+    database: 4
     host: 202.102.89.244
 
 # 跨域

@@ -26,7 +26,7 @@
         from t_resource
         <where>
             <trim suffixOverrides="and">
-                <if test="content!=null">resource_name like concat('%',#{content},'%') and </if>
+                <if test="content!=null">MATCH(content) AGAINST(concat('*',#{content},'*') IN BOOLEAN MODE) and </if>
                 <if test="type!=0">resource_type =#{type} and </if>
             </trim>
         </where>
