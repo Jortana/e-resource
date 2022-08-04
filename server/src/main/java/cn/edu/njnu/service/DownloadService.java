@@ -15,6 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import cn.edu.njnu.mapper.FavoriteMapper;
 import cn.edu.njnu.mapper.ResourceMapper;
+import cn.edu.njnu.mapper.UserMapper;
+import cn.edu.njnu.mapper.XApiMapper;
 import cn.edu.njnu.pojo.Resource;
 import cn.edu.njnu.pojo.Result;
 import cn.edu.njnu.pojo.ResultFactory;
@@ -24,6 +26,7 @@ import org.apache.poi.util.IOUtils;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
+import org.apache.shiro.SecurityUtils;
 import org.neo4j.driver.v1.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,6 +41,10 @@ public class DownloadService {
     private ResourceMapper resourceMapper;
     @Autowired
     private FavoriteMapper favoriteMapper;
+    @Autowired
+    private XApiMapper xApiMapper;
+    @Autowired
+    private UserMapper userMapper;
     @Value("${file.root}")
     private String root;
 
@@ -51,12 +58,19 @@ public class DownloadService {
     private  final static String rootPath = "http://s4.z100.vip:7716";
 
     public void getFile(@RequestParam Map<String, Object> resourceIDMap, final HttpServletResponse response, final HttpServletRequest request) throws IOException {
+        long browseDate = System.currentTimeMillis();
+        String username = (String) SecurityUtils.getSubject().getPrincipal();
+        int userId = userMapper.queryUserByName(username).getUserId();
+
         //读取路径下面的文件
         int resourceID = Integer.parseInt((String)resourceIDMap.get("resourceID"));
         System.out.println(resourceID);
         int res = resourceMapper.updateDownload(resourceID);
         System.out.println(res);
         Resource resource = resourceMapper.queryResourceByID(resourceID);
+        int resourceType = resource.getResourceType();
+        int objectType = resourceType==1?2:3;
+        xApiMapper.addDownload(userId,resourceID,objectType,browseDate);
         String resultWordPath="";
         String url="";
         if (resource.getTable()==2){
@@ -109,16 +123,24 @@ public class DownloadService {
     public Result downloadFile(@RequestParam Map<String, Object> resourceIDMap, final HttpServletResponse response, final HttpServletRequest request){
         int resourceID = Integer.parseInt((String)resourceIDMap.get("resourceID"));
         Resource resource = resourceMapper.queryResourceByID(resourceID);
+        long browseDate = System.currentTimeMillis();
+        String username = (String) SecurityUtils.getSubject().getPrincipal();
+        int userId = userMapper.queryUserByName(username).getUserId();
+        int resourceType = resource.getResourceType();
+        int objectType = resourceType==1?2:3;
+
         if (resource.getTable()==2){
             String url = resourceMapper.queryUrl(resourceID);
             String resultWordPath = encode(rootPath + url);
             resourceMapper.updateDownload(resourceID);
+            xApiMapper.addDownload(userId,resourceID,objectType,browseDate);
             return ResultFactory.buildSuccessResult("下载成功",resultWordPath);
         }
         else if (resource.getTable()==3){
             String url = resourceMapper.queryVideoUrl(resourceID);
             String resultWordPath = encode(rootPath + url);
             resourceMapper.updateDownload(resourceID);
+            xApiMapper.addDownload(userId,resourceID,objectType,browseDate);
             return ResultFactory.buildSuccessResult("下载成功",resultWordPath);
         }
         else{
