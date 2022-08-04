@@ -9,6 +9,24 @@ public class Comment {
     double rate;
     String avatar;
     String username;
+    long browseDate;
+    int resourceType;
+
+    public int getResourceType() {
+        return resourceType;
+    }
+
+    public void setResourceType(int resourceType) {
+        this.resourceType = resourceType;
+    }
+
+    public long getBrowseDate() {
+        return browseDate;
+    }
+
+    public void setBrowseDate(long browseDate) {
+        this.browseDate = browseDate;
+    }
 
     public Comment() {
     }

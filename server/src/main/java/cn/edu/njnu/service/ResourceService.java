@@ -2,12 +2,14 @@ package cn.edu.njnu.service;
 
 import cn.edu.njnu.mapper.ResourceMapper;
 import cn.edu.njnu.mapper.UserMapper;
+import cn.edu.njnu.mapper.XApiMapper;
 import cn.edu.njnu.pojo.Resource;
 import cn.edu.njnu.pojo.Result;
 import cn.edu.njnu.pojo.ResultFactory;
 import cn.edu.njnu.pojo.User;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.shiro.SecurityUtils;
 import org.neo4j.driver.v1.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -31,6 +33,9 @@ public class ResourceService {
 
     @Autowired
     private RedisTemplate redisTemplate;
+
+    @Autowired
+    private XApiMapper xApiMapper;
 
     private static Driver driver;
 
@@ -89,8 +94,19 @@ public class ResourceService {
 
     //根据ID查资源属性
     public Result queryResource(Map<String, Object> ResourceIDMap){
+        System.out.println(ResourceIDMap);
         Session session = driver.session();//已关
         int resourceID = Integer.parseInt ((String) ResourceIDMap.get("resourceID"));
+        String username = (String) SecurityUtils.getSubject().getPrincipal();
+        int from = Integer.parseInt((String)ResourceIDMap.getOrDefault("from", "0"));
+        long browseDate = System.currentTimeMillis();
+        if (username!=null){
+            int userId = userMapper.queryUserByName(username).getUserId();
+            System.out.println(resourceMapper.queryResourceByID(resourceID));
+            int resourceType = resourceMapper.queryResourceByID(resourceID).getResourceType();
+            int objectType = resourceType==1?2:3;
+            xApiMapper.addBrowse(userId,resourceID, objectType,browseDate,from);
+        }
         Resource queryResource = (Resource) redisTemplate.opsForValue().get("resource_"+resourceID);
         if (queryResource != null&&queryResource.getViewUrl()!=null){
             queryResource.setRate(resourceRate(queryResource.getId()));

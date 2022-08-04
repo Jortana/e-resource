@@ -4,6 +4,7 @@ import cn.edu.njnu.filter.RedisBloomFilter;
 import cn.edu.njnu.mapper.RecordMapper;
 import cn.edu.njnu.mapper.ResourceMapper;
 import cn.edu.njnu.mapper.UserMapper;
+import cn.edu.njnu.mapper.XApiMapper;
 import cn.edu.njnu.pojo.Resource;
 import cn.edu.njnu.pojo.Result;
 import cn.edu.njnu.pojo.ResultFactory;
@@ -35,6 +36,9 @@ import java.util.jar.JarEntry;
 
 @Service
 public class EntityService {
+    @Autowired
+    private XApiMapper xApiMapper;
+
     @Autowired
     private ResourceMapper resourceMapper;
 
@@ -316,9 +320,13 @@ public class EntityService {
         String content = keyword;
         //向数据库添加用户浏览记录
         String username = (String) SecurityUtils.getSubject().getPrincipal();
+        int from = Integer.parseInt((String)keywordMap.getOrDefault("from", 0));
         if (username!=null){
             int userId = userMapper.queryUserByName(username).getUserId();
             recordMapper.addEntityRecord(userId,browseDate,keyword, browser, OS, ipAddress);
+            if (from==1){
+                xApiMapper.addClickEntity(userId,browseDate,keyword);
+            }
         }
         int period = Integer.parseInt((String) keywordMap.getOrDefault("period", "0"));
         int subject = Integer.parseInt((String) keywordMap.getOrDefault("subject", "0"));

@@ -1,12 +1,16 @@
 package cn.edu.njnu.service;
 
 import cn.edu.njnu.mapper.FavoriteMapper;
+import cn.edu.njnu.mapper.ResourceMapper;
+import cn.edu.njnu.mapper.UserMapper;
+import cn.edu.njnu.mapper.XApiMapper;
 import cn.edu.njnu.pojo.Folder;
 import cn.edu.njnu.pojo.Result;
 import cn.edu.njnu.pojo.ResultFactory;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.shiro.SecurityUtils;
+import org.checkerframework.checker.units.qual.A;
 import org.neo4j.driver.v1.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +23,15 @@ import static org.neo4j.driver.v1.Values.parameters;
 public class FavoriteService {
     @Autowired
     private FavoriteMapper favoriteMapper;
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private XApiMapper xApiMapper;
+
+    @Autowired
+    private ResourceMapper resourceMapper;
 
     private static Driver driver;
 
@@ -220,6 +233,9 @@ public class FavoriteService {
         String username = (String) SecurityUtils.getSubject().getPrincipal();
         int flag = 0; //判断是否添加成功
         if (IDMap.containsKey("resourceID")){
+            int userId = userMapper.queryUserByName(username).getUserId();
+            long browseDate = System.currentTimeMillis();
+
             int resourceID = (int) IDMap.get("resourceID");
             for (String folderID:delFolderIDList){
                 favoriteMapper.delFolderResource(resourceID, folderID);
@@ -232,6 +248,10 @@ public class FavoriteService {
                 if (favoriteMapper.yiyou(condition).size() == 0){
                     flag = 1;
                     favoriteMapper.putInFolder(resourceID, folderID, date);
+                    String folderName = favoriteMapper.queryFolder(folderID).getName();
+                    int resourceType = resourceMapper.queryResourceByID(resourceID).getResourceType();
+                    int objectType = resourceType==1?2:3;
+                    xApiMapper.addFavorite(userId,resourceID,folderName,objectType,browseDate);
                 }
             }
         }
@@ -290,7 +310,7 @@ public class FavoriteService {
             return ResultFactory.buildFailResult("添加失败");
         }
     }
-    //资源加入资源包
+    //删除资源包资源
     public Result delSingle(Map<String, Object> IDMap){
         String folderID = (String) IDMap.get("folderID");
         int flag = 0; //判断是否添加成功
